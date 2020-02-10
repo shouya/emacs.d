@@ -1,7 +1,6 @@
 #+TITLE: My Emacs Preferences
 #+latex_compiler: xelatex
-#+latex_header: \usepackage{libertine}
-#+latex_header: \usepackage{unicode-math}
+#+latex_header: \usemintedstyle{emacs}
 
 * Setup personal information
 
@@ -144,6 +143,12 @@ I use =minions= to contract all minor modes into a single one.
 #+END_SRC
 
 * Editing
+** Use =org-mode= as default mode
+
+#+BEGIN_SRC emacs-lisp
+(setq major-mode 'org-mode)
+#+END_SRC
+
 ** Indentation
 
 Use tab-width of 2 by default.
@@ -156,6 +161,13 @@ Always indent with spaces.
 
 #+BEGIN_SRC emacs-lisp
 (setq indent-tabs-mode nil)
+#+END_SRC
+
+Some modes set this variable automatically, so we need to override them.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode-hook
+          (lambda () (setq indent-tabs-mode nil)))
 #+END_SRC
 
 ** Cursor movement
@@ -261,6 +273,115 @@ Use =company-mode= for completion.
   :bind ("M-/" . company-completion-common)
   :config (add-hook 'after-init-hook 'global-company-mode))
 #+END_SRC
+
+** Combo key hints
+
+I use =which-key= package to display a screen of hints when a key prefix is
+entered.
+
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+  :config
+  (add-hook 'after-init-hook 'which-key-mode)
+  (setq which-key-idel-delay 1.5))
+#+END_SRC
+
+** Expand region (~C-=~, ~C--~, ~v =~, ~v -~)
+
+#+BEGIN_SRC emacs-lisp
+(use-package expand-region
+  :bind (("C-=" . er/expand-region)
+         ("C--" . er/contract-region)
+
+         :map evil-visual-state-map
+         ("=" . er/expand-region)
+         ("-" . er/contract-region)))
+#+END_SRC
+
+** Writing prose
+*** Markdown format support
+
+- Associate =.md= files with the mode
+- Use =pandoc= to render the result (please ensure it
+
+#+BEGIN_SRC emacs-lisp
+(use-package markdown-mode
+  :commands gfm-mode
+  :mode (("\.md$" . gfm-mode))
+  :config
+  (when (executable-find "pando")
+    (setq markdown-command "pandoc --standalone --mathjax --from=markdown")))
+#+END_SRC
+
+*** Define the list of text mode hooks
+
+#+BEGIN_SRC emacs-lisp
+(setq text-mode-hooks
+      '(text-mode-hook
+        markdown-mode-hook
+        gfm-mode-hook
+        org-mode-hook))
+#+END_SRC
+
+*** Enable spell checking
+
+Remember to install =ispell= command line tool.
+
+#+BEGIN_SRC emacs-lisp
+(use-package flyspell
+  :config
+  (setq ispell-personal-dictionary
+        (expand-file-name "user-dict" user-emacs-directory))
+
+  ;; enable flyspell-mode for text modes
+  (dolist (hook text-mode-hooks) (add-hook hook 'flyspell-mode))
+
+  ;; sort correction by likelihood
+  (setq flyspell-sort-corrections t)
+
+  :bind
+  (:map evil-normal-state-map
+        ("M->" . flyspell-correct-word-before-point)))
+#+END_SRC
+
+*** Enable auto wrap
+
+#+BEGIN_SRC emacs-lisp
+(dolist (hook text-mode-hooks)
+  (add-hook hook 'auto-fill-mode))
+#+END_SRC
+
+*** Linting prose
+
+We first define =proselint= checker for flycheck. Remember to install =proselint=
+cli tool.
+
+#+BEGIN_SRC emacs-lisp
+(use-package flycheck)
+
+(when (executable-find "proselint")
+  (flycheck-define-checker proselint
+    "A linter for prose."
+    :command ("proselint" source-inplace)
+    :error-patterns
+    ((warning line-start (file-name) ":" line ":" column ": "
+              (id (one-or-more (not (any " "))))
+              (message (one-or-more not-newline)
+                       (zero-or-more "\n" (any " ") (one-or-more not-newline)))
+              line-end))
+    :modes (text-mode markdown-mode gfm-mode org-mode))
+
+  (add-to-list 'flycheck-checkers 'proselint))
+#+END_SRC
+
+
+Next we enable proselint for text modes.
+
+#+BEGIN_SRC emacs-lisp
+(dolist (hook text-mode-hooks)
+  (add-hook hook #'flycheck-mode))
+#+END_SRC
+
 
 * Programming
 ** Syntax checking
@@ -369,6 +490,8 @@ Colorize function names/arguments in info doucmentations.
   :config (add-hook 'Info-selection-hook 'info-colors-fontify-mode))
 #+END_SRC
 
+*** Elixir
+
 * Org mode
 ** Visual Tweaks
 *** Fancy bullet headers
@@ -449,9 +572,8 @@ Next we disable =org-mode='s built-in hard indentation:
 #+BEGIN_SRC emacs-lisp
 (setq org-adapt-indentation nil)
 #+END_SRC
-** Export
+** Export to various formats
 *** Disable unused export options
-
 *** Export to PDF
 
 Enable exporting to Beamer.
@@ -463,16 +585,26 @@ Enable exporting to Beamer.
 Enhance unicode characters support.
 
 #+BEGIN_SRC emacs-lisp
-(setq org-latex-inputenc-alist '(("utf8" . "utf8x"))(setq org-latex-default-packages-alist (cons '("mathletters" "ucs" nil) org-latex-default-packages-alist)))
-(add-to-list 'org-latex-packages-alist '("" "libertine"))
-(add-to-list 'org-latex-packages-alist '("" "unicode-math"))
+(setq org-latex-inputenc-alist '(("utf8" . "utf8x")))
+;; (setq org-latex-default-packages-alist (cons '("mathletters" "ucs" nil) org-latex-default-packages-alist))
+;; (add-to-list 'org-latex-packages-alist '("" "libertine"))
+;; (add-to-list 'org-latex-packages-alist '("" "unicode-math"))
 #+END_SRC
 
-Enable syntax highlighting.
+Enable syntax highlighting. In a fresh install please make sure =pygements= is
+installed (~pip install Pygments~).
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 (setq org-latex-listings 'minted)
+(setq org-latex-minted-options
+      '(("frame" "lines")
+        ("fontsize" "\\scriptsize")
+        ("linenos" "")))
+(setq org-latex-pdf-process
+      '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 #+END_SRC
 
 *** Export to MediaWiki

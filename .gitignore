@@ -53,3 +53,4 @@ site-lisp/package/
 /transient
 /preferences.*
 !/preferences.org
+/_minted-preferences
