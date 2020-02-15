@@ -6,7 +6,7 @@
 
 #+BEGIN_SRC emacs-lisp
 (setq-default user-full-name "Shou Ya"
-      user-email-address "shou@lain.li")
+              user-email-address "shou@lain.li")
 #+END_SRC
 
 * Boot up
@@ -507,8 +507,8 @@ Ref: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configuration.
   ;; Ignore order for searching words on files
   ;; Use regular matching for others
   (setq-default ivy-re-builders-alist
-      '((read-file-name-internal . ivy--regex-ignore-order)
-        (t . ivy--regex-plus))))
+                '((read-file-name-internal . ivy--regex-ignore-order)
+                  (t . ivy--regex-plus))))
 #+END_SRC
 
 *** Sort the result produced by =ivy=
@@ -565,10 +565,10 @@ entered.
 
 #+BEGIN_SRC emacs-lisp
 (setq-default text-mode-hooks
-      '(text-mode-hook
-        markdown-mode-hook
-        gfm-mode-hook
-        org-mode-hook))
+              '(text-mode-hook
+                markdown-mode-hook
+                gfm-mode-hook
+                org-mode-hook))
 #+END_SRC
 
 *** Enable spell checking
@@ -580,7 +580,7 @@ Remember to install =ispell= command line tool.
   :ensure-system-package ispell
   :config
   (setq-default ispell-personal-dictionary
-        (expand-file-name "user-dict" user-emacs-directory))
+                (expand-file-name "user-dict" user-emacs-directory))
 
   ;; enable flyspell-mode for text modes
   (dolist (hook text-mode-hooks) (add-hook hook 'flyspell-mode))
@@ -661,9 +661,9 @@ Next we enable proselint for text modes.
 
   ;; apply certain rules when generating file name
   (setq-default deft-file-naming-rules
-        '((noslash . "-")
-          (nospace . "-")
-          (case-fn . downcase)))
+                '((noslash . "-")
+                  (nospace . "-")
+                  (case-fn . downcase)))
 
   ;; switch to insert state when starting deft
   (add-hook 'deft-mode 'evil-insert-state))
@@ -686,7 +686,7 @@ Also show a ruler at column 80.
 
 #+BEGIN_SRC emacs-lisp
 (setq-default whitespace-line-column 80
-      whitespace-style '(face lines-tail))
+              whitespace-style '(face lines-tail))
 (add-hook 'prog-mode-hook 'whitespace-mode)
 #+END_SRC
 
@@ -837,9 +837,9 @@ Use =company-mode= for auto completion.
 
   :config
   (setq-default company-idle-delay 0.4 ; Show completion immediately
-        company-show-numbers t ; Number the candidates (use M-1, M-2 etc to
-                                        ; select completions)
-        company-tooltip-align-annotations t)
+                company-show-numbers t ; Number the candidates (use M-1, M-2 etc
+                                       ; to select completions)
+                company-tooltip-align-annotations t)
 
   (define-key company-active-map (kbd "TAB")
     (lambda () (interactive) (company-complete-common-or-cycle +1)))
@@ -847,18 +847,18 @@ Use =company-mode= for auto completion.
     (lambda () (interactive) (company-complete-common-or-cycle -1)))
 
   (setq-default company-backends
-        '(company-bbdb
-          company-eclim
-          company-semantic
-          company-clang
-          company-xcode
-          company-cmake
-          company-capf
-          company-files
-          (company-dabbrev-code company-gtags company-etags company-keywords)
-          company-oddmuse
-          company-dabbrev
-          )))
+                '(company-bbdb
+                  company-eclim
+                  company-semantic
+                  company-clang
+                  company-xcode
+                  company-cmake
+                  company-capf
+                  company-files
+                  (company-dabbrev-code company-gtags company-etags company-keywords)
+                  company-oddmuse
+                  company-dabbrev
+                  )))
 #+END_SRC
 
 *** TabNine
@@ -887,40 +887,40 @@ Use =TabNine= for general text completion. Please remember to run
   (setq-default company-box-icons-unknown 'fa_question_circle)
 
   (setq-default company-box-icons-elisp
-        '((fa_tag :face font-lock-function-name-face) ;; Function
-          (fa_cog :face font-lock-variable-name-face) ;; Variable
-          (fa_cube :face font-lock-constant-face) ;; Feature
-          (md_color_lens :face font-lock-doc-face))) ;; Face
+                '((fa_tag :face font-lock-function-name-face) ;; Function
+                  (fa_cog :face font-lock-variable-name-face) ;; Variable
+                  (fa_cube :face font-lock-constant-face)     ;; Feature
+                  (md_color_lens :face font-lock-doc-face)))  ;; Face
 
   (setq-default company-box-icons-yasnippet 'fa_bookmark)
 
   (setq-default company-box-icons-lsp
-        '((1 . fa_text_height) ;; Text
-          (2 . (fa_tags :face font-lock-function-name-face)) ;; Method
-          (3 . (fa_tag :face font-lock-function-name-face)) ;; Function
-          (4 . (fa_tag :face font-lock-function-name-face)) ;; Constructor
-          (5 . (fa_cog :foreground "#FF9800")) ;; Field
-          (6 . (fa_cog :foreground "#FF9800")) ;; Variable
-          (7 . (fa_cube :foreground "#7C4DFF")) ;; Class
-          (8 . (fa_cube :foreground "#7C4DFF")) ;; Interface
-          (9 . (fa_cube :foreground "#7C4DFF")) ;; Module
-          (10 . (fa_cog :foreground "#FF9800")) ;; Property
-          (11 . md_settings_system_daydream) ;; Unit
-          (12 . (fa_cog :foreground "#FF9800")) ;; Value
-          (13 . (md_storage :face font-lock-type-face)) ;; Enum
-          (14 . (md_closed_caption :foreground "#009688")) ;; Keyword
-          (15 . md_closed_caption) ;; Snippet
-          (16 . (md_color_lens :face font-lock-doc-face)) ;; Color
-          (17 . fa_file_text_o) ;; File
-          (18 . md_refresh) ;; Reference
-          (19 . fa_folder_open) ;; Folder
-          (20 . (md_closed_caption :foreground "#009688")) ;; EnumMember
-          (21 . (fa_square :face font-lock-constant-face)) ;; Constant
-          (22 . (fa_cube :face font-lock-type-face)) ;; Struct
-          (23 . fa_calendar) ;; Event
-          (24 . fa_square_o) ;; Operator
-          (25 . fa_arrows)) ;; TypeParameter
-        ))
+                '((1 . fa_text_height)                               ;; Text
+                  (2 . (fa_tags :face font-lock-function-name-face)) ;; Method
+                  (3 . (fa_tag :face font-lock-function-name-face))  ;; Function
+                  (4 . (fa_tag :face font-lock-function-name-face)) ;; Constructor
+                  (5 . (fa_cog :foreground "#FF9800"))              ;; Field
+                  (6 . (fa_cog :foreground "#FF9800"))              ;; Variable
+                  (7 . (fa_cube :foreground "#7C4DFF"))             ;; Class
+                  (8 . (fa_cube :foreground "#7C4DFF"))             ;; Interface
+                  (9 . (fa_cube :foreground "#7C4DFF"))             ;; Module
+                  (10 . (fa_cog :foreground "#FF9800"))             ;; Property
+                  (11 . md_settings_system_daydream)                ;; Unit
+                  (12 . (fa_cog :foreground "#FF9800"))             ;; Value
+                  (13 . (md_storage :face font-lock-type-face))     ;; Enum
+                  (14 . (md_closed_caption :foreground "#009688"))  ;; Keyword
+                  (15 . md_closed_caption)                          ;; Snippet
+                  (16 . (md_color_lens :face font-lock-doc-face))   ;; Color
+                  (17 . fa_file_text_o)                             ;; File
+                  (18 . md_refresh)                                 ;; Reference
+                  (19 . fa_folder_open)                             ;; Folder
+                  (20 . (md_closed_caption :foreground "#009688")) ;; EnumMember
+                  (21 . (fa_square :face font-lock-constant-face)) ;; Constant
+                  (22 . (fa_cube :face font-lock-type-face))       ;; Struct
+                  (23 . fa_calendar)                               ;; Event
+                  (24 . fa_square_o)                               ;; Operator
+                  (25 . fa_arrows)) ;; TypeParameter
+                ))
 #+END_SRC
 *** Company completion pop up on CLI
 
@@ -940,7 +940,7 @@ Use =TabNine= for general text completion. Please remember to run
 
   :config
   (setq-default yas-snippet-dirs
-        `(,(expand-file-name "snippets" user-emacs-directory)))
+                `(,(expand-file-name "snippets" user-emacs-directory)))
   (yas-reload-all))
 #+END_SRC
 
@@ -957,22 +957,22 @@ We use =eglot= for LSP support. Since eglot has a hook that turns off any compan
 *** Configure company backends
 
 #+BEGIN_SRC emacs-lisp
-  (setq-default default-company-backends
-	'(company-files
-	  company-tabnine
-	  company-capf))
-  (setq-default company-backend-alist
-	'((prog-mode-hook (company-files
-			   company-tabnine))
-	  (emacs-lisp-mode-hook (company-files company-elisp))))
+(setq-default default-company-backends
+              '(company-files
+                company-tabnine
+                company-capf))
+(setq-default company-backend-alist
+              '((prog-mode-hook (company-files
+                                 company-tabnine))
+                (emacs-lisp-mode-hook (company-files company-elisp))))
 
-  (setq-default company-backends default-company-backends)
-  (dolist (pair company-backend-alist)
-    (let ((hook (car pair))
-	  (backends (cadr pair)))
-      (add-hook hook
-		`(lambda () (interactive)
-		   (set (make-local-variable 'company-backends) ',backends)))))
+(setq-default company-backends default-company-backends)
+(dolist (pair company-backend-alist)
+  (let ((hook (car pair))
+        (backends (cadr pair)))
+    (add-hook hook
+              `(lambda () (interactive)
+                 (set (make-local-variable 'company-backends) ',backends)))))
 #+END_SRC
 
 ** Languages
@@ -1025,7 +1025,7 @@ brackets with =evil= editing.
 **** Enable above two modes for all lisp languages
 
 #+BEGIN_SRC emacs-lisp
-(setq-default lispy-mode-hooks
+(setq lispy-mode-hooks
       '(clojure-mode-hook
         emacs-lisp-mode-hook
         lisp-mode-hook
@@ -1126,8 +1126,7 @@ Reformatting JSON.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'sh-mode-hook
           (lambda ()
-            (setq-default sh-basic-offset 2
-                  sh-indentation 2)))
+            (setq-default sh-basic-offset 2 sh-indentation 2)))
 #+END_SRC
 
 * Org mode
@@ -1173,7 +1172,7 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
 
 #+BEGIN_SRC emacs-lisp
 (setq-default org-src-strip-leading-and-trailing-blank-lines t
-      org-src-preserve-indentation t)
+              org-src-preserve-indentation t)
 #+END_SRC
 
 *** Use the same window for org-src-edit
@@ -1251,13 +1250,13 @@ installed (~pip install Pygments~).
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 (setq-default org-latex-listings 'minted)
 (setq-default org-latex-minted-options
-      '(("frame" "lines")
-        ("fontsize" "\\scriptsize")
-        ("linenos" "")))
+              '(("frame" "lines")
+                ("fontsize" "\\scriptsize")
+                ("linenos" "")))
 (setq-default org-latex-pdf-process
-      '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+              '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 #+END_SRC
 
 *** Export to MediaWiki
