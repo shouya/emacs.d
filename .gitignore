@@ -54,3 +54,5 @@ site-lisp/package/
 /preferences.*
 !/preferences.org
 /_minted-preferences
+user-dict
+projectile.cache
