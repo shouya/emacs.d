@@ -161,16 +161,6 @@ Features:
     (find-file (expand-file-name "preferences.org" user-emacs-directory))))
 #+END_SRC
 
-** =C-c n= to quickly edit notes
-
-#+BEGIN_SRC emacs-lisp
-(define-key global-map
-  (kbd "C-c n")
-  (lambda ()
-    (interactive)
-    (find-file "~/notes.org")))
-#+END_SRC
-
 ** =C-x k= Kill current buffer
 
 #+BEGIN_SRC emacs-lisp
@@ -215,6 +205,12 @@ Disable visual bell because Emacs for macOS renders it poorly.
 (setq-default ring-bell-function 'ignore)
 #+END_SRC
 
+Show file name in window title.
+
+#+BEGIN_SRC emacs-lisp
+(setq frame-title-format '("%b - %m @ Emacs"))
+#+END_SRC
+
 ** Set font
 
 I use "Input" as my default font face.
@@ -229,10 +225,12 @@ I use "Input" as my default font face.
 
 ** Theme
 
+I use =sanityinc-tomorrow= theme because it's high contrast and colorful.
+
 #+BEGIN_SRC emacs-lisp
-(use-package leuven-theme
+(use-package color-theme-sanityinc-tomorrow
   :config
-  (load-theme 'leuven t))
+  (load-theme 'sanityinc-tomorrow-night t))
 #+END_SRC
 
 ** Modeline customization
@@ -334,18 +332,19 @@ bracket don't. I like it the other way around.
                      ?\} '("{ " . " }")))
 #+END_SRC
 
-** Vim key binding for Org mode
+** Org mode
 
 Use =evil= key bindings with Org agendas.
 
 #+BEGIN_SRC emacs-lisp
 (use-package evil-org
+  :after org
   :config
   (add-hook 'org-mode-hook 'evil-org-mode)
   (add-hook 'evil-org-mode-hook
             (lambda () (evil-org-set-key-theme)))
   (require 'evil-org-agenda)
-  (evil-define-key 'motion org-mode-map (kbd "TAB") 'org-cycle)
+  ; (evil-define-key 'motion org-mode-map (kbd "TAB") 'org-cycle)
   (evil-org-agenda-set-keys))
 #+END_SRC
 
@@ -1034,7 +1033,7 @@ brackets with =evil= editing.
 (dolist (hook lispy-mode-hooks)
   (add-hook hook
             (lambda ()
-              (setq-default show-paren-style 'expression)
+              (setq-default show-paren-style 'parenthesis)
               (paredit-mode)
               (rainbow-delimiters-mode))))
 #+END_SRC
@@ -1130,10 +1129,58 @@ Reformatting JSON.
 #+END_SRC
 
 * Org mode
+** Use org mode
+
+#+BEGIN_SRC emacs-lisp
+(use-package org)
+#+END_SRC
+
+** Set org directory
+
+#+BEGIN_SRC emacs-lisp
+(if (eq system-type 'darwin)
+  (setq-default org-directory "~/Documents/org")
+  (setq-default org-directory "~/org"))
+
+(defun org-file-path (filename)
+  "Return the path of file inside org-directory"
+  (expand-file-name filename org-directory))
+
+(setq-default org-default-notes-file (org-file-path "notes.org"))
+#+END_SRC
+
 ** Set =org-mode= as the default mode
 
 #+BEGIN_SRC emacs-lisp
 (setq-default initial-major-mode 'org-mode)
+#+END_SRC
+
+** Behavior tweaks
+*** Indentation settings
+
+First, we enable =org-indent-mode=:
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'org-mode-hook 'org-indent-mode)
+(setq-default org-indent-indentation-per-level 1)
+#+END_SRC
+
+Next we disable =org-mode='s built-in hard indentation:
+
+#+BEGIN_SRC emacs-lisp
+(setq-default org-adapt-indentation nil)
+#+END_SRC
+
+*** Make TAB acts like major mode in source block
+
+#+BEGIN_SRC emacs-lisp
+(setq-default org-src-tab-acts-natively t)
+#+END_SRC
+
+*** Let =<TAB>= fold current outline from anywhere in the section
+
+#+BEGIN_SRC emacs-lisp
+(setq-default org-cycle-emulate-tab 'white)
 #+END_SRC
 
 ** Visual Tweaks
@@ -1165,7 +1212,13 @@ I'd like to hide ===, =+=, =*= symbols when not necessary.
 (setq-default org-ellipsis " ⤵")
 #+END_SRC
 
-** Behavior tweaks
+*** Turn on native source fontification in org buffer
+
+#+BEGIN_SRC emacs-lisp
+(setq-default org-src-fontify-natively t)
+#+END_SRC
+
+** Source editing
 *** Do not add indentation from org-src-edit
 
 See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-two-extra-spaces-at-the-beginning-of-code-blocks-in-or][reference]].
@@ -1181,43 +1234,6 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
 (setq-default org-src-window-setup 'current-window)
 #+END_SRC
 
-*** Make TAB acts like major mode in source block
-
-#+BEGIN_SRC emacs-lisp
-(setq-default org-src-tab-acts-natively t)
-#+END_SRC
-
-*** Turn on native source fontification in org buffer
-
-#+BEGIN_SRC emacs-lisp
-(setq-default org-src-fontify-natively t)
-#+END_SRC
-
-*** Let =<TAB>= fold current outline from anywhere in the section
-
-#+BEGIN_SRC emacs-lisp
-(setq-default org-cycle-emulate-tab 'white)
-#+END_SRC
-
-*** Log down time when marking an item "DONE"
-
-#+BEGIN_SRC emacs-lisp
-(setq-default org-log-done 'time)
-#+END_SRC
-
-** Custom keystrokes
-*** In CLI rebind "<tab>"
-*** Use =C-c l= to collect links
-
-#+BEGIN_SRC emacs-lisp
-(define-key global-map (kbd "C-c l") 'org-store-link)
-#+END_SRC
-
-*** Use =C-c C-c= to save and quit =org-src-mode=
-
-#+BEGIN_SRC emacs-lisp
-(define-key org-src-mode-map (kbd "C-c C-c") 'org-edit-src-exit)
-#+END_SRC
 *** Include emacs-lisp src quickly
 
 #+BEGIN_SRC emacs-lisp
@@ -1225,7 +1241,91 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
              '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
 #+END_SRC
 
-*** Disable unused export options
+** To-do settings
+*** Log down time when marking an item "DONE"
+
+#+BEGIN_SRC emacs-lisp
+(setq-default org-log-done 'time)
+#+END_SRC
+
+** Agenda
+*** Use =C-c a= to enter agenda mode
+
+#+BEGIN_SRC emacs-lisp
+(define-key global-map (kbd "C-c a") 'org-agenda)
+#+END_SRC
+
+*** Set agenda files
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-files (list
+                        (org-file-path "agenda.org")
+                        (org-file-path "todo.org")
+                        (org-file-path "work.org")
+                        (org-file-path "diary.org")
+                        (org-file-path "to-read.org")))
+#+END_SRC
+
+*** Agenda view
+
+#+BEGIN_SRC emacs-lisp
+; (setq org-agenda-span 7)
+(setq org-agenda-start-on-weekday nil)
+#+END_SRC
+
+** Archiving
+
+#+BEGIN_SRC emacs-lisp
+(setq org-archive-location
+      (concat (org-file-path "archive.org") "::* From %s"))
+#+END_SRC
+
+** Capturing
+*** Use =C-c c= for capturing
+
+#+BEGIN_SRC emacs-lisp
+(define-key global-map (kbd "C-c c") 'org-capture)
+#+END_SRC
+
+*** Capture templates
+
+#+BEGIN_SRC emacs-lisp
+(setq org-capture-templates
+      `(
+        ;; Work
+        ("w" "(Work) To-do" entry (file+headline "todo.org" "Work")
+         "* TODO %^{Description}\n%?\nRef: %l\nAdded: %U\n")
+
+        ("p" "(Personal) To-do" entry (file+headline "todo.org" "Personal")
+         "* TODO %^{Description}\n%?\nRef: %l\nAdded: %U\n")
+
+        ;; Note
+        ("n" "Note" entry (file "notes.org")
+         "* %^{Note}\n%?\nAdded: %U\n")
+
+        ;; Reading
+        ("r" "Reading" entry (file "to-read.org")
+         "* %^{Article}\n%?\n%l\nAdded: %U\n")
+
+        ;; Diary fragments
+        ("d" "Diary" entry (file+olp+datetree "diary.org")
+         "* %U %^{Diary}\n%?\n")
+        ))
+
+(add-hook 'org-capture-mode-hook 'evil-insert-state)
+#+END_SRC
+** Exporting
+*** Export to Bootstrap (HTML)
+
+#+BEGIN_SRC emacs-lisp
+(use-package ox-twbs)
+#+END_SRC
+
+*** Export to MediaWiki
+
+#+BEGIN_SRC emacs-lisp
+(use-package ox-mediawiki)
+#+END_SRC
 *** Export to PDF
 
 Enable exporting to Beamer.
@@ -1259,25 +1359,36 @@ installed (~pip install Pygments~).
                 "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 #+END_SRC
 
-*** Export to MediaWiki
+** Custom keystrokes
+*** In CLI rebind "<tab>"
+*** =C-c n= to quickly open org files
 
 #+BEGIN_SRC emacs-lisp
-(use-package ox-mediawiki)
+(defun open-org (file)
+  (interactive "f")
+  (find-file (org-file-path file)))
+
+(defun open-org-todo () (interactive) (open-org "todo.org"))
+(defun open-org-notes () (interactive) (open-org "notes.org"))
+(defun open-org-diary () (interactive) (open-org "diary.org"))
+
+;; Open todo.org with C-c n t
+(define-prefix-command 'open-org-file)
+(define-key global-map (kbd "C-c n") 'open-org-file)
+(define-key global-map (kbd "C-c n t") 'open-org-todo)
+(define-key global-map (kbd "C-c n n") 'open-org-notes)
+(define-key global-map (kbd "C-c n d") 'open-org-diary)
 #+END_SRC
 
-** Indentation settings
-
-First, we enable =org-indent-mode=:
+*** Use =C-c l= to collect links
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'org-mode-hook 'org-indent-mode)
-;; (setq-default org-startup-indented t)
-(setq-default org-indent-indentation-per-level 1)
+(define-key global-map (kbd "C-c l") 'org-store-link)
 #+END_SRC
 
-Next we disable =org-mode='s built-in hard indentation:
+*** Use =C-c C-c= to save and quit =org-src-mode=
 
 #+BEGIN_SRC emacs-lisp
-(setq-default org-adapt-indentation nil)
+(define-key org-src-mode-map (kbd "C-c C-c") 'org-edit-src-exit)
 #+END_SRC
-** Export to various formats
+*** Disable unused export options
