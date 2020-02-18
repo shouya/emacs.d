@@ -745,6 +745,12 @@ And enable =evil-magit= for evil-style motion.
   :after magit)
 #+END_SRC
 
+*** Switch to evil insert state when entering commit message
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'git-commit-mode-hook 'evil-insert-state)
+#+END_SRC
+
 *** =GitHub= support
 
 #+BEGIN_SRC emacs-lisp
