@@ -10,6 +10,29 @@
 #+END_SRC
 
 * Boot up
+** Suppress GC at startup
+
+Doing so will boost boot-up speed. See [[https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#avoid-garbage-collection-at-startup][Avoid garbage collection at startup]].
+
+#+BEGIN_SRC emacs-lisp
+(setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
+      gc-cons-percentage 0.6)
+
+(setq shou/default-gc-threshold 16777216) ; 16mb
+
+;; reset it after load
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold shou/default-gc-threshold ; 16mb
+                  gc-cons-percentage 0.1)))
+
+;; pause gc when minibuffer is active
+(add-hook 'minibuffer-setup-hook
+          (lambda () (setq gc-cons-threshold most-positive-fixnum)))
+(add-hook 'minibuffer-exit-hook
+          (lambda () (setq gc-cons-threshold shou/default-gc-threshold)))
+#+END_SRC
+
 ** Enable packages are loadable
 
 =lisp/= stores modules I copied from [[https://github.com/purcell/emacs.d][purcell/emacs.d]].
@@ -37,14 +60,32 @@ We prepare the package repositories.
 (package-initialize)
 #+END_SRC
 
+** Configure =straight.el=
+
+=straight.el= allows loading packages directly from VC upstream, while keeping a
+lock file for specific version, some new packages depend on it.
+
+#+BEGIN_SRC emacs-lisp
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+#+END_SRC
+
 ** Configure =use-package=
 
 Ensure =use-package= is installed.
 
 #+BEGIN_SRC emacs-lisp
-(when (not (package-installed-p 'use-package))
-  (package-refresh-contents)
-  (package-install 'use-package))
+(straight-use-package 'use-package)
 #+END_SRC
 
 Make sure =use-package= install missing packages.
@@ -90,6 +131,12 @@ Allow installing required system packages automatically.
 
 #+BEGIN_SRC emacs-lisp
 (setq-default frame-resize-pixelwise t)
+#+END_SRC
+
+** Set exec path
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'exec-path "~/.asdf/shims")
 #+END_SRC
 
 * General behavior
@@ -190,7 +237,8 @@ Hide the title bar, menu bar, as well as the scroll bar.
 #+BEGIN_SRC emacs-lisp
 (tool-bar-mode 0)
 (menu-bar-mode 0)
-(scroll-bar-mode -1)
+(when (display-graphic-p)
+  (scroll-bar-mode -1))
 #+END_SRC
 
 Enable pixel-wise scrolling for mouse scroll-wheel. It looks nicer.
@@ -260,8 +308,22 @@ I use =minions= to contract all minor modes into a single one.
 (use-package diff-hl
   :config
   (add-hook 'prog-mode-hook 'turn-on-diff-hl-mode)
+  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
   (add-hook 'vc-dir-mode-hook 'turn-on-diff-hl-mode))
 #+END_SRC
+** Install all-the-icon
+
+In order for the icons to work it is very important that you install the
+Resource Fonts included in this package, they are available in the fonts
+directory. You can also install the latest fonts for this package in the
+(guessed?) based on the OS by calling the following function;
+
+=M-x all-the-icons-install-fonts=
+
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons)
+#+END_SRC
+
 * =evil-mode=
 ** Load =evil=
 Set =evil-want-keybinding= to =nil= to disable a startup warning, See ([[https://github.com/emacs-evil/evil-collection/issues/60][related
@@ -344,7 +406,7 @@ Use =evil= key bindings with Org agendas.
   (add-hook 'evil-org-mode-hook
             (lambda () (evil-org-set-key-theme)))
   (require 'evil-org-agenda)
-  ; (evil-define-key 'motion org-mode-map (kbd "TAB") 'org-cycle)
+  (evil-define-key 'motion org-mode-map (kbd "TAB") 'org-cycle)
   (evil-org-agenda-set-keys))
 #+END_SRC
 
@@ -382,8 +444,12 @@ Load Dired X that comes with Emacs.
 ** Retain the same window when browsing
 
 #+BEGIN_SRC emacs-lisp
+;; RET to find file in same window
 (evil-define-key 'normal dired-mode-map
   (kbd "RET") 'dired-find-alternate-file)
+
+;; do not show warning
+(put 'dired-find-alternate-file 'disabled nil)
 #+END_SRC
 
 ** Recursive copy and delete
@@ -424,6 +490,20 @@ So it doesn't block the main UI when copying large files.
 (use-package async
   :config
   (dired-async-mode 1))
+#+END_SRC
+
+** File tree view (=<f8>=)
+
+#+BEGIN_SRC emacs-lisp
+(use-package neotree
+  :bind ("<f8>" . neotree-toggle)
+  :custom
+  (neo-theme (if (display-graphic-p) 'icons 'arrow))
+  (neo-smart-open t "auto find current file and jump to node")
+  (neo-vc-integration '(face))
+  (projectile-switch-project-action
+   'neotree-projectile-action
+   "switch to neotree to projectile root dir"))
 #+END_SRC
 
 * Terminal
@@ -576,6 +656,7 @@ Remember to install =ispell= command line tool.
 
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell
+  :when (executable-find "ispell")
   :ensure-system-package ispell
   :config
   (setq-default ispell-personal-dictionary
@@ -637,35 +718,6 @@ Next we enable proselint for text modes.
   :config
   (dolist (hook text-mode-hooks)
     (add-hook hook 'auto-correct-mode)))
-#+END_SRC
-
-** Taking note with =deft=
-
-=deft.el= provides National Velocity-like note browsing and editing experience.
-
-#+BEGIN_SRC emacs-lisp
-(use-package deft
-  :bind ("C-M-n" . deft)
-  :commands (deft)
-  :config
-  (setq-default deft-extension '("org" "txt" "md" "markdown"))
-  (setq-default deft-directory "~/notes/")
-
-  ;; search recursively
-  (setq-default deft-recursive t)
-
-  ;; use search keyword as title and file name
-  (setq-default deft-use-filename-as-title t)
-  (setq-default deft-use-filter-string-for-filename t)
-
-  ;; apply certain rules when generating file name
-  (setq-default deft-file-naming-rules
-                '((noslash . "-")
-                  (nospace . "-")
-                  (case-fn . downcase)))
-
-  ;; switch to insert state when starting deft
-  (add-hook 'deft-mode 'evil-insert-state))
 #+END_SRC
 
 ** Key cast mode
@@ -791,15 +843,18 @@ Use =magit='s project =forge= for GitHub interaction.
 
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
+  :custom
+  (projectile-completion-system 'ivy)
+  (projectile-switch-project-action 'projectile-dired)
+  (projectile-enable-caching t)
+  (projectile-indexing-method 'native)
+  (frame-title-format '((:eval (projectile-project-name))))
+
   :config
-  (projectile-global-mode)
-  (setq-default projectile-completion-system 'ivy)
-  (setq-default projectile-switch-project-action 'projectile-dired)
-  (setq-default projectile-enable-caching t)
-  (setq-default projectile-project-search-path '("~/projects/"))
-  (setq-default frame-title-format '((:eval (projectile-project-name))))
+  (projectile-global-mode +1)
+
   :bind
-  (:map evil-normal-state-map
+  (:map projectile-mode-map
         ("M-p" . projectile-command-map)))
 #+END_SRC
 
@@ -873,10 +928,22 @@ Use =TabNine= for general text completion. Please remember to run
 
 #+BEGIN_SRC emacs-lisp
 (use-package company-tabnine
+  :when (eq system-type 'darwin)
   :after company
   :config
-  ; (nconc company-backends '(company-tabnine))
   (add-to-list 'company-backends 'company-tabnine))
+
+(defun shou/tabnine-off ()
+  "turn off TabNine for this buffer"
+  (interactive)
+  (let ((backends (delete 'tabnine company-backends))
+        (set (make-local-variable 'company-backends) backends))))
+
+(defun shou/tabnine-on ()
+  "turn on TabNine for this buffer"
+  (interactive)
+  (let ((backends (add-to-list 'company-backends 'tabnine))
+        (set (make-local-variable 'company-backends) backends))))
 #+END_SRC
 
 *** Company completion icons on GUI
@@ -964,11 +1031,11 @@ We use =eglot= for LSP support. Since eglot has a hook that turns off any compan
 #+BEGIN_SRC emacs-lisp
 (setq-default default-company-backends
               '(company-files
-                company-tabnine
-                company-capf))
+                company-capf
+                company-tabnine))
 (setq-default company-backend-alist
               '((prog-mode-hook (company-files
-                                 company-tabnine))
+                                 company-capf))
                 (emacs-lisp-mode-hook (company-files company-elisp))))
 
 (setq-default company-backends default-company-backends)
@@ -1133,6 +1200,15 @@ Reformatting JSON.
           (lambda ()
             (setq-default sh-basic-offset 2 sh-indentation 2)))
 #+END_SRC
+*** Dockerfile
+
+#+BEGIN_SRC emacs-lisp
+(use-package dockerfile-mode
+  :mode "Dockerfile")
+(use-package docker-compose-mode
+  :mode "docker-compose\\.ya?ml"
+  :mode "fig\\.ya?ml")
+#+END_SRC
 
 * Org mode
 ** Use org mode
@@ -1186,7 +1262,29 @@ Next we disable =org-mode='s built-in hard indentation:
 *** Let =<TAB>= fold current outline from anywhere in the section
 
 #+BEGIN_SRC emacs-lisp
-(setq-default org-cycle-emulate-tab 'white)
+; (setq-default org-cycle-emulate-tab 'white)
+#+END_SRC
+
+*** Avoid inadvertent text edit in invisible area
+
+Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#avoid-inadvertent-text-edit-in-invisible-area][Org-mode Hidden Gems - 01 Document Structure]].
+
+#+BEGIN_SRC emacs-lisp
+(setq org-catch-invisible-edits 'show-and-error)
+#+END_SRC
+
+*** Hide empty lines between subtrees in collapsed view
+
+Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#in-collapsed-view-hide-empty-lines-between-subtrees][Org-mode Hidden Gems - 01 Document Structure]].
+
+#+BEGIN_SRC emacs-lisp
+(setq org-cycle-separator-lines 0)
+#+END_SRC
+
+*** List bullets
+
+#+BEGIN_SRC emacs-lisp
+(setq org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
 #+END_SRC
 
 ** Visual Tweaks
@@ -1254,6 +1352,54 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
 (setq-default org-log-done 'time)
 #+END_SRC
 
+** Taking note with =deft=
+
+=deft.el= provides National Velocity-like note browsing and editing experience.
+
+#+BEGIN_SRC emacs-lisp
+(use-package deft
+  :bind ("C-M-n" . deft)
+  :commands (deft)
+  :custom
+  (deft-extensions '("org" "txt" "md" "markdown"))
+  (deft-directory (org-file-path "deft"))
+  (deft-default-extension "org" "use org as default format")
+  (deft-recursive t "search recursively")
+  (deft-use-filename-as-title t)
+  (deft-use-filter-string-for-filename t "instead of some generated gibberish")
+  (deft-auto-save-interval 60
+    "don't auto save as it will reformat in middle of typing")
+  (deft-file-naming-rules
+    '((noslash . "-")
+      (nospace . "-")
+      (case-fn . downcase))
+    "apply certain rules when generating file name")
+  :config
+  ;; switch to insert state when starting deft
+  (add-hook 'deft-mode 'evil-insert-state))
+#+END_SRC
+** Roam
+
+For building personal knowledge base, I like the idea of [[https://www.roamresearch.com/][Roam]], but it only have
+a web version. Fortunately someone build a replica in =org-mode=, so great that I
+don't need to leave Emacs for that.
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-roam
+  :after org
+  :hook
+  ((org-mode . org-roam-mode)
+   (after-init . org-roam--build-cache-async))
+  :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
+  :custom
+  (org-roam-directory (org-file-path "roam/"))
+  :bind
+  ("C-c r l" . org-roam)
+  ("C-c r t" . org-roam-today)
+  ("C-c r f" . org-roam-find-file)
+  ("C-c r i" . org-roam-insert)
+  ("C-c r g" . org-roam-show-graph))
+#+END_SRC
 ** Agenda
 *** Use =C-c a= to enter agenda mode
 
@@ -1337,32 +1483,23 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
 Enable exporting to Beamer.
 
 #+BEGIN_SRC emacs-lisp
+(require 'ox-latex)
 (require 'ox-beamer)
 #+END_SRC
 
 Enhance unicode characters support.
 
-#+BEGIN_SRC emacs-lisp
-(setq-default org-latex-inputenc-alist '(("utf8" . "utf8x")))
-;; (setq-default org-latex-default-packages-alist (cons '("mathletters" "ucs" nil) org-latex-default-packages-alist))
-;; (add-to-list 'org-latex-packages-alist '("" "libertine"))
-;; (add-to-list 'org-latex-packages-alist '("" "unicode-math"))
-#+END_SRC
-
 Enable syntax highlighting. In a fresh install please make sure =pygements= is
 installed (~pip install Pygments~).
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'org-latex-packages-alist '("" "minted"))
-(setq-default org-latex-listings 'minted)
-(setq-default org-latex-minted-options
-              '(("frame" "lines")
-                ("fontsize" "\\scriptsize")
-                ("linenos" "")))
-(setq-default org-latex-pdf-process
-              '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+(setq org-latex-pdf-process
+      '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+(setq org-latex-compiler "xelatex")
+(setq-default TeX-engine 'xetex)
+(setq-default TeX-PDF-mode t)
 #+END_SRC
 
 ** Custom keystrokes

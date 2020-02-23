@@ -1,0 +1,18 @@
+# -*- mode: snippet -*-
+# name: bridi
+# key: bridi
+# --
+* ${lojban sentence}
+** lo valsi
+
+- valsi :: valsi smuni
+
+** lo gerna
+
+- cmevla :: (selma'o) smuni
+
+** lo fanva
+
+#+BEGIN_QUOTE
+the translation
+#+END_QUOTE

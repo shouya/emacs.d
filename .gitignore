@@ -57,3 +57,4 @@ site-lisp/package/
 user-dict
 projectile.cache
 /bookmarks
+/straight
