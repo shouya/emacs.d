@@ -8,7 +8,6 @@
 (setq-default user-full-name "Shou Ya"
               user-email-address "shou@lain.li")
 #+END_SRC
-
 * Boot up
 ** Suppress GC at startup
 
@@ -229,6 +228,30 @@ Features:
     (insert "* Scratch\n")))
 #+END_SRC
 
+** Web browser
+
+
+I use eww as default web browser when opening web url in emacs.
+
+I also like to open the browser in a separate window instead of on the current
+one.
+
+#+BEGIN_SRC emacs-lisp
+(defun shou/eww-browse-url-in-new-buffer (url &rest ignore)
+  (interactive "sURL: ")
+  (switch-to-buffer-other-window (get-buffer-create "*eww*"))
+  (eww-browse-url url))
+
+(setq browse-url-browser-function 'shou/eww-browse-url-in-new-buffer)
+#+END_SRC
+
+=eww-readable= makes the web page more readable by hiding unnecessary content, so
+I switched to readable mode after a web page is rendered.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'eww-after-render-hook 'eww-readable)
+#+END_SRC
+
 * UI
 ** Tweak main UI
 
@@ -302,7 +325,7 @@ I use =minions= to contract all minor modes into a single one.
 (global-hl-line-mode)
 #+END_SRC
 
-** Highlight uncommited changes
+** Highlight uncommitted changes
 
 #+BEGIN_SRC emacs-lisp
 (use-package diff-hl
@@ -322,6 +345,17 @@ directory. You can also install the latest fonts for this package in the
 
 #+BEGIN_SRC emacs-lisp
 (use-package all-the-icons)
+#+END_SRC
+** Blink cursor
+
+#+BEGIN_SRC emacs-lisp
+(blink-cursor-mode 1)
+#+END_SRC
+** Window split
+
+#+BEGIN_SRC emacs-lisp
+(define-key global-map (kbd "C-x -") 'split-window-below)
+(define-key global-map (kbd "C-x |") 'split-window-right)
 #+END_SRC
 
 * =evil-mode=
@@ -507,11 +541,19 @@ So it doesn't block the main UI when copying large files.
 #+END_SRC
 
 * Terminal
+** Use =vterm= for terminal support
+
+#+BEGIN_SRC emacs-lisp
+(use-package vterm
+  :commands (vterm vterm-other-window)
+  :bind (("C-c t" . vterm)))
+         ;; :map vterm-mode ("C-c C-l" . vterm-clear-scrollback)))
+#+END_SRC
+
 ** Use =multi-term= to manage terminal sessions
 
 #+BEGIN_SRC emacs-lisp
 (use-package multi-term
-  :bind ("C-c t" . multi-term)
 
   :config
   ;; Use login shell
@@ -783,6 +825,7 @@ I use =magit= to show git status.
 
 #+BEGIN_SRC emacs-lisp
 (use-package magit
+  :bind ("C-x g" . magit-status)
   :config
   ;; automatically refresh after saving a file
   (add-hook 'after-save-hook 'magit-after-save-refresh-status t))
@@ -854,8 +897,7 @@ Use =magit='s project =forge= for GitHub interaction.
   (projectile-global-mode +1)
 
   :bind
-  (:map projectile-mode-map
-        ("M-p" . projectile-command-map)))
+  ("M-p" . projectile-command-map))
 #+END_SRC
 
 *** Customize project-find-functions to find multi-project vc
@@ -1214,7 +1256,9 @@ Reformatting JSON.
 ** Use org mode
 
 #+BEGIN_SRC emacs-lisp
-(use-package org)
+(use-package org
+  :init
+  (setq org-export-backends '(ascii html latex)))
 #+END_SRC
 
 ** Set org directory
@@ -1433,6 +1477,15 @@ don't need to leave Emacs for that.
 #+END_SRC
 
 ** Capturing
+
+*** Use =org-clip-link= to insert title automatically
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-cliplink
+  :commands (org-cliplink org-cliplink-capture)
+  :bind ("C-c C-S-l" . org-cliplink))
+#+END_SRC
+
 *** Use =C-c c= for capturing
 
 #+BEGIN_SRC emacs-lisp
@@ -1457,7 +1510,7 @@ don't need to leave Emacs for that.
 
         ;; Reading
         ("r" "Reading" entry (file "to-read.org")
-         "* %^{Article}\n%?\n%l\nAdded: %U\n")
+         "* %^{Article}\n%?\n%(org-capture-link)\nAdded: %U\n")
 
         ;; Diary fragments
         ("d" "Diary" entry (file+olp+datetree "diary.org")
@@ -1466,6 +1519,33 @@ don't need to leave Emacs for that.
 
 (add-hook 'org-capture-mode-hook 'evil-insert-state)
 #+END_SRC
+** Presentation
+
+#+BEGIN_SRC emacs-lisp
+(use-package epresent
+  :commands epresent-run
+  :config
+  (add-hook 'epresent-start-presentation-hook 'evil-emacs-state))
+#+END_SRC
+** Inline Image
+*** Set inline image width to 600px
+
+#+BEGIN_SRC emacs-lisp
+(setq org-image-actual-width 600)
+#+END_SRC
+
+*** Enable drag-n-drop download for images
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-download
+  :commands (org-download-image org-download-enable org-download-screenshot)
+  :hook (dired-mode . org-download-enable)
+  :custom (org-download-screenshot-method
+           (when (eq system-type 'darwin)
+             "screencapture -i %s"
+             "xclip -selection clipboard -t image/png -o > %s")))
+#+END_SRC
+
 ** Exporting
 *** Export to Bootstrap (HTML)
 
@@ -1477,6 +1557,11 @@ don't need to leave Emacs for that.
 
 #+BEGIN_SRC emacs-lisp
 (use-package ox-mediawiki)
+#+END_SRC
+
+*** Export to Markdown (GFM)
+#+BEGIN_SRC emacs-lisp
+(use-package ox-gfm :after org)
 #+END_SRC
 *** Export to PDF
 
@@ -1501,7 +1586,6 @@ installed (~pip install Pygments~).
 (setq-default TeX-engine 'xetex)
 (setq-default TeX-PDF-mode t)
 #+END_SRC
-
 ** Custom keystrokes
 *** In CLI rebind "<tab>"
 *** =C-c n= to quickly open org files
