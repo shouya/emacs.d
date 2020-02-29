@@ -32,13 +32,10 @@ Doing so will boost boot-up speed. See [[https://github.com/hlissner/doom-emacs/
 (add-hook 'emacs-startup-hook
           (lambda () (setq file-name-handler-alist cfg--file-name-handler-alist)))
 (add-hook 'emacs-startup-hook
-          (lambda () (message "Emacs ready in %s with %d garbage collections."
-                         (format "%.2f seconds"
-                                 (float-time
-                                  (time-subtract after-init-time before-init-time)))
+          (lambda () (message "Emacs ready in %.2f seconds with %d garbage collections."
+                         (float-time (time-subtract after-init-time before-init-time))
                          gcs-done)))
 #+END_SRC
-
 
 ** Enable packages are loadable
 
@@ -52,19 +49,6 @@ Doing so will boost boot-up speed. See [[https://github.com/hlissner/doom-emacs/
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path (expand-file-name "site-lisp" user-emacs-directory))
-#+END_SRC
-
-** Configure MELPA
-
-We prepare the package repositories.
-
-#+BEGIN_SRC emacs-lisp
-(require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-(package-initialize)
 #+END_SRC
 
 ** Configure =straight.el=
@@ -87,30 +71,20 @@ lock file for specific version, some new packages depend on it.
   (load bootstrap-file nil 'nomessage))
 #+END_SRC
 
-** Configure =use-package=
+** Enable ELPA with straight
 
+#+BEGIN_SRC emacs-lisp
+(straight-use-package 'el-patch)
+#+END_SRC
+
+** Install =use-package= with straight.el
 Ensure =use-package= is installed.
 
 #+BEGIN_SRC emacs-lisp
 (straight-use-package 'use-package)
 (defvar use-package-compute-statistics)
 (setq use-package-compute-statistics t)
-#+END_SRC
-
-Make sure =use-package= install missing packages.
-
-#+BEGIN_SRC emacs-lisp
-(require 'use-package-ensure)
-(setq-default use-package-always-ensure t)
-#+END_SRC
-
-Auto compile packages with newest version available.
-
-#+BEGIN_SRC emacs-lisp
-(use-package auto-compile
-  :config
-  (auto-compile-on-load-mode)
-  (setq-default load-prefer-newer t))
+(setq straight-use-package-by-default t)
 #+END_SRC
 
 Allow installing required system packages automatically.
@@ -201,7 +175,7 @@ Features:
 
 #+BEGIN_SRC emacs-lisp
 (use-package osx-clipboard
-  :when (eq system-type 'darwin)
+  :if (eq system-type 'darwin)
   :config (osx-clipboard-mode +1))
 #+END_SRC
 
@@ -271,11 +245,12 @@ I switched to readable mode after a web page is rendered.
 
 ** Run garbage collector on idle
 
+Garbage collection magic hack.
+
 #+BEGIN_SRC emacs-lisp
 (use-package gcmh
-  :config
-  (setq gcmh-idle-timer 3)
-  (gcmh-mode 1))
+  :hook (emacs-startup . gcmh-mode)
+  :custom (gcmh-idle-timer 3))
 #+END_SRC
 
 ** Startup profiler
@@ -345,7 +320,8 @@ I use =minions= to contract all minor modes into a single one.
 
 #+BEGIN_SRC emacs-lisp
 (use-package minions
-  :config (minions-mode 1))
+  :config
+  (minions-mode 1))
 #+END_SRC
 
 ** Use fancy lambdas
@@ -613,6 +589,7 @@ So it doesn't block the main UI when copying large files.
 
 #+BEGIN_SRC emacs-lisp
 (use-package vterm
+  :after evil-collection
   :commands (vterm vterm-other-window)
   :bind (("C-c t" . vterm)))
          ;; :map vterm-mode ("C-c C-l" . vterm-clear-scrollback)))
@@ -795,21 +772,21 @@ We first define =proselint= checker for flycheck. Remember to install =proselint
 CLI tool.
 
 #+BEGIN_SRC emacs-lisp
-(use-package flycheck)
+(use-package flycheck
+  :config
+  (when (executable-find "proselint")
+    (flycheck-define-checker proselint
+      "A linter for prose."
+      :command ("proselint" source-inplace)
+      :error-patterns
+      ((warning line-start (file-name) ":" line ":" column ": "
+                (id (one-or-more (not (any " "))))
+                (message (one-or-more not-newline)
+                         (zero-or-more "\n" (any " ") (one-or-more not-newline)))
+                line-end))
+      :modes (text-mode markdown-mode gfm-mode org-mode))
 
-(when (executable-find "proselint")
-  (flycheck-define-checker proselint
-    "A linter for prose."
-    :command ("proselint" source-inplace)
-    :error-patterns
-    ((warning line-start (file-name) ":" line ":" column ": "
-              (id (one-or-more (not (any " "))))
-              (message (one-or-more not-newline)
-                       (zero-or-more "\n" (any " ") (one-or-more not-newline)))
-              line-end))
-    :modes (text-mode markdown-mode gfm-mode org-mode))
-
-  (add-to-list 'flycheck-checkers 'proselint))
+    (add-to-list 'flycheck-checkers 'proselint)))
 #+END_SRC
 
 
@@ -831,7 +808,19 @@ Next we enable proselint for text modes.
 ** Key cast mode
 
 #+BEGIN_SRC emacs-lisp
-(use-package keycast)
+(use-package keycast
+  :commands keycast-mode)
+#+END_SRC
+
+** Bind keys for transpose char
+
+#+BEGIN_SRC emacs-lisp
+(defun shou/transpose-next-char ()
+  (interactive)
+  (save-excursion
+    (forward-char)
+    (transpose-chars 1)))
+(define-key evil-normal-state-map (kbd "C-t") 'shou/transpose-next-char)
 #+END_SRC
 
 * Programming
@@ -864,10 +853,11 @@ We use =dumb-jump=, which works out of the box for many languages.
 #+BEGIN_SRC emacs-lisp
 (use-package dumb-jump
   :after evil
-  :config
-  (define-key evil-normal-state-map (kbd "M-.") 'dumb-jump-go)
-  (setq-default dumb-jump-selector 'ivy)
-  (setq-default dumb-jump-force-searcher 'rg))
+  :bind (:map evil-normal-state-map
+              ("M-." . dumb-jump-go))
+  :custom
+  (dumb-jump-selector 'ivy)
+  (dumb-jump-force-searcher 'rg))
 #+END_SRC
 
 ** Spell checking in comment
@@ -945,13 +935,11 @@ Use =magit='s project =forge= for GitHub interaction.
 
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
-  :defines projectile-project-name
   :custom
   (projectile-completion-system 'ivy)
   (projectile-switch-project-action 'projectile-dired)
   (projectile-enable-caching t)
   (projectile-indexing-method 'native)
-  (frame-title-format '((:eval (projectile-project-name))))
 
   :config
   (projectile-mode 1)
@@ -984,7 +972,8 @@ Let the project root to be where =mix.exs= is found. This function is used by
 (use-package dash-at-point
   :if (eq system-type 'drawin)
   :ensure-system-package
-  ("/Applications/Dash.app" . "brew cask install dash"))
+  ("/Applications/Dash.app" . "brew cask install dash")
+  )
 #+END_SRC
 
 ** Auto completion (=M-/=)
@@ -997,30 +986,28 @@ Use =company-mode= for auto completion.
   :bind ("M-/" . company-complete)
   :hook (emacs-startup . global-company-mode)
 
-  :config
-  (setq-default company-idle-delay 0.4 ; Show completion immediately
-                company-show-numbers t ; Number the candidates (use M-1, M-2 etc
-                                       ; to select completions)
-                company-tooltip-align-annotations t)
+  :custom
+  (company-idle-delay 0.4 "Show completion immediately")
+  (company-show-numbers t "Number the candidates (use M-1, M-2 etc to select completions)")
+  (company-tooltip-align-annotations t)
+  (company-backends '(company-bbdb
+                      company-eclim
+                      company-semantic
+                      company-clang
+                      company-xcode
+                      company-cmake
+                      company-capf
+                      company-files
+                      (company-dabbrev-code company-gtags company-etags company-keywords)
+                      company-oddmuse
+                      company-dabbrev
+                      ))
 
+  :config
   (define-key company-active-map (kbd "TAB")
     (lambda () (interactive) (company-complete-common-or-cycle +1)))
   (define-key company-active-map (kbd "S-TAB")
-    (lambda () (interactive) (company-complete-common-or-cycle -1)))
-
-  (setq-default company-backends
-                '(company-bbdb
-                  company-eclim
-                  company-semantic
-                  company-clang
-                  company-xcode
-                  company-cmake
-                  company-capf
-                  company-files
-                  (company-dabbrev-code company-gtags company-etags company-keywords)
-                  company-oddmuse
-                  company-dabbrev
-                  )))
+    (lambda () (interactive) (company-complete-common-or-cycle -1))))
 #+END_SRC
 
 *** TabNine
@@ -1030,7 +1017,8 @@ Use =TabNine= for general text completion. Please remember to run
 
 #+BEGIN_SRC emacs-lisp
 (use-package company-tabnine
-  :when (eq system-type 'darwin)
+  :if (eq system-type 'darwin)
+  :commands company-tabnine
   :after company
   :config
   (add-to-list 'company-backends 'company-tabnine))
@@ -1038,20 +1026,20 @@ Use =TabNine= for general text completion. Please remember to run
 (defun shou/tabnine-off ()
   "turn off TabNine for this buffer"
   (interactive)
-  (setq-local ((company-backends (remove 'company-tabnine company-backends)))))
+  (setq-local company-backends (delete company-tabnine company-backends)))
 
 (defun shou/tabnine-on ()
   "turn on TabNine for this buffer"
   (interactive)
-  (setq-local ((company-backends (add-to-list company-backends 'company-tabnine)))))
+  (setq-local company-backends (add-to-list company-backends 'company-tabnine)))
 #+END_SRC
 
 *** Company completion icons on GUI
 #+BEGIN_SRC emacs-lisp
 (use-package company-box
   :init (require 'icons-in-terminal)
-  :when (display-graphic-p)
-  :when nil
+  :if (display-graphic-p)
+  :disabled
   :hook (company-mode . company-box-mode)
   :config
 
@@ -1098,7 +1086,7 @@ Use =TabNine= for general text completion. Please remember to run
 
 #+BEGIN_SRC emacs-lisp
 (use-package company-quickhelp
-  :when (not (display-graphic-p))
+  :if (not (display-graphic-p))
   :config
   (add-hook 'company-mode-hook 'company-quickhelp-mode))
 #+END_SRC
@@ -1326,7 +1314,11 @@ Reformatting JSON.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :pin org
+  :straight (org :type git
+                 :repo "https://code.orgmode.org/bzg/org-mode.git"
+                 :local-repo nil
+                 :tag "release_9.3")
+  :commands (org-mode)
   :mode ("\\.org\\'" . org-mode))
 #+END_SRC
 
@@ -1358,8 +1350,9 @@ First, we enable =org-indent-mode=:
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :hook (org-mode . org-indent-mode)
-  :custom (org-ident-indentation-per-level 1))
+  :custom (org-ident-indentation-per-level 1)
+  :config
+  (add-hook 'org-mode-hook 'org-indent-mode))
 #+END_SRC
 
 Next we disable =org-mode='s built-in hard indentation:
@@ -1518,16 +1511,16 @@ don't need to leave Emacs for that.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org-roam
-  :after org
-  :hook
-  ((org-mode . org-roam-mode)
-   (emacs-startup . org-roam--build-cache-async))
   :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
-  :config
-  (setq org-roam-mute-cache-build t)
+  :after org
+  :commands (org-roam org-roam-insert org-roam-mode)
   :custom
   (org-roam-mute-cache-build t)
   (org-roam-directory (org-file-path "roam/"))
+
+  :config
+  (org-roam-mode)
+
   :bind
   ("C-c r l" . org-roam)
   ("C-c r t" . org-roam-today)
@@ -1679,11 +1672,13 @@ Enable exporting to Beamer.
 
 #+BEGIN_SRC emacs-lisp
 (use-package ox-latex
-   :ensure nil
-   :after (org ox))
+  :straight nil
+  :ensure nil
+  :after (org ox))
 (use-package ox-beamer
-   :ensure nil
-   :after (org ox))
+  :straight nil
+  :ensure nil
+  :after (org ox))
 #+END_SRC
 
 Enhance unicode characters support.
