@@ -57,6 +57,8 @@ site-lisp/package/
 user-dict
 projectile.cache
 /bookmarks
-/straight
 /games/
 /nov-places
+/straight/repos
+/straight/build
+/straight/build-cache.el
