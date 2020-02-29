@@ -37,7 +37,6 @@
  ("evil-matchit" . "11d98debf8b051b10068137668eb54c2fede0e30")
  ("evil-numbers" . "6ea1c8c3a9b37bed63d48f1128e9a4910e68187e")
  ("evil-org-mode" . "9d4be14118bf27094a30dbff349b815f098aacbf")
- ("evil-paredit" . "e058fbdcf9dbf7ad6cc77f0172d7517ef233d55f")
  ("evil-surround" . "9b0b17f06cef9bac81ee4800d121265e54718a17")
  ("expand-region.el" . "1603d01fbfbef0d73ac940f7847c7e0b9b978093")
  ("exunit.el" . "c77b0397b80d772c98fcc34c9ab131a8350fbf40")

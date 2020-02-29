@@ -5,7 +5,6 @@
 * Setup personal information
 
 #+BEGIN_SRC emacs-lisp
-;;; -*- lexical-binding: t; -*-
 (setq-default user-full-name "Shou Ya"
               user-email-address "shou@lain.li")
 #+END_SRC
@@ -69,6 +68,12 @@ lock file for specific version, some new packages depend on it.
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
+#+END_SRC
+
+** Do not mangle with org
+
+#+BEGIN_SRC emacs-lisp
+(setq straight-fix-org nil)
 #+END_SRC
 
 ** Enable ELPA with straight
@@ -266,6 +271,7 @@ Garbage collection magic hack.
 Hide the title bar, menu bar, as well as the scroll bar.
 
 #+BEGIN_SRC emacs-lisp
+;; this one turns off slower so I deferred it to execute after boot
 (when (boundp 'tool-bar-mode)
   (add-hook 'emacs-startup-hook (lambda () (tool-bar-mode -1))))
 (when (boundp 'menu-bar-mode)
@@ -340,11 +346,11 @@ I use =minions= to contract all minor modes into a single one.
 
 #+BEGIN_SRC emacs-lisp
 (use-package diff-hl
-  :config
-  (add-hook 'prog-mode-hook 'turn-on-diff-hl-mode)
-  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-  (add-hook 'vc-dir-mode-hook 'turn-on-diff-hl-mode))
+  :hook ((prog-mode . turn-on-diff-hl-mode)
+         (dired-mode . diff-hl-dired-mode)
+         (vc-dir-mode . turn-on-diff-hl-mode)))
 #+END_SRC
+
 ** Install all-the-icon
 
 In order for the icons to work it is very important that you install the
@@ -394,8 +400,8 @@ Then load evil mode.
 #+BEGIN_SRC emacs-lisp
 (use-package evil
   :init (setq evil-want-keybinding nil)
-  ; :defer nil
   :hook (emacs-startup . evil-mode)
+  :demand t
   :custom (evil-symbol-word-search t))
 #+END_SRC
 
@@ -405,7 +411,7 @@ Install evil-collection, which provides evil-friendly bindings for many modes.
 #+BEGIN_SRC emacs-lisp
 (use-package evil-collection
   :after evil
-  :config (evil-collection-init))
+  :hook (emacs-startup . evil-collection-init))
 #+END_SRC
 
 ** Manipulate surroundings with Vim key bindings
@@ -440,8 +446,8 @@ bracket don't. I like it the other way around.
 #+BEGIN_SRC emacs-lisp
 (use-package evil-surround
   :after evil
+  :hook (emacs-startup . global-evil-surround-mode)
   :config
-  (global-evil-surround-mode 1)
   (evil-add-to-alist 'evil-surround-pairs-alist
                      ?\( '("(" . ")")
                      ?\[ '("[" . "]")
@@ -479,14 +485,7 @@ Triggered with =<<= and =>>=.
 #+BEGIN_SRC emacs-lisp
 (use-package evil-matchit
   :after evil
-  :config (global-evil-matchit-mode 1))
-#+END_SRC
-
-** Search symbol instead of word
-
-Make =*= search for symbol (e.g. =my-token=) instead of word.
-
-#+BEGIN_SRC emacs-lisp
+  :hook (emacs-startup . global-evil-matchit-mode))
 #+END_SRC
 
 ** Increment/Decrement numbers
@@ -513,12 +512,13 @@ Load Dired X that comes with Emacs.
 ** Retain the same window when browsing
 
 #+BEGIN_SRC emacs-lisp
-(use-package evil
-  :config
-  ;; RET to find file in same window
-  (evil-define-key 'normal dired-mode-map (kbd "RET") 'dired-find-alternate-file)
-  ;; do not show warning
-  (put 'dired-find-alternate-file 'disabled nil))
+;; RET to find file in same window
+;; (with-eval-after-load 'evil
+;;   (evil-define-key 'normal dired-mode-map
+;;     (kbd "RET") 'dired-find-alternate-file))
+(define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+;; do not show warning
+(put 'dired-find-alternate-file 'disabled nil)
 #+END_SRC
 
 ** Recursive copy and delete
@@ -538,10 +538,10 @@ Hit =.= key to reveal the files.
 #+BEGIN_SRC emacs-lisp
 (use-package dired-hide-dotfiles
   :after (evil dired)
+  :hook (dired-mode . dired-hide-dotfiles-mode)
   :config
   (evil-define-key 'normal dired-mode-map
-    (kbd ".") 'dired-hide-dotfiles-mode)
-  (add-hook 'dired-mode-hook 'dired-hide-dotfiles-mode))
+    (kbd ".") 'dired-hide-dotfiles-mode))
 #+END_SRC
 
 ** Hide details by default
@@ -645,34 +645,34 @@ Some modes set this variable automatically, so we need to override them.
 #+END_SRC
 
 ** Minibuffer Completion
-*** Ivy and Counsel
+*** Counsel
 
 I use counsel and ivy to complete commands in minibuffer.
 
-Ref: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configuration.org#configure-ivy-and-counsel][hrs/dotfiles]]
+Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configuration.org#configure-ivy-and-counsel][hrs/dotfiles]]
 
 #+BEGIN_SRC emacs-lisp
 (use-package counsel
+  :demand t
   :bind
-  ("M-x" . counsel-M-x)
   ("C-s" . swiper)
+  ("M-x" . counsel-M-x)
 
-  :hook
-  (emacs-startup . ivy-mode)
-
-  :custom
-  (ivy-count-format "(%d/%d) ")
+  :config
+  (setq ivy-count-format "(%d/%d) ")
   ;; Wrap around when reaches last page
-  (ivy-wrap t)
+  (setq ivy-wrap t)
   ;; Use recentf in switch buffers
-  (ivy-use-virtual-buffers t)
-  ;; Do not insert "^" automatically
-  (ivy-initial-inputs-alist nil)
-
+  (setq ivy-use-virtual-buffers t)
   ;; Ignore order for searching words on files
   ;; Use regular matching for others
-  (ivy-re-builders-alist '((read-file-name-internal . ivy--regex-ignore-order)
-                           (t . ivy--regex-plus))))
+  (setq ivy-re-builders-alist '((read-file-name-internal . ivy--regex-ignore-order)
+                                (t . ivy--regex-plus)))
+
+  ;; Do not insert "^" automatically
+  (setq ivy-initial-inputs-alist nil)
+  (ivy-mode))
+
 #+END_SRC
 
 *** Sort the result produced by =ivy=
@@ -682,8 +682,7 @@ Ref: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configuration.
 #+BEGIN_SRC emacs-lisp
 (use-package ivy-prescient
   :after counsel
-  :config
-  (ivy-prescient-mode))
+  :hook (emacs-startup . ivy-prescient-mode))
 #+END_SRC
 
 ** Combo key hints
@@ -773,6 +772,13 @@ CLI tool.
 
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
+  :demand t
+  :hook
+  ;; enable spellcheck in code comments
+  (prog-mode . flycheck-prog-mode)
+
+  :commands (flycheck-mode flycheck-prog-mode)
+
   :config
   (when (executable-find "proselint")
     (flycheck-define-checker proselint
@@ -794,7 +800,7 @@ Next we enable proselint for text modes.
 
 #+BEGIN_SRC emacs-lisp
 (dolist (hook text-mode-hooks)
-  (add-hook hook #'flycheck-mode))
+  (add-hook hook 'flycheck-mode))
 #+END_SRC
 
 *** Auto correct frequent typo
@@ -812,7 +818,7 @@ Next we enable proselint for text modes.
   :commands keycast-mode)
 #+END_SRC
 
-** Bind keys for transpose char
+** Bind key for transpose char
 
 #+BEGIN_SRC emacs-lisp
 (defun shou/transpose-next-char ()
@@ -820,7 +826,8 @@ Next we enable proselint for text modes.
   (save-excursion
     (forward-char)
     (transpose-chars 1)))
-(define-key evil-normal-state-map (kbd "C-t") 'shou/transpose-next-char)
+(with-eval-after-load 'evil
+  (define-key evil-normal-state-map (kbd "C-t") 'shou/transpose-next-char))
 #+END_SRC
 
 * Programming
@@ -838,14 +845,6 @@ Also show a ruler at column 80.
 (add-hook 'prog-mode-hook 'whitespace-mode)
 #+END_SRC
 
-** Syntax checking
-
-Enable flycheck for syntax checking.
-
-#+BEGIN_SRC emacs-lisp
-(use-package flycheck)
-#+END_SRC
-
 ** Jump to definition (=M-.=)
 
 We use =dumb-jump=, which works out of the box for many languages.
@@ -860,12 +859,6 @@ We use =dumb-jump=, which works out of the box for many languages.
   (dumb-jump-force-searcher 'rg))
 #+END_SRC
 
-** Spell checking in comment
-
-#+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
-#+END_SRC
-
 ** Highlight all occurrences word at point
 
 #+BEGIN_SRC emacs-lisp
@@ -873,52 +866,6 @@ We use =dumb-jump=, which works out of the box for many languages.
   :config
   (setq-default idle-highlight-idle-time 0.3)
   (add-hook 'prog-mode-hook 'idle-highlight-mode))
-#+END_SRC
-
-** Git
-*** Use =magit= to show git status
-
-I use =magit= to show git status.
-
-#+BEGIN_SRC emacs-lisp
-(use-package magit
-  :bind ("C-x g" . magit-status)
-  :config
-  ;; automatically refresh after saving a file
-  (add-hook 'after-save-hook 'magit-after-save-refresh-status t))
-#+END_SRC
-
-*** Use evil motion keys in =magit=
-And enable =evil-magit= for evil-style motion.
-
-#+BEGIN_SRC emacs-lisp
-(use-package evil-magit
-  :init (setq-default evil-magit-state 'motion)
-  :after magit)
-#+END_SRC
-
-*** Switch to evil insert state when entering commit message
-
-#+BEGIN_SRC emacs-lisp
-(add-hook 'git-commit-mode-hook 'evil-insert-state)
-#+END_SRC
-
-*** =GitHub= support
-
-#+BEGIN_SRC emacs-lisp
-(use-package magithub
-  :after magit
-  :config
-  (magithub-feature-autoinject t))
-#+END_SRC
-
-Use =magit='s project =forge= for GitHub interaction.
-
-#+BEGIN_SRC emacs-lisp
-;; (use-package ghub
-;;   :after magit)
-;; (use-package forge
-;;   :after magit)
 #+END_SRC
 
 ** Project management
@@ -941,10 +888,9 @@ Use =magit='s project =forge= for GitHub interaction.
   (projectile-enable-caching t)
   (projectile-indexing-method 'native)
 
-  :config
-  (projectile-mode 1)
+  :hook (emacs-startup . projectile-mode)
 
-  :bind
+  :bind-keymap
   ("M-p" . projectile-command-map))
 #+END_SRC
 
@@ -966,14 +912,48 @@ Let the project root to be where =mix.exs= is found. This function is used by
 
 #+END_SRC
 
+** Git
+*** Use =magit= to show git status
+
+I use =magit= to show git status.
+
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :bind ("C-x g" . magit)
+  :demand t
+  :after projectile
+  :config
+  ;; automatically refresh after saving a file
+  (add-hook 'after-save-hook 'magit-after-save-refresh-status t))
+#+END_SRC
+
+*** Use evil motion keys in =magit=
+And enable =evil-magit= for evil-style motion.
+
+#+BEGIN_SRC emacs-lisp
+(use-package evil-magit
+  :after magit
+  :init (setq-default evil-magit-state 'motion)
+  :config
+  ;; Switch to evil insert state when entering commit message
+  (add-hook 'git-commit-mode-hook 'evil-insert-state))
+#+END_SRC
+
+*** =GitHub= support
+
+#+BEGIN_SRC emacs-lisp
+(use-package magithub
+  :after magit
+  :config
+  (magithub-feature-autoinject t))
+#+END_SRC
 ** Search symbol at point in Dash with =C-c D=
 
 #+BEGIN_SRC emacs-lisp
 (use-package dash-at-point
   :if (eq system-type 'drawin)
   :ensure-system-package
-  ("/Applications/Dash.app" . "brew cask install dash")
-  )
+  ("/Applications/Dash.app" . "brew cask install dash"))
 #+END_SRC
 
 ** Auto completion (=M-/=)
@@ -1026,12 +1006,14 @@ Use =TabNine= for general text completion. Please remember to run
 (defun shou/tabnine-off ()
   "turn off TabNine for this buffer"
   (interactive)
-  (setq-local company-backends (delete company-tabnine company-backends)))
+  (setq-local company-backends (delete 'company-tabnine company-backends))
+  (company-mode 1))
 
 (defun shou/tabnine-on ()
   "turn on TabNine for this buffer"
   (interactive)
-  (setq-local company-backends (add-to-list company-backends 'company-tabnine)))
+  (setq-local company-backends (add-to-list 'company-backends 'company-tabnine))
+  (company-mode 1))
 #+END_SRC
 
 *** Company completion icons on GUI
@@ -1087,8 +1069,8 @@ Use =TabNine= for general text completion. Please remember to run
 #+BEGIN_SRC emacs-lisp
 (use-package company-quickhelp
   :if (not (display-graphic-p))
-  :config
-  (add-hook 'company-mode-hook 'company-quickhelp-mode))
+  :after company
+  :hook (company-mode . company-quickhelp-mode))
 #+END_SRC
 
 *** Yasnippet
@@ -1314,10 +1296,7 @@ Reformatting JSON.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :straight (org :type git
-                 :repo "https://code.orgmode.org/bzg/org-mode.git"
-                 :local-repo nil
-                 :tag "release_9.3")
+  :straight (org :local-repo nil)
   :commands (org-mode)
   :mode ("\\.org\\'" . org-mode))
 #+END_SRC
@@ -1350,7 +1329,7 @@ First, we enable =org-indent-mode=:
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :custom (org-ident-indentation-per-level 1)
+  :custom (org-indent-indentation-per-level 1)
   :config
   (add-hook 'org-mode-hook 'org-indent-mode))
 #+END_SRC
@@ -1402,6 +1381,12 @@ Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#in-collapsed-vie
 #+END_SRC
 
 ** Visual Tweaks
+*** Turn on native source fontification in org buffer
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :custom (org-src-fontify-natively t))
+#+END_SRC
 *** Fancy bullet headers
 
 #+BEGIN_SRC emacs-lisp
@@ -1417,7 +1402,7 @@ Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#in-collapsed-vie
   :custom (org-hide-leading-stars t))
 #+END_SRC
 
-*** Hide markup symbols
+*** Hide mark-up symbols
 
 I'd like to hide ===, =+=, =*= symbols when not necessary.
 
@@ -1432,13 +1417,6 @@ I'd like to hide ===, =+=, =*= symbols when not necessary.
 (use-package org
   :custom (org-hide-emphasis-markers t))
 (setq-default org-ellipsis " ⤵")
-#+END_SRC
-
-*** Turn on native source fontification in org buffer
-
-#+BEGIN_SRC emacs-lisp
-(use-package org
-  :custom (org-src-fontify-natively t))
 #+END_SRC
 
 ** Source editing
