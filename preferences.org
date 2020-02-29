@@ -5,6 +5,7 @@
 * Setup personal information
 
 #+BEGIN_SRC emacs-lisp
+;;; -*- lexical-binding: t; -*-
 (setq-default user-full-name "Shou Ya"
               user-email-address "shou@lain.li")
 #+END_SRC
@@ -14,23 +15,30 @@
 Doing so will boost boot-up speed. See [[https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#avoid-garbage-collection-at-startup][Avoid garbage collection at startup]].
 
 #+BEGIN_SRC emacs-lisp
-(setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
-      gc-cons-percentage 0.6)
-
-(setq shou/default-gc-threshold 16777216) ; 16mb
+(setq gc-cons-threshold most-positive-fixnum) ; 2^61 bytes
 
 ;; reset it after load
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq gc-cons-threshold shou/default-gc-threshold ; 16mb
-                  gc-cons-percentage 0.1)))
-
-;; pause gc when minibuffer is active
-(add-hook 'minibuffer-setup-hook
-          (lambda () (setq gc-cons-threshold most-positive-fixnum)))
-(add-hook 'minibuffer-exit-hook
-          (lambda () (setq gc-cons-threshold shou/default-gc-threshold)))
+; (add-hook 'emacs-startup-hook
+;           (lambda ()
+;             (setq gc-cons-threshold gc-cons-threshold-default
+;                   gc-cons-percentage gc-cons-percentage-default)))
 #+END_SRC
+
+** Trick to make startup faster
+
+#+BEGIN_SRC emacs-lisp
+(defvar cfg--file-name-handler-alist file-name-handler-alist)
+(setq file-name-handler-alist nil)
+(add-hook 'emacs-startup-hook
+          (lambda () (setq file-name-handler-alist cfg--file-name-handler-alist)))
+(add-hook 'emacs-startup-hook
+          (lambda () (message "Emacs ready in %s with %d garbage collections."
+                         (format "%.2f seconds"
+                                 (float-time
+                                  (time-subtract after-init-time before-init-time)))
+                         gcs-done)))
+#+END_SRC
+
 
 ** Enable packages are loadable
 
@@ -52,7 +60,7 @@ We prepare the package repositories.
 
 #+BEGIN_SRC emacs-lisp
 (require 'package)
-
+(setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
@@ -85,6 +93,8 @@ Ensure =use-package= is installed.
 
 #+BEGIN_SRC emacs-lisp
 (straight-use-package 'use-package)
+(defvar use-package-compute-statistics)
+(setq use-package-compute-statistics t)
 #+END_SRC
 
 Make sure =use-package= install missing packages.
@@ -136,6 +146,12 @@ Allow installing required system packages automatically.
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'exec-path "~/.asdf/shims")
+#+END_SRC
+
+** Inhibit startup screen
+
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-startup-screen t)
 #+END_SRC
 
 * General behavior
@@ -249,7 +265,24 @@ one.
 I switched to readable mode after a web page is rendered.
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'eww-after-render-hook 'eww-readable)
+;; (add-hook 'eww-after-render-hook 'eww-readable)
+(setq eww-after-render-hook '())
+#+END_SRC
+
+** Run garbage collector on idle
+
+#+BEGIN_SRC emacs-lisp
+(use-package gcmh
+  :config
+  (setq gcmh-idle-timer 3)
+  (gcmh-mode 1))
+#+END_SRC
+
+** Startup profiler
+
+#+BEGIN_SRC emacs-lisp
+(use-package esup
+  :commands (esup))
 #+END_SRC
 
 * UI
@@ -258,16 +291,18 @@ I switched to readable mode after a web page is rendered.
 Hide the title bar, menu bar, as well as the scroll bar.
 
 #+BEGIN_SRC emacs-lisp
-(tool-bar-mode 0)
-(menu-bar-mode 0)
-(when (display-graphic-p)
+(when (boundp 'tool-bar-mode)
+  (add-hook 'emacs-startup-hook (lambda () (tool-bar-mode -1))))
+(when (boundp 'menu-bar-mode)
+  (menu-bar-mode -1))
+(when (boundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 #+END_SRC
 
 Enable pixel-wise scrolling for mouse scroll-wheel. It looks nicer.
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'after-init-hook 'pixel-scroll-mode)
+(add-hook 'emacs-startup-hook 'pixel-scroll-mode)
 #+END_SRC
 
 Disable visual bell because Emacs for macOS renders it poorly.
@@ -357,24 +392,35 @@ directory. You can also install the latest fonts for this package in the
 (define-key global-map (kbd "C-x -") 'split-window-below)
 (define-key global-map (kbd "C-x |") 'split-window-right)
 #+END_SRC
-
-* =evil-mode=
-** Load =evil=
-Set =evil-want-keybinding= to =nil= to disable a startup warning, See ([[https://github.com/emacs-evil/evil-collection/issues/60][related
-issue]]).
+** Keep track of cursor whenever window scrolls
 
 #+BEGIN_SRC emacs-lisp
-(setq-default evil-want-keybinding nil)
+(use-package beacon
+  :commands beacon-mode
+  :hook (emacs-startup . beacon-mode)
+  :custom (beacon-color "#d3d3d3"))
+#+END_SRC
+** Turn off auto window scroll to get faster movement
+
+This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-pointcursor-movement-lag/28746][motion - Emacs point(cursor) movement lag]].
+
+#+BEGIN_SRC emacs-lisp
+(setq auto-window-vscroll nil)
 #+END_SRC
 
-Load evil mode.
+* Evil mode
+** Load =evil=
+Set =evil-want-keybinding= to =nil= to disable a startup warning, see ([[https://github.com/emacs-evil/evil-collection/issues/60][related
+issue]]).
+
+Then load evil mode.
 
 #+BEGIN_SRC emacs-lisp
 (use-package evil
-  :config
-  (setq-default evil-symbol-word-search t)
-  ; (defalias #'forward-evil-word #'forward-evil-symbol)
-  (evil-mode 1))
+  :init (setq evil-want-keybinding nil)
+  ; :defer nil
+  :hook (emacs-startup . evil-mode)
+  :custom (evil-symbol-word-search t))
 #+END_SRC
 
 ** A collection of Vim key bindings among modes
@@ -417,6 +463,7 @@ bracket don't. I like it the other way around.
 
 #+BEGIN_SRC emacs-lisp
 (use-package evil-surround
+  :after evil
   :config
   (global-evil-surround-mode 1)
   (evil-add-to-alist 'evil-surround-pairs-alist
@@ -434,11 +481,10 @@ Use =evil= key bindings with Org agendas.
 
 #+BEGIN_SRC emacs-lisp
 (use-package evil-org
-  :after org
+  :after (org evil)
+  :hook ((org-mode . evil-org-mode)
+         (evil-org-mode . evil-org-set-key-theme))
   :config
-  (add-hook 'org-mode-hook 'evil-org-mode)
-  (add-hook 'evil-org-mode-hook
-            (lambda () (evil-org-set-key-theme)))
   (require 'evil-org-agenda)
   (evil-define-key 'motion org-mode-map (kbd "TAB") 'org-cycle)
   (evil-org-agenda-set-keys))
@@ -456,6 +502,7 @@ Triggered with =<<= and =>>=.
 
 #+BEGIN_SRC emacs-lisp
 (use-package evil-matchit
+  :after evil
   :config (global-evil-matchit-mode 1))
 #+END_SRC
 
@@ -464,6 +511,18 @@ Triggered with =<<= and =>>=.
 Make =*= search for symbol (e.g. =my-token=) instead of word.
 
 #+BEGIN_SRC emacs-lisp
+#+END_SRC
+
+** Increment/Decrement numbers
+
+Works just like C-a/C-x in vim.
+
+#+BEGIN_SRC emacs-lisp
+(use-package evil-numbers
+  :bind (:map evil-normal-state-map
+              ("+" . evil-numbers/inc-at-pt)
+              ("-" . evil-numbers/dec-at-pt)
+              ("_" . evil-numbers/dec-at-pt)))
 #+END_SRC
 
 * =dired-mode=
@@ -478,12 +537,12 @@ Load Dired X that comes with Emacs.
 ** Retain the same window when browsing
 
 #+BEGIN_SRC emacs-lisp
-;; RET to find file in same window
-(evil-define-key 'normal dired-mode-map
-  (kbd "RET") 'dired-find-alternate-file)
-
-;; do not show warning
-(put 'dired-find-alternate-file 'disabled nil)
+(use-package evil
+  :config
+  ;; RET to find file in same window
+  (evil-define-key 'normal dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+  ;; do not show warning
+  (put 'dired-find-alternate-file 'disabled nil))
 #+END_SRC
 
 ** Recursive copy and delete
@@ -502,6 +561,7 @@ Hit =.= key to reveal the files.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dired-hide-dotfiles
+  :after (evil dired)
   :config
   (evil-define-key 'normal dired-mode-map
     (kbd ".") 'dired-hide-dotfiles-mode)
@@ -540,6 +600,14 @@ So it doesn't block the main UI when copying large files.
    "switch to neotree to projectile root dir"))
 #+END_SRC
 
+* Document reading
+** EPUB
+
+#+BEGIN_SRC emacs-lisp
+(use-package nov
+  :mode ("\\.epub\\'" . nov-mode))
+#+END_SRC
+
 * Terminal
 ** Use =vterm= for terminal support
 
@@ -554,7 +622,7 @@ So it doesn't block the main UI when copying large files.
 
 #+BEGIN_SRC emacs-lisp
 (use-package multi-term
-
+  :commands multi-term
   :config
   ;; Use login shell
   (setq-default multi-term-program-switches "--login")
@@ -589,14 +657,14 @@ Some modes set this variable automatically, so we need to override them.
 
 #+BEGIN_SRC emacs-lisp
 (use-package subword
-  :config (global-subword-mode 1))
+  :hook (emacs-startup . global-subword-mode))
 #+END_SRC
 
 ** Undo tree
 
 #+BEGIN_SRC emacs-lisp
 (use-package undo-tree
-  :config (add-hook 'after-init-hook 'global-undo-tree-mode))
+  :hook (emasc-startup . global-undo-tree-mode))
 #+END_SRC
 
 ** Minibuffer Completion
@@ -609,27 +677,25 @@ Ref: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configuration.
 #+BEGIN_SRC emacs-lisp
 (use-package counsel
   :bind
-  ("M-x" . 'counsel-M-x)
-  ("C-s" . 'swiper)
+  ("M-x" . counsel-M-x)
+  ("C-s" . swiper)
 
-  :config
-  (ivy-mode 1)
-  (setq-default ivy-count-format "(%d/%d) ")
+  :hook
+  (emacs-startup . ivy-mode)
 
+  :custom
+  (ivy-count-format "(%d/%d) ")
   ;; Wrap around when reaches last page
-  (setq-default ivy-wrap t)
-
+  (ivy-wrap t)
   ;; Use recentf in switch buffers
-  (setq-default ivy-use-virtual-buffers t)
-
+  (ivy-use-virtual-buffers t)
   ;; Do not insert "^" automatically
-  (setq-default ivy-initial-inputs-alist nil)
+  (ivy-initial-inputs-alist nil)
 
   ;; Ignore order for searching words on files
   ;; Use regular matching for others
-  (setq-default ivy-re-builders-alist
-                '((read-file-name-internal . ivy--regex-ignore-order)
-                  (t . ivy--regex-plus))))
+  (ivy-re-builders-alist '((read-file-name-internal . ivy--regex-ignore-order)
+                           (t . ivy--regex-plus))))
 #+END_SRC
 
 *** Sort the result produced by =ivy=
@@ -650,9 +716,9 @@ entered.
 
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
-  :config
-  (add-hook 'after-init-hook 'which-key-mode)
-  (setq-default which-key-idel-delay 1.5))
+  :hook (emacs-startup . which-key-mode)
+  :custom
+  (which-key-idel-delay 1.5))
 #+END_SRC
 
 ** Expand region (~C-=~, ~C--~, ~v =~, ~v -~)
@@ -797,6 +863,7 @@ We use =dumb-jump=, which works out of the box for many languages.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dumb-jump
+  :after evil
   :config
   (define-key evil-normal-state-map (kbd "M-.") 'dumb-jump-go)
   (setq-default dumb-jump-selector 'ivy)
@@ -864,14 +931,6 @@ Use =magit='s project =forge= for GitHub interaction.
 ;;   :after magit)
 #+END_SRC
 
-** Jump to matching parentheses/keyword
-
-#+BEGIN_SRC emacs-lisp
-(use-package evil-matchit
-  :config
-  (global-evil-matchit-mode 1))
-#+END_SRC
-
 ** Project management
 *** Use =ripgrep= (=<f5>=)
 
@@ -886,6 +945,7 @@ Use =magit='s project =forge= for GitHub interaction.
 
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
+  :defines projectile-project-name
   :custom
   (projectile-completion-system 'ivy)
   (projectile-switch-project-action 'projectile-dired)
@@ -894,7 +954,7 @@ Use =magit='s project =forge= for GitHub interaction.
   (frame-title-format '((:eval (projectile-project-name))))
 
   :config
-  (projectile-global-mode +1)
+  (projectile-mode 1)
 
   :bind
   ("M-p" . projectile-command-map))
@@ -935,7 +995,7 @@ Use =company-mode= for auto completion.
 #+BEGIN_SRC emacs-lisp
 (use-package company
   :bind ("M-/" . company-complete)
-  :hook (after-init . global-company-mode)
+  :hook (emacs-startup . global-company-mode)
 
   :config
   (setq-default company-idle-delay 0.4 ; Show completion immediately
@@ -978,14 +1038,12 @@ Use =TabNine= for general text completion. Please remember to run
 (defun shou/tabnine-off ()
   "turn off TabNine for this buffer"
   (interactive)
-  (let ((backends (delete 'tabnine company-backends))
-        (set (make-local-variable 'company-backends) backends))))
+  (setq-local ((company-backends (remove 'company-tabnine company-backends)))))
 
 (defun shou/tabnine-on ()
   "turn on TabNine for this buffer"
   (interactive)
-  (let ((backends (add-to-list 'company-backends 'tabnine))
-        (set (make-local-variable 'company-backends) backends))))
+  (setq-local ((company-backends (add-to-list company-backends 'company-tabnine)))))
 #+END_SRC
 
 *** Company completion icons on GUI
@@ -1181,6 +1239,8 @@ Colorize function names/arguments in info doucmentations.
 
 #+BEGIN_SRC emacs-lisp
 (use-package elixir-mode
+  :mode (("\\.exs\\'" . elixir-mode)
+         ("\\.ex\\'" . elixir-mode))
   :config
   (define-key elixir-mode-map (kbd "M-F") 'elixir-format))
 #+END_SRC
@@ -1211,20 +1271,27 @@ Colorize function names/arguments in info doucmentations.
 Simply install protobuf mode. Default settings should work.
 
 #+BEGIN_SRC emacs-lisp
-(use-package protobuf-mode)
+(use-package protobuf-mode
+  :commands protobuf-mode
+  :mode "\\.proto\\'"
+  :mode "\\.proto3\\'")
 #+END_SRC
 *** JSON
 
 Install JSON mode.
 
 #+BEGIN_SRC emacs-lisp
-(use-package json-mode)
+(use-package json-mode
+  :commands json-mode
+  :mode "\\.json\\'")
 #+END_SRC
 
 Reformatting JSON.
 
 #+BEGIN_SRC emacs-lisp
 (use-package json-reformat
+  :after json-mode
+  :functions json-reformat-format
   :config
   (define-key json-mode-map (kbd "M-F")
     (lambda () (interactive) (mark-whole-buffer) (json-reformat-format))))
@@ -1232,6 +1299,7 @@ Reformatting JSON.
 *** Rust
 #+BEGIN_SRC emacs-lisp
 (use-package rust-mode
+  :mode "\\.rs\\'"
   :config
   (setq-default rust-format-on-save t))
 #+END_SRC
@@ -1240,7 +1308,8 @@ Reformatting JSON.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'sh-mode-hook
           (lambda ()
-            (setq-default sh-basic-offset 2 sh-indentation 2)))
+            (setq-default sh-basic-offset 2
+                          sh-indentation 2)))
 #+END_SRC
 *** Dockerfile
 
@@ -1257,8 +1326,8 @@ Reformatting JSON.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :init
-  (setq org-export-backends '(ascii html latex)))
+  :pin org
+  :mode ("\\.org\\'" . org-mode))
 #+END_SRC
 
 ** Set org directory
@@ -1272,7 +1341,8 @@ Reformatting JSON.
   "Return the path of file inside org-directory"
   (expand-file-name filename org-directory))
 
-(setq-default org-default-notes-file (org-file-path "notes.org"))
+(use-package org
+  :custom (org-default-notes-file (org-file-path "notes.org")))
 #+END_SRC
 
 ** Set =org-mode= as the default mode
@@ -1287,26 +1357,30 @@ Reformatting JSON.
 First, we enable =org-indent-mode=:
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'org-mode-hook 'org-indent-mode)
-(setq-default org-indent-indentation-per-level 1)
+(use-package org
+  :hook (org-mode . org-indent-mode)
+  :custom (org-ident-indentation-per-level 1))
 #+END_SRC
 
 Next we disable =org-mode='s built-in hard indentation:
 
 #+BEGIN_SRC emacs-lisp
-(setq-default org-adapt-indentation nil)
+(use-package org
+  :custom (org-adapt-indentation nil))
 #+END_SRC
 
 *** Make TAB acts like major mode in source block
 
 #+BEGIN_SRC emacs-lisp
-(setq-default org-src-tab-acts-natively t)
+(use-package org
+  :custom (org-src-tab-acts-natively t))
 #+END_SRC
 
 *** Let =<TAB>= fold current outline from anywhere in the section
 
 #+BEGIN_SRC emacs-lisp
-; (setq-default org-cycle-emulate-tab 'white)
+; (use-package org
+;   :custom (org-cycle-emulate-tab 'white))
 #+END_SRC
 
 *** Avoid inadvertent text edit in invisible area
@@ -1314,7 +1388,8 @@ Next we disable =org-mode='s built-in hard indentation:
 Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#avoid-inadvertent-text-edit-in-invisible-area][Org-mode Hidden Gems - 01 Document Structure]].
 
 #+BEGIN_SRC emacs-lisp
-(setq org-catch-invisible-edits 'show-and-error)
+(use-package org
+  :custom (org-catch-invisible-edits 'show-and-error))
 #+END_SRC
 
 *** Hide empty lines between subtrees in collapsed view
@@ -1322,13 +1397,15 @@ Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#avoid-inadverten
 Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#in-collapsed-view-hide-empty-lines-between-subtrees][Org-mode Hidden Gems - 01 Document Structure]].
 
 #+BEGIN_SRC emacs-lisp
-(setq org-cycle-separator-lines 0)
+(use-package org
+  :custom (org-cycle-separator-lines 0))
 #+END_SRC
 
 *** List bullets
 
 #+BEGIN_SRC emacs-lisp
-(setq org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
+(use-package org
+  :custom (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+"))))
 #+END_SRC
 
 ** Visual Tweaks
@@ -1336,14 +1413,15 @@ Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#in-collapsed-vie
 
 #+BEGIN_SRC emacs-lisp
 (use-package org-bullets
-  :config
-  (add-hook 'org-mode-hook 'org-bullets-mode))
+  :after org
+  :hook (org-mode . org-bullets-mode))
 #+END_SRC
 
 *** Hide leading stars
 
 #+BEGIN_SRC emacs-lisp
-(setq-default org-hide-leading-stars t)
+(use-package org
+  :custom (org-hide-leading-stars t))
 #+END_SRC
 
 *** Hide markup symbols
@@ -1351,19 +1429,23 @@ Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#in-collapsed-vie
 I'd like to hide ===, =+=, =*= symbols when not necessary.
 
 #+BEGIN_SRC emacs-lisp
-(setq-default org-hide-emphasis-markers t)
+(use-package org
+  :custom (org-hide-emphasis-markers t))
 #+END_SRC
 
 *** Customize wrap around symbol
 
 #+BEGIN_SRC emacs-lisp
+(use-package org
+  :custom (org-hide-emphasis-markers t))
 (setq-default org-ellipsis " ⤵")
 #+END_SRC
 
 *** Turn on native source fontification in org buffer
 
 #+BEGIN_SRC emacs-lisp
-(setq-default org-src-fontify-natively t)
+(use-package org
+  :custom (org-src-fontify-natively t))
 #+END_SRC
 
 ** Source editing
@@ -1372,28 +1454,34 @@ I'd like to hide ===, =+=, =*= symbols when not necessary.
 See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-two-extra-spaces-at-the-beginning-of-code-blocks-in-or][reference]].
 
 #+BEGIN_SRC emacs-lisp
-(setq-default org-src-strip-leading-and-trailing-blank-lines t
-              org-src-preserve-indentation t)
+(use-package org
+  :custom
+  (org-src-strip-leading-and-trailing-blank-lines t)
+  (org-src-preserve-indentation t))
 #+END_SRC
 
 *** Use the same window for org-src-edit
 
 #+BEGIN_SRC emacs-lisp
-(setq-default org-src-window-setup 'current-window)
+(use-package org
+  :custom (org-src-window-setup 'current-window))
 #+END_SRC
 
 *** Include emacs-lisp src quickly
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'org-structure-template-alist
-             '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+(use-package org
+  :config
+  (add-to-list 'org-structure-template-alist
+               '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")))
 #+END_SRC
 
 ** To-do settings
 *** Log down time when marking an item "DONE"
 
 #+BEGIN_SRC emacs-lisp
-(setq-default org-log-done 'time)
+(use-package org
+  :custom (org-log-done 'time))
 #+END_SRC
 
 ** Taking note with =deft=
@@ -1433,9 +1521,12 @@ don't need to leave Emacs for that.
   :after org
   :hook
   ((org-mode . org-roam-mode)
-   (after-init . org-roam--build-cache-async))
+   (emacs-startup . org-roam--build-cache-async))
   :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
+  :config
+  (setq org-roam-mute-cache-build t)
   :custom
+  (org-roam-mute-cache-build t)
   (org-roam-directory (org-file-path "roam/"))
   :bind
   ("C-c r l" . org-roam)
@@ -1448,32 +1539,35 @@ don't need to leave Emacs for that.
 *** Use =C-c a= to enter agenda mode
 
 #+BEGIN_SRC emacs-lisp
-(define-key global-map (kbd "C-c a") 'org-agenda)
+(use-package org
+  :bind ("C-c a" . org-agenda))
 #+END_SRC
 
 *** Set agenda files
 
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-files (list
-                        (org-file-path "agenda.org")
-                        (org-file-path "todo.org")
-                        (org-file-path "work.org")
-                        (org-file-path "diary.org")
-                        (org-file-path "to-read.org")))
+(use-package org
+  :custom
+  (org-agenda-files (list
+                     (org-file-path "agenda.org")
+                     (org-file-path "todo.org")
+                     (org-file-path "work.org")
+                     (org-file-path "diary.org")
+                     (org-file-path "to-read.org"))))
 #+END_SRC
 
 *** Agenda view
 
 #+BEGIN_SRC emacs-lisp
-; (setq org-agenda-span 7)
-(setq org-agenda-start-on-weekday nil)
+(use-package org
+  :custom (org-agenda-start-on-weekday nil))
 #+END_SRC
 
 ** Archiving
 
 #+BEGIN_SRC emacs-lisp
-(setq org-archive-location
-      (concat (org-file-path "archive.org") "::* From %s"))
+(use-package org
+  :custom (org-archive-location (concat (org-file-path "archive.org") "::* From %s")))
 #+END_SRC
 
 ** Capturing
@@ -1482,6 +1576,7 @@ don't need to leave Emacs for that.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org-cliplink
+  :after org
   :commands (org-cliplink org-cliplink-capture)
   :bind ("C-c C-S-l" . org-cliplink))
 #+END_SRC
@@ -1489,40 +1584,42 @@ don't need to leave Emacs for that.
 *** Use =C-c c= for capturing
 
 #+BEGIN_SRC emacs-lisp
-(define-key global-map (kbd "C-c c") 'org-capture)
+(use-package org
+  :bind ("C-c c" . org-capture))
 #+END_SRC
 
 *** Capture templates
 
 #+BEGIN_SRC emacs-lisp
-(setq org-capture-templates
-      `(
-        ;; Work
-        ("w" "(Work) To-do" entry (file+headline "todo.org" "Work")
-         "* TODO %^{Description}\n%?\nRef: %l\nAdded: %U\n")
+(use-package org
+  :custom
+  (org-capture-templates `(;; Work
+                           ("w" "(Work) To-do" entry (file+headline "todo.org" "Work")
+                            "* TODO %^{Description}\n%?\nRef: %l\nAdded: %U\n")
 
-        ("p" "(Personal) To-do" entry (file+headline "todo.org" "Personal")
-         "* TODO %^{Description}\n%?\nRef: %l\nAdded: %U\n")
+                           ("p" "(Personal) To-do" entry (file+headline "todo.org" "Personal")
+                            "* TODO %^{Description}\n%?\nRef: %l\nAdded: %U\n")
 
-        ;; Note
-        ("n" "Note" entry (file "notes.org")
-         "* %^{Note}\n%?\nAdded: %U\n")
+                           ;; Note
+                           ("n" "Note" entry (file "notes.org")
+                            "* %^{Note}\n%?\nAdded: %U\n")
 
-        ;; Reading
-        ("r" "Reading" entry (file "to-read.org")
-         "* %^{Article}\n%?\n%(org-capture-link)\nAdded: %U\n")
+                           ;; Reading
+                           ("r" "Reading" entry (file "to-read.org")
+                            "* %^{Article}\n%?\n%(org-capture-link)\nAdded: %U\n")
 
-        ;; Diary fragments
-        ("d" "Diary" entry (file+olp+datetree "diary.org")
-         "* %U %^{Diary}\n%?\n")
-        ))
+                           ;; Diary fragments
+                           ("d" "Diary" entry (file+olp+datetree "diary.org")
+                            "* %U %^{Diary}\n%?\n")
+                           ))
+  :hook (org-capture-mode . evil-insert-state))
 
-(add-hook 'org-capture-mode-hook 'evil-insert-state)
 #+END_SRC
 ** Presentation
 
 #+BEGIN_SRC emacs-lisp
 (use-package epresent
+  :after org
   :commands epresent-run
   :config
   (add-hook 'epresent-start-presentation-hook 'evil-emacs-state))
@@ -1531,13 +1628,15 @@ don't need to leave Emacs for that.
 *** Set inline image width to 600px
 
 #+BEGIN_SRC emacs-lisp
-(setq org-image-actual-width 600)
+(use-package org
+  :custom (org-image-actual-width 600))
 #+END_SRC
 
 *** Enable drag-n-drop download for images
 
 #+BEGIN_SRC emacs-lisp
 (use-package org-download
+  :after org
   :commands (org-download-image org-download-enable org-download-screenshot)
   :hook (dired-mode . org-download-enable)
   :custom (org-download-screenshot-method
@@ -1546,30 +1645,45 @@ don't need to leave Emacs for that.
              "xclip -selection clipboard -t image/png -o > %s")))
 #+END_SRC
 
+** Annotating documents
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-noter
+  :after org
+  :commands org-noter)
+#+END_SRC
+
 ** Exporting
 *** Export to Bootstrap (HTML)
 
 #+BEGIN_SRC emacs-lisp
-(use-package ox-twbs)
+(use-package ox-twbs
+  :after (org ox))
 #+END_SRC
 
 *** Export to MediaWiki
 
 #+BEGIN_SRC emacs-lisp
-(use-package ox-mediawiki)
+(use-package ox-mediawiki
+  :after (org ox))
 #+END_SRC
 
 *** Export to Markdown (GFM)
 #+BEGIN_SRC emacs-lisp
-(use-package ox-gfm :after org)
+(use-package ox-gfm
+  :after (org ox))
 #+END_SRC
 *** Export to PDF
 
 Enable exporting to Beamer.
 
 #+BEGIN_SRC emacs-lisp
-(require 'ox-latex)
-(require 'ox-beamer)
+(use-package ox-latex
+   :ensure nil
+   :after (org ox))
+(use-package ox-beamer
+   :ensure nil
+   :after (org ox))
 #+END_SRC
 
 Enhance unicode characters support.
@@ -1578,13 +1692,15 @@ Enable syntax highlighting. In a fresh install please make sure =pygements= is
 installed (~pip install Pygments~).
 
 #+BEGIN_SRC emacs-lisp
-(setq org-latex-pdf-process
-      '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-(setq org-latex-compiler "xelatex")
-(setq-default TeX-engine 'xetex)
-(setq-default TeX-PDF-mode t)
+(use-package org
+  :custom
+  (org-latex-pdf-process
+   '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  (org-latex-compiler "xelatex")
+  (TeX-engine 'xetex)
+  (TeX-PDF-mode t))
 #+END_SRC
 ** Custom keystrokes
 *** In CLI rebind "<tab>"
@@ -1610,12 +1726,20 @@ installed (~pip install Pygments~).
 *** Use =C-c l= to collect links
 
 #+BEGIN_SRC emacs-lisp
-(define-key global-map (kbd "C-c l") 'org-store-link)
+(use-package org
+  :bind ("C-c l" . org-store-link))
 #+END_SRC
 
 *** Use =C-c C-c= to save and quit =org-src-mode=
 
 #+BEGIN_SRC emacs-lisp
-(define-key org-src-mode-map (kbd "C-c C-c") 'org-edit-src-exit)
+(use-package org
+  :bind (:map org-src-mode-map ("C-c C-c" . org-edit-src-exit)))
 #+END_SRC
 *** Disable unused export options
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :init
+  (setq org-export-backends '(ascii html latex)))
+#+END_SRC
