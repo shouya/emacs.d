@@ -5,6 +5,7 @@
 * Setup personal information
 
 #+BEGIN_SRC emacs-lisp
+;;; -*- lexical-binding: t; -*-
 (setq-default user-full-name "Shou Ya"
               user-email-address "shou@lain.li")
 #+END_SRC
@@ -68,12 +69,6 @@ lock file for specific version, some new packages depend on it.
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
-#+END_SRC
-
-** Do not mangle with org
-
-#+BEGIN_SRC emacs-lisp
-(setq straight-fix-org nil)
 #+END_SRC
 
 ** Enable ELPA with straight
