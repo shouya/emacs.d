@@ -18,10 +18,8 @@ Doing so will boost boot-up speed. See [[https://github.com/hlissner/doom-emacs/
 (setq gc-cons-threshold most-positive-fixnum) ; 2^61 bytes
 
 ;; reset it after load
-; (add-hook 'emacs-startup-hook
-;           (lambda ()
-;             (setq gc-cons-threshold gc-cons-threshold-default
-;                   gc-cons-percentage gc-cons-percentage-default)))
+(add-hook 'emacs-startup-hook
+          (lambda () (setq gc-cons-threshold 800000)))
 #+END_SRC
 
 ** Trick to make startup faster
@@ -232,7 +230,10 @@ one.
   (switch-to-buffer-other-window (get-buffer-create "*eww*"))
   (eww-browse-url url))
 
-(setq browse-url-browser-function 'shou/eww-browse-url-in-new-buffer)
+(setq browse-url-browser-function
+      `(("github\\.com" . browse-url-default-browser)
+        ("reddit\\.com" . browse-url-default-browser)
+        (".*" . shou/eww-browse-url-in-new-buffer)))
 #+END_SRC
 
 =eww-readable= makes the web page more readable by hiding unnecessary content, so
@@ -248,9 +249,9 @@ I switched to readable mode after a web page is rendered.
 Garbage collection magic hack.
 
 #+BEGIN_SRC emacs-lisp
-(use-package gcmh
-  :hook (emacs-startup . gcmh-mode)
-  :custom (gcmh-idle-timer 3))
+; (use-package gcmh
+;   :hook (emacs-startup . gcmh-mode)
+;   :custom (gcmh-idle-timer 3))
 #+END_SRC
 
 ** Startup profiler
@@ -262,6 +263,11 @@ Garbage collection magic hack.
 
 * UI
 ** Tweak main UI
+
+eejaldksf
+asdfa
+
+
 
 Hide the title bar, menu bar, as well as the scroll bar.
 
@@ -278,7 +284,8 @@ Hide the title bar, menu bar, as well as the scroll bar.
 Enable pixel-wise scrolling for mouse scroll-wheel. It looks nicer.
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'emacs-startup-hook 'pixel-scroll-mode)
+;; disabling it for now as it sometimes causes emacs to hang
+; (add-hook 'emacs-startup-hook 'pixel-scroll-mode)
 #+END_SRC
 
 Disable visual bell because Emacs for macOS renders it poorly.
@@ -298,11 +305,11 @@ Show file name in window title.
 I use "Input" as my default font face.
 
 #+BEGIN_SRC emacs-lisp
-(set-face-attribute 'default nil
-  :family "Input"
-  :height 130
-  :weight 'light
-  :width 'normal)
+(custom-theme-set-faces
+ 'user
+ '(variable-pitch ((t (:family "Helvetica"))))
+ '(fixed-pitch ((t (:family "Input")))))
+(set-face-attribute 'default nil :font "Input")
 #+END_SRC
 
 ** Theme
@@ -384,6 +391,29 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
 #+BEGIN_SRC emacs-lisp
 (setq auto-window-vscroll nil)
 #+END_SRC
+** Window management with =ace-window=
+
+#+BEGIN_SRC emacs-lisp
+(use-package ace-window
+  :bind ("M-o" . ace-window)
+  :custom
+  ;; show current action in minibuffer
+  (aw-minibuffer-flag t)
+  ;; don't grey out background
+  (aw-background nil)
+  ;; custom actions
+  (aw-dispatch-alist '((?o aw-flip-window)
+                       (?B aw-switch-buffer-other-window "Switch buffer in other window")
+                       (?x delete-window)
+                       (?x aw-delete-window "Delete other window")
+                       (?m aw-swap-window "Swap with window")
+                       (?M aw-move-window "Move and override window at location")
+                       (?C aw-copy-window "Copy and override window at location")
+                       (?? aw-show-dispatch-help))))
+
+;; Disable C-x o
+(global-unset-key (kbd "C-x o"))
+#+END_SRC
 
 * Evil mode
 ** Load =evil=
@@ -397,7 +427,10 @@ Then load evil mode.
   :init (setq evil-want-keybinding nil)
   :hook (emacs-startup . evil-mode)
   :demand t
-  :custom (evil-symbol-word-search t))
+  :custom
+  ;; "*" Search by symbol instead of word, useful for snake_case
+  (evil-symbol-word-search t))
+
 #+END_SRC
 
 ** A collection of Vim key bindings among modes
@@ -406,7 +439,12 @@ Install evil-collection, which provides evil-friendly bindings for many modes.
 #+BEGIN_SRC emacs-lisp
 (use-package evil-collection
   :after evil
-  :hook (emacs-startup . evil-collection-init))
+  :config
+  (evil-collection-init)
+  (with-eval-after-load 'dired
+    ; (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+    (evil-define-key 'normal dired-mode-map
+      (kbd "RET") 'dired-find-alternate-file)))
 #+END_SRC
 
 ** Manipulate surroundings with Vim key bindings
@@ -472,7 +510,8 @@ Use =evil= key bindings with Org agendas.
 Triggered with =<<= and =>>=.
 
 #+BEGIN_SRC emacs-lisp
-(setq-default evil-shift-width 2)
+(use-package evil
+  :custom (evil-shift-width 2))
 #+END_SRC
 
 ** Match =begin =... =end= with =%=
@@ -495,7 +534,7 @@ Works just like C-a/C-x in vim.
               ("_" . evil-numbers/dec-at-pt)))
 #+END_SRC
 
-* =dired-mode=
+* Dired
 ** Load =dired-x= by default
 
 Load Dired X that comes with Emacs.
@@ -507,13 +546,21 @@ Load Dired X that comes with Emacs.
 ** Retain the same window when browsing
 
 #+BEGIN_SRC emacs-lisp
+(require 'dired)
+(define-key dired-mode-map
+  (kbd "RET") 'dired-find-alternate-file) ; was dired-advertised-find-file
+(define-key dired-mode-map
+  (kbd "^") (lambda () (interactive) (find-alternate-file "..")))  ; was dired-up-directory
 ;; RET to find file in same window
-;; (with-eval-after-load 'evil
-;;   (evil-define-key 'normal dired-mode-map
-;;     (kbd "RET") 'dired-find-alternate-file))
-(define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
 ;; do not show warning
 (put 'dired-find-alternate-file 'disabled nil)
+#+END_SRC
+
+** Copy file to split window
+
+#+BEGIN_SRC emacs-lisp
+(eval-after-load 'dired
+  (setq dired-dwim-target t))
 #+END_SRC
 
 ** Recursive copy and delete
@@ -562,21 +609,15 @@ So it doesn't block the main UI when copying large files.
 #+BEGIN_SRC emacs-lisp
 (use-package neotree
   :bind ("<f8>" . neotree-toggle)
+  :after projectile
   :custom
   (neo-theme (if (display-graphic-p) 'icons 'arrow))
   (neo-smart-open t "auto find current file and jump to node")
   (neo-vc-integration '(face))
-  (projectile-switch-project-action
-   'neotree-projectile-action
-   "switch to neotree to projectile root dir"))
-#+END_SRC
-
-* Document reading
-** EPUB
-
-#+BEGIN_SRC emacs-lisp
-(use-package nov
-  :mode ("\\.epub\\'" . nov-mode))
+  ;; (projectile-switch-project-action
+  ;;  'neotree-projectile-action
+  ;;  "switch to neotree to projectile root dir")
+)
 #+END_SRC
 
 * Terminal
@@ -586,8 +627,11 @@ So it doesn't block the main UI when copying large files.
 (use-package vterm
   :after evil-collection
   :commands (vterm vterm-other-window)
-  :bind (("C-c t" . vterm)))
-         ;; :map vterm-mode ("C-c C-l" . vterm-clear-scrollback)))
+  :bind ("C-c t" . vterm)
+  :custom
+  (vterm-max-scrollback 20000)
+  :config
+  (define-key vterm-mode-map (kbd "C-c C-l") vterm-clear-scrollback))
 #+END_SRC
 
 ** Use =multi-term= to manage terminal sessions
@@ -623,13 +667,21 @@ Some modes set this variable automatically, so we need to override them.
 (add-hook 'prog-mode-hook
           (lambda () (setq-default indent-tabs-mode nil)))
 #+END_SRC
+** Detect indentation using heuristics
+
+#+BEGIN_SRC emacs-lisp
+(use-package dtrt-indent
+  :commands dtrt-indent-mode)
+(defalias 'detect-indentation 'dtrt-indent-mode)
+(defalias 'detect-tab-size 'dtrt-indent-mode)
+#+END_SRC
 
 ** Cursor movement
 *** Use subword mode everywhere
 
 #+BEGIN_SRC emacs-lisp
-(use-package subword
-  :hook (emacs-startup . global-subword-mode))
+; (use-package syntax-subword
+;   :hook (emacs-startup . global-syntax-subword-mode))
 #+END_SRC
 
 ** Undo tree
@@ -666,6 +718,11 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
 
   ;; Do not insert "^" automatically
   (setq ivy-initial-inputs-alist nil)
+
+  ;; Retain the window after backward-deleted last char
+  (setq ivy-on-del-error-function nil)
+
+  ;; Start ivy
   (ivy-mode))
 
 #+END_SRC
@@ -731,24 +788,32 @@ entered.
 
 *** Enable spell checking
 
-Remember to install =ispell= command line tool.
+Remember to install =aspell= command line tool.
 
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell
-  :when (executable-find "ispell")
-  :ensure-system-package ispell
-  :config
-  (setq-default ispell-personal-dictionary
-                (expand-file-name "user-dict" user-emacs-directory))
-
-  ;; enable flyspell-mode for text modes
-  (dolist (hook text-mode-hooks) (add-hook hook 'flyspell-mode))
+  :when (executable-find "aspell")
+  :ensure-system-package aspell
+  :custom
+  ;; personal dictionary
+  (ispell-personal-dictionary (expand-file-name "user-dict" user-emacs-directory))
 
   ;; sort correction by likelihood
-  (setq-default flyspell-sort-corrections t)
+  (flyspell-sort-corrections t)
 
   ;; save to personal dictionary without confirmation
-  (setq-default ispell-silently-savep t))
+  (ispell-silently-savep t)
+
+  ;; use aspell
+  (ispell-program-name (executable-find "aspell"))
+
+  :config
+  ;; run flyspell only on idle time to avoid performance issue
+  (use-package flyspell-lazy)
+  (flyspell-lazy-mode 1)
+
+  ;; enable flyspell-mode for text modes
+  (dolist (hook text-mode-hooks) (add-hook hook 'flyspell-mode)))
 #+END_SRC
 
 Use =M-$= to correct word at point.
@@ -758,44 +823,6 @@ Use =M-$= to correct word at point.
 #+BEGIN_SRC emacs-lisp
 (dolist (hook text-mode-hooks)
   (add-hook hook 'auto-fill-mode))
-#+END_SRC
-
-*** Linting prose
-
-We first define =proselint= checker for flycheck. Remember to install =proselint=
-CLI tool.
-
-#+BEGIN_SRC emacs-lisp
-(use-package flycheck
-  :demand t
-  :hook
-  ;; enable spellcheck in code comments
-  (prog-mode . flycheck-prog-mode)
-
-  :commands (flycheck-mode flycheck-prog-mode)
-
-  :config
-  (when (executable-find "proselint")
-    (flycheck-define-checker proselint
-      "A linter for prose."
-      :command ("proselint" source-inplace)
-      :error-patterns
-      ((warning line-start (file-name) ":" line ":" column ": "
-                (id (one-or-more (not (any " "))))
-                (message (one-or-more not-newline)
-                         (zero-or-more "\n" (any " ") (one-or-more not-newline)))
-                line-end))
-      :modes (text-mode markdown-mode gfm-mode org-mode))
-
-    (add-to-list 'flycheck-checkers 'proselint)))
-#+END_SRC
-
-
-Next we enable proselint for text modes.
-
-#+BEGIN_SRC emacs-lisp
-(dolist (hook text-mode-hooks)
-  (add-hook hook 'flycheck-mode))
 #+END_SRC
 
 *** Auto correct frequent typo
@@ -825,6 +852,23 @@ Next we enable proselint for text modes.
   (define-key evil-normal-state-map (kbd "C-t") 'shou/transpose-next-char))
 #+END_SRC
 
+** EPUB
+
+#+BEGIN_SRC emacs-lisp
+(use-package nov
+  :mode ("\\.epub\\'" . nov-mode))
+#+END_SRC
+
+
+
+** Dictionary
+
+#+BEGIN_SRC emacs-lisp
+(use-package osx-dictionary
+  :if (eq system-type 'darwin)
+  :bind ("C-c d" . osx-dictionary-search-word-at-point))
+
+#+END_SRC
 * Programming
 ** Show column number
 
@@ -835,9 +879,26 @@ Next we enable proselint for text modes.
 Also show a ruler at column 80.
 
 #+BEGIN_SRC emacs-lisp
-(setq-default whitespace-line-column 80
-              whitespace-style '(face lines-tail))
-(add-hook 'prog-mode-hook 'whitespace-mode)
+(use-package fill-column-indicator
+  :custom
+  (fci-rule-column 80)
+
+  ;; customize the look of the ruler
+  (fci-rule-width 1)
+  (fci-rule-use-dashes t)
+  (fci-dash-pattern 0.3)
+
+  ;; fci is incompatible with show-trailing-whitespace
+  (show-trailing-whitespace nil)
+
+  :hook (prog-mode . fci-mode))
+
+#+END_SRC
+** Show line number
+
+#+BEGIN_SRC emacs-lisp
+(use-package nlinum
+  :hook (prog-mode . nlinum-mode))
 #+END_SRC
 
 ** Jump to definition (=M-.=)
@@ -848,10 +909,19 @@ We use =dumb-jump=, which works out of the box for many languages.
 (use-package dumb-jump
   :after evil
   :bind (:map evil-normal-state-map
-              ("M-." . dumb-jump-go))
+              ("M-." . dumb-jump-go-other-window)
+              ("M-," . dumb-jump-go))
   :custom
   (dumb-jump-selector 'ivy)
   (dumb-jump-force-searcher 'rg))
+#+END_SRC
+
+** Enable flycheck
+
+#+BEGIN_SRC emacs-lisp
+(use-package flycheck
+  :demand t
+  :commands (flycheck-mode))
 #+END_SRC
 
 ** Highlight all occurrences word at point
@@ -881,12 +951,17 @@ We use =dumb-jump=, which works out of the box for many languages.
   (projectile-completion-system 'ivy)
   (projectile-switch-project-action 'projectile-dired)
   (projectile-enable-caching t)
-  (projectile-indexing-method 'native)
+  (projectile-indexing-method 'alien)
 
   :hook (emacs-startup . projectile-mode)
 
   :bind-keymap
-  ("M-p" . projectile-command-map))
+  ("M-p" . projectile-command-map)
+
+  :config
+  (setq projectile-globally-ignored-directories
+        (append projectile-globally-ignored-directories
+                '(".elixir_ls" "_build"))))
 #+END_SRC
 
 *** Customize project-find-functions to find multi-project vc
@@ -905,6 +980,28 @@ Let the project root to be where =mix.exs= is found. This function is used by
 ;;                               (vc-call-backend backend 'root dir)))))
 ;;     (and root (cons 'vc root))))
 
+#+END_SRC
+
+** Auto complete parentheses
+
+I use =smartparens= package for the purpose.
+
+#+BEGIN_SRC emacs-lisp
+(use-package smartparens
+  :hook (prog-mode . smartparens-mode)
+  :bind (:map smartparens-mode-map
+              ;; ((a|) b) => ((a| b))
+              ("M-l" . sp-forward-slurp-sexp)
+              ;; ((a| b)) => ((a|) b)
+              ("M-h" . sp-forward-barf-sexp)
+              ;; (a (|b)) => ((a |b))
+              ("M-S-h" . sp-backward-slurp-sexp)
+              ;; ((a |b)) => (a (|b))
+              ("M-S-l" . sp-backward-barf-sexp)
+              ;; ((a|) b) => (a| b)
+              ("M-j" . sp-splice-sexp))
+  :config
+  (require 'smartparens-config))
 #+END_SRC
 
 ** Git
@@ -1072,8 +1169,8 @@ Use =TabNine= for general text completion. Please remember to run
 
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
-  :commands yas-minor-mode
-  :hook (prog-mode . yas-minor-mode)
+  :commands (yas-global-mode yas-minor-mode)
+  :hook (emacs-startup . yas-global-mode)
 
   :config
   (setq-default yas-snippet-dirs
@@ -1087,6 +1184,7 @@ We use =eglot= for LSP support. Since eglot has a hook that turns off any compan
 
 #+BEGIN_SRC emacs-lisp
 (use-package eglot
+  :commands (eglot eglot-ensure)
   :after (company yasnippet)
   :config (setq-default eglot-stay-out-of '(company)))
 #+END_SRC
@@ -1097,13 +1195,18 @@ We use =eglot= for LSP support. Since eglot has a hook that turns off any compan
 (setq-default default-company-backends
               '(company-files
                 company-capf
+                company-semantic
+                company-dabbrev
                 company-tabnine))
 (setq-default company-backend-alist
               '((prog-mode-hook (company-files
-                                 company-capf))
-                (emacs-lisp-mode-hook (company-files company-elisp))))
+                                 company-capf
+                                 company-dabbrev))
+                (emacs-lisp-mode-hook (company-files
+                                       company-elisp
+                                       company-dabbrev))))
 
-(setq-default company-backends default-company-backends)
+(setq company-backends default-company-backends)
 (dolist (pair company-backend-alist)
   (let ((hook (car pair))
         (backends (cadr pair)))
@@ -1206,31 +1309,22 @@ Colorize function names/arguments in info doucmentations.
 (use-package elixir-mode
   :mode (("\\.exs\\'" . elixir-mode)
          ("\\.ex\\'" . elixir-mode))
+
+  ;; Format with M-F
+  :bind (:map elixir-mode-map ("M-F" . elixir-format))
+
+  ;; Enable eglot for completion from LSP
   :config
-  (define-key elixir-mode-map (kbd "M-F") 'elixir-format))
+  (add-hook 'elixir-mode-hook 'eglot-ensure))
 #+END_SRC
 
-**** Enable eglot for completion from LSP
-
-#+BEGIN_SRC emacs-lisp
-(add-hook 'elixir-mode-hook 'eglot-ensure)
-#+END_SRC
-
-**** Auto un-indent "end"
-#+BEGIN_SRC emacs-lisp
-(use-package ruby-end
-  :config
-  (add-hook 'elixir-mode-hook
-            (lambda ()
-              (set (make-variable-buffer-local 'ruby-end-expand-keywords-before-re)
-                   "\\(?:^\\|\\s-+\\)\\(?:do\\)")
-              (set (make-variable-buffer-local 'ruby-end-check-statement-modifiers) nil)
-              (ruby-end-mode +1))))
-#+END_SRC
 **** Run ExUnit
 #+BEGIN_SRC emacs-lisp
-(use-package exunit)
+(use-package exunit
+  :after elixir-mode
+  :custom (exunit-environment "MIX_ENV=test"))
 #+END_SRC
+
 *** Protobuf
 
 Simply install protobuf mode. Default settings should work.
@@ -1273,8 +1367,12 @@ Reformatting JSON.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'sh-mode-hook
           (lambda ()
-            (setq-default sh-basic-offset 2
-                          sh-indentation 2)))
+            ;; to use shellcheck as lint software
+            (flycheck-mode)
+            ;; these variables sometimes get reset when opening a shell file, so
+            ;; I manually set them here.
+            (setq sh-basic-offset 2
+                  sh-indentation 2)))
 #+END_SRC
 *** Dockerfile
 
@@ -1284,6 +1382,27 @@ Reformatting JSON.
 (use-package docker-compose-mode
   :mode "docker-compose\\.ya?ml"
   :mode "fig\\.ya?ml")
+#+END_SRC
+*** Terraform
+
+#+BEGIN_SRC emacs-lisp
+(use-package terraform-mode
+  :mode "\\.tf\\'")
+#+END_SRC
+*** Web
+
+#+BEGIN_SRC emacs-lisp
+(use-package web-mode
+  :mode "\\.html\\'")
+#+END_SRC
+*** Systemd unit files
+
+#+BEGIN_SRC emacs-lisp
+(use-package systemd
+  :if (eq 'system-type 'gnu/linux)
+  :mode (("\\.service\\'" . systemd-mode)
+         ("\\.timer\\'" . systemd-mode)
+         ("/etc/systemd/.*\\.conf\\'" . systemd-mode)))
 #+END_SRC
 
 * Org mode
@@ -1375,6 +1494,18 @@ Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#in-collapsed-vie
   :custom (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+"))))
 #+END_SRC
 
+*** Avoid unwanted indentation
+
+By default =evil-open-below= inserts an unwanted indentation in the newline. Which is
+very annoying when editing definition lists. This feature is useful in
+programming though, so I only turns it off in org mode.
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :config
+  (add-hook 'org-mode-hook (lambda () (setq-local evil-auto-indent nil))))
+#+END_SRC
+
 ** Visual Tweaks
 *** Turn on native source fontification in org buffer
 
@@ -1439,7 +1570,9 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
 (use-package org
   :config
   (add-to-list 'org-structure-template-alist
-               '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")))
+               '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")
+  (add-to-list 'org-structure-template-alist
+               '("lojban" "#+BEGIN_SRC lojban\n?\n#+END_SRC"))))
 #+END_SRC
 
 ** To-do settings
@@ -1501,6 +1634,33 @@ don't need to leave Emacs for that.
   ("C-c r i" . org-roam-insert)
   ("C-c r g" . org-roam-show-graph))
 #+END_SRC
+** Anki deck
+
+#+BEGIN_SRC emacs-lisp
+(defun shou/interactive-push-anki-notes ()
+  (interactive)
+  (when (and (eq major-mode 'org-mode)
+             (> (length (anki-editor-map-note-entries t nil 'file)) 0)
+             (yes-or-no-p "Push cards to Anki?"))
+    (let ((progress-reporter
+           (make-progress-reporter "Pushing cards to Anki..." nil nil)))
+      (anki-editor-push-notes)
+      (progress-reporter-done progress-reporter))))
+
+(use-package anki-editor
+  :after org
+  :commands (anki-editor-push-notes
+             anki-editor-map-note-entries
+             anki-editor-insert-note
+             anki-editor-mode)
+  :hook (before-save . shou/interactive-push-anki-notes)
+  :custom
+  (anki-editor-org-tags-as-anki-tags t)
+  (anki-editor-protected-tags '("marked" "leech" "relearn-experiment"))
+  :config
+  (setq anki-editor--ox-anki-html-backend 'ascii))
+#+END_SRC
+
 ** Agenda
 *** Use =C-c a= to enter agenda mode
 
@@ -1560,11 +1720,12 @@ don't need to leave Emacs for that.
 (use-package org
   :custom
   (org-capture-templates `(;; Work
-                           ("w" "(Work) To-do" entry (file+headline "todo.org" "Work")
-                            "* TODO %^{Description}\n%?\nRef: %l\nAdded: %U\n")
+                           ("w" "To-do (Work)" entry (file+headline "todo.org" "Work")
+                            "* TODO %^{Description}\nSCHEDULED: %t\n%?\nAdded: %U\n")
 
-                           ("p" "(Personal) To-do" entry (file+headline "todo.org" "Personal")
-                            "* TODO %^{Description}\n%?\nRef: %l\nAdded: %U\n")
+                           ;; Personal
+                           ("p" "To-do (Oersonal)" entry (file+headline "todo.org" "Personal")
+                            "* TODO %^{Description}\nSCHEDULED: %t\n%?\nAdded: %U\n")
 
                            ;; Note
                            ("n" "Note" entry (file "notes.org")
@@ -1572,14 +1733,13 @@ don't need to leave Emacs for that.
 
                            ;; Reading
                            ("r" "Reading" entry (file "to-read.org")
-                            "* %^{Article}\n%?\n%(org-capture-link)\nAdded: %U\n")
+                            "* %(org-cliplink-capture)\nSCHEDULED: %t\n%?\n\nAdded: %U\n")
 
-                           ;; Diary fragments
-                           ("d" "Diary" entry (file+olp+datetree "diary.org")
-                            "* %U %^{Diary}\n%?\n")
-                           ))
-  :hook (org-capture-mode . evil-insert-state))
-
+                           ;; Anki fragments
+                           ("a" "Anki card" entry (file "anki-cards.org")
+                            "* Item %u   %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic (and reversed card)\n:ANKI_DECK: Remember\n:END:\n** Front\n%^{Front}\n** Back\n%^{Back}\n")
+                           )
+  :hook (org-capture-mode . evil-insert-state)))
 #+END_SRC
 ** Presentation
 
@@ -1710,4 +1870,26 @@ installed (~pip install Pygments~).
 (use-package org
   :init
   (setq org-export-backends '(ascii html latex)))
+#+END_SRC
+** Customize source languages
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :custom
+  (org-src-lang-modes
+   '(("ocaml" . tuareg)
+     ("elisp" . emacs-lisp)
+     ("ditaa" . artist)
+     ("asymptote" . asy)
+     ("dot" . fundamental)
+     ("sqlite" . sql)
+     ("calc" . fundamental)
+     ("C" . c)
+     ("cpp" . c++)
+     ("C++" . c++)
+     ("screen" . shell-script)
+     ("shell" . sh)
+     ("bash" . sh))
+     ("lojban" . lojban)
+   ))
 #+END_SRC

@@ -62,3 +62,4 @@ projectile.cache
 /straight/repos
 /straight/build
 /straight/build-cache.el
+/abbrev_defs

@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: Anki card for brivla
+# key: brivla
+# --
+* Item `(format-time-string "[%Y-%m-%d %a]" (current-time))`   :brivla:
+:PROPERTIES:
+:ANKI_NOTE_TYPE: Basic (and reversed card)
+:ANKI_DECK: Remember
+:END:
+** Front
+$1
+
+** Back
+$2
