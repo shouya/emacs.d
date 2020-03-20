@@ -233,6 +233,8 @@ one.
 (setq browse-url-browser-function
       `(("github\\.com" . browse-url-default-browser)
         ("reddit\\.com" . browse-url-default-browser)
+        ("youtube\\.com" . browse-url-default-browser)
+        (".*" . browse-url-default-browser)
         (".*" . shou/eww-browse-url-in-new-buffer)))
 #+END_SRC
 
@@ -401,6 +403,8 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
   (aw-minibuffer-flag t)
   ;; don't grey out background
   (aw-background nil)
+  ;; only jump between windows in the same frame
+  (aw-scope 'frame)
   ;; custom actions
   (aw-dispatch-alist '((?o aw-flip-window)
                        (?B aw-switch-buffer-other-window "Switch buffer in other window")
@@ -1200,8 +1204,8 @@ We use =eglot= for LSP support. Since eglot has a hook that turns off any compan
                 company-tabnine))
 (setq-default company-backend-alist
               '((prog-mode-hook (company-files
-                                 company-capf
-                                 company-dabbrev))
+                                 company-dabbrev
+                                 company-capf))
                 (emacs-lisp-mode-hook (company-files
                                        company-elisp
                                        company-dabbrev))))
@@ -1580,7 +1584,9 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :custom (org-log-done 'time))
+  :custom
+  (org-log-done 'time)
+  (org-log-into-drawer t))
 #+END_SRC
 
 ** Taking note with =deft=
@@ -1679,7 +1685,8 @@ don't need to leave Emacs for that.
                      (org-file-path "todo.org")
                      (org-file-path "work.org")
                      (org-file-path "diary.org")
-                     (org-file-path "to-read.org"))))
+                     (org-file-path "to-read.org")
+                     (org-file-path "gcal.org"))))
 #+END_SRC
 
 *** Agenda view
