@@ -218,6 +218,21 @@ I switched to readable mode after a web page is rendered.
   :commands (esup))
 #+END_SRC
 
+** Backup
+
+#+BEGIN_SRC emacs-lisp
+(setq backup-directory-alist
+      `((".*" . "~/tmp/.emacs.d/backup/")))
+(setq auto-save-file-name-transforms
+      `((".*" "~/tmp/.emacs.d/backup/" t)))
+#+END_SRC
+
+** Remove trailing whitespaces on save
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+END_SRC
+
 * UI
 ** Tweak main UI
 
@@ -422,12 +437,29 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
 (use-package popwin
   :hook (emacs-startup . popwin-mode)
   :config
-  (push '("*elixir-format-errors*" :noselect t)
-        popwin:special-display-config)
-  (push '("*idris-repl*")
-        popwin:special-display-config)
-  (push '("*idris-holes*" :noselect t)
-        popwin:special-display-config))
+  (push '("*elixir-format-errors*" :noselect t) popwin:special-display-config)
+  (push "*idris-repl*" popwin:special-display-config)
+  (push '("*idris-holes*" :noselect t) popwin:special-display-config)
+  (push "*Help*" popwin:special-display-config))
+#+END_SRC
+
+** Startup dashboard
+
+#+BEGIN_SRC emacs-lisp
+(use-package dashboard
+  :config
+  (dashboard-setup-startup-hook)
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+  :custom
+  (dashboard-items '((agenda . 7)
+                     (recents . 5)
+                     (projects . 5)))
+  (dashboard-startup-banner 2)
+  (dashboard-set-heading-icons t)
+  (dashboard-set-file-icons t)
+  (dashboard-set-navigator t)
+  (dashboard-set-footer nil)
+  )
 #+END_SRC
 
 * Dired
@@ -589,6 +621,7 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
   :bind
   ("C-s" . swiper)
   ("M-x" . counsel-M-x)
+  ("M-y" . counsel-yank-pop)
 
   :config
   (setq ivy-count-format "(%d/%d) ")
@@ -738,7 +771,7 @@ Use =M-$= to correct word at point.
   (save-excursion
     (next-line)
     (delete-indentation)))
-(bind-key "C-j" 'shou/join-line)
+(bind-key* "C-j" 'shou/join-line)
 #+END_SRC
 
 *** Select whole line (=C-S-v=)
@@ -883,12 +916,6 @@ Let the project root to be where =mix.exs= is found. This function is used by
   (let ((probe (locate-dominating-file dir "mix.exs")))
     (and probe (cons 'vc probe))))
 (add-hook 'project-find-functions 'shou/elixir-project-finder)
-;; (defun project-try-vc (dir)
-;;   (let* ((backend (ignore-errors (vc-responsible-backend dir)))
-;;          (root (and backend (ignore-errors
-;;                               (vc-call-backend backend 'root dir)))))
-;;     (and root (cons 'vc root))))
-
 #+END_SRC
 
 ** Auto complete parentheses
@@ -920,14 +947,21 @@ I use =magit= to show git status.
 
 #+BEGIN_SRC emacs-lisp
 (use-package magit
-  :bind ("C-x g" . magit)
+  :bind
+  ("C-x g" . magit)
+  ("C-x C-g" . magit-file-dispatch)
+  
   :demand t
   :after projectile
   :config
   ;; automatically refresh after saving a file
   (add-hook 'after-save-hook 'magit-after-save-refresh-status t))
 #+END_SRC
-*** Use =forge= for online features 
+*** Use =forge= for online features
+
+Hotkey to remember:
+
+| C-c C-o | forge-browse-topic |
 
 #+BEGIN_SRC emacs-lisp
 (use-package forge
@@ -935,13 +969,23 @@ I use =magit= to show git status.
 #+END_SRC
 
 
-*** Browse current file on github
+*** Browse current file on GitHub
 
 #+BEGIN_SRC emacs-lisp
 (use-package browse-at-remote
-  :bind ("C-c g g" . browse-at-remote))
+  :bind (("C-c g g" . browse-at-remote)
+         ("C-c g G" . browse-at-remote-kill)
+         ;; mimic "open-at-point" behaviour
+         ("C-c C-o" . browse-at-remote)))
 #+END_SRC
 
+
+*** Git time machine
+
+#+BEGIN_SRC emacs-lisp
+(use-package git-timemachine
+  :commands git-timemachine)
+#+END_SRC
 
 ** Search symbol at point in Dash with =C-c d=
 
@@ -1019,7 +1063,7 @@ Use =TabNine= for general text completion. Please remember to run
 (use-package company-box
   :init (require 'icons-in-terminal)
   :if (display-graphic-p)
-  :disabled
+  ;:disabled
   :hook (company-mode . company-box-mode)
   :config
 
