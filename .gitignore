@@ -64,3 +64,6 @@ projectile.cache
 /straight/build-cache.el
 /abbrev_defs
 /scripts/.credentials
+/scripts/secrets.sh
+/request/
+persp-confs

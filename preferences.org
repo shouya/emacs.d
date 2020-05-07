@@ -119,6 +119,7 @@ Allow installing required system packages automatically.
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'exec-path "~/.asdf/shims")
+(add-to-list 'exec-path "~/.local/bin")
 #+END_SRC
 
 ** Inhibit startup screen
@@ -213,8 +214,7 @@ Features:
          (buffer (generate-new-buffer buffer-name)))
     (set (make-local-variable 'major-mode) 'org-mode)
     (switch-to-buffer buffer)
-    (org-mode)
-    (insert "* Scratch\n")))
+    (org-mode)))
 #+END_SRC
 
 ** Web browser
@@ -328,39 +328,82 @@ directory. You can also install the latest fonts for this package in the
 I use =sanityinc-tomorrow= theme because it's high contrast and colorful.
 
 #+BEGIN_SRC emacs-lisp
-;; (use-package color-theme-sanityinc-tomorrow
-;;   :config
-;;   (load-theme 'sanityinc-tomorrow-night t))
+(setq shou/current-theme 'doom-tomorrow-night)
+
 (use-package doom-themes
   :custom
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
   :config
-  (load-theme 'doom-tomorrow-night t))
+  (load-theme shou/current-theme t))
 #+END_SRC
 
 ** Modeline customization
 
+Doom modeline
+
 #+BEGIN_SRC emacs-lisp
 (use-package doom-modeline
   :custom
-  (doom-modeline-height 18)
+  (doom-modeline-height 19)
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-env-version nil)
   (doom-modeline-lsp nil)
   (doom-modeline-modal-icon nil)
   (doom-modeline-buffer-state-icon t)
+  (doom-modeline-project-detection 'project)
+  (doom-modeline-persp-name t)
+
   :config
-  (set-face-attribute 'mode-line nil :height 100)
-  (set-face-attribute 'mode-line-inactive nil :height 100)
-  (setq find-file-visit-truename t)
+  (set-face-attribute 'mode-line nil :height 120 :background "#330033")
+  (set-face-attribute 'mode-line-inactive nil :height 120 :background "#0d0d0d")
+
   (doom-modeline-mode 1))
 #+END_SRC
 
-** Use fancy lambdas
+=Spaceline=
 
 #+BEGIN_SRC emacs-lisp
-(global-prettify-symbols-mode t)
+;; (use-package spaceline
+;;   :hook (emacs-startup . spaceline-spacemacs-theme)
+;;   :custom
+;;   (powerline-default-separator 'box)
+;;   ;; use circled number for eyebrowse workspace name
+;;   (spaceline-workspace-numbers-unicode t)
+;;
+;;   ;; change color based on evil state
+;;   (spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
+;;
+;;   :config
+;;
+;;   (setq modeline-left-side
+;;         '(
+;;           (workspace-number
+;;            :fallback evil-state
+;;            :face highlight-face
+;;            :priority 10)
+;;           ((buffer-modified buffer-id remote-host)
+;;            :priority 9)
+;;           ((point-position line-column buffer-position)
+;;            :priority 7)
+;;           (major-mode :priority 9)
+;;           (process :when active)
+;;           ((flycheck-error flycheck-warning flycheck-info) :when active :priority 8)
+;;           (version-control :when active :priority 5)
+;;           ))
+;;
+;;   (setq modeline-right-side
+;;         '((org-clock :priority 9)
+;;           (which-function
+;;            (purpose :priority 7)
+;;            (selection-info :priority 7)
+;;            (global :when active)
+;;            )))
+;;
+;;   (apply 'spaceline-compile 'shou
+;;          modeline-left-side
+;;          modeline-right-side)
+;;   (setq mode-line-format '("%e" (:eval (spaceline-ml-shou)))))
 #+END_SRC
 
 ** Highlight current line
@@ -452,6 +495,62 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
 (global-unset-key (kbd "C-x o"))
 #+END_SRC
 
+** Window config switching
+
+#+BEGIN_SRC emacs-lisp
+; (use-package eyebrowse
+;   :hook (emacs-startup . eyebrowse-mode)
+;   :config
+;   ;; use M-0..M-9 to switch config
+;   (eyebrowse-setup-opinionated-keys))
+
+(use-package persp-mode
+  :hook (emacs-startup . persp-mode)
+  :bind (:map persp-key-map
+              ("c" . persp-frame-switch)
+              ("," . persp-rename))
+  :init
+  (setq persp-autokill-buffer-on-remove 'kill-weak)
+  (setq persp-keymap-prefix (kbd "M-n")))
+#+END_SRC
+
+** Auto restore session
+
+#+BEGIN_SRC emacs-lisp
+(require 'desktop)
+(setq desktop-dirname "~/tmp/emacs-desktop")
+(setq desktop-path (list desktop-dirname))
+(setq desktop-save t)
+(setq desktop-auto-save-timeout 30)
+(add-hook 'after-init-hook (lambda () (desktop-save-mode 1)))
+#+END_SRC
+
+** Alert library
+
+#+BEGIN_SRC emacs-lisp
+(use-package alert
+  :commands alert
+  :custom
+  (alert-default-style (cond
+                        ((eq system-type 'darwin) 'osx-notifier)
+                        ((display-graphic-p) 'libnotify)
+                        (t 'mode-line))))
+#+END_SRC
+
+** Popup window manager
+
+#+BEGIN_SRC emacs-lisp
+(use-package popwin
+  :hook (emacs-startup . popwin-mode)
+  :config
+  (push '("*elixir-format-errors*" :noselect t)
+        popwin:special-display-config)
+  (push '("*idris-repl*")
+        popwin:special-display-config)
+  (push '("*idris-holes*" :noselect t)
+        popwin:special-display-config))
+#+END_SRC
+
 * Evil mode
 ** Load =evil=
 Set =evil-want-keybinding= to =nil= to disable a startup warning, see ([[https://github.com/emacs-evil/evil-collection/issues/60][related
@@ -467,7 +566,6 @@ Then load evil mode.
   :custom
   ;; "*" Search by symbol instead of word, useful for snake_case
   (evil-symbol-word-search t))
-
 #+END_SRC
 
 ** A collection of Vim key bindings among modes
@@ -518,13 +616,13 @@ bracket don't. I like it the other way around.
   :after evil
   :hook (emacs-startup . global-evil-surround-mode)
   :config
-  (evil-add-to-alist 'evil-surround-pairs-alist
-                     ?\( '("(" . ")")
-                     ?\[ '("[" . "]")
-                     ?\{ '("{" . "}")
-                     ?\) '("( " . " )")
-                     ?\] '("[ " . " ]")
-                     ?\} '("{ " . " }")))
+  (dolist (x '((?\( . '("(" . ")"))
+               (?\[ . '("[" . "]"))
+               (?\{ . '("{" . "}"))
+               (?\) . '("( " . " )"))
+               (?\] . '("[ " . " ]"))
+               (?\} . '("{ " . " }"))))
+    (add-to-list 'evil-surround-pairs-alist x)))
 #+END_SRC
 
 ** Org mode
@@ -535,11 +633,12 @@ Use =evil= key bindings with Org agendas.
 (use-package evil-org
   :after (org evil)
   :hook ((org-mode . evil-org-mode)
+         (org-agenda-mode . evil-org-agenda-set-keys)
          (evil-org-mode . evil-org-set-key-theme))
   :config
   (require 'evil-org-agenda)
-  (evil-define-key 'motion org-mode-map (kbd "TAB") 'org-cycle)
-  (evil-org-agenda-set-keys))
+  (evil-define-key 'motion org-mode-map (kbd "TAB") 'org-cycle))
+
 #+END_SRC
 
 ** Set shift size to 2
@@ -899,13 +998,18 @@ Use =M-$= to correct word at point.
 
 
 
-** Dictionary
+** Dictionary with =C-c C-d=
 
 #+BEGIN_SRC emacs-lisp
 (use-package osx-dictionary
   :if (eq system-type 'darwin)
-  :bind ("C-c d" . osx-dictionary-search-word-at-point))
+  :bind ("C-c C-d" . osx-dictionary-search-word-at-point))
+#+END_SRC
 
+** TRAMP
+
+#+BEGIN_SRC emacs-lisp
+(setq tramp-default-method "ssh")
 #+END_SRC
 
 * Programming
@@ -992,6 +1096,7 @@ We use =dumb-jump=, which works out of the box for many languages.
   (projectile-switch-project-action 'projectile-dired)
   (projectile-enable-caching t)
   (projectile-indexing-method 'alien)
+  (projectile-globally-ignored-file-suffixes '("beam"))
 
   :hook (emacs-startup . projectile-mode)
 
@@ -1080,11 +1185,13 @@ And enable =evil-magit= for evil-style motion.
   (magithub-feature-autoinject t))
 #+END_SRC
 
-** Search symbol at point in Dash with =C-c D=
+** Search symbol at point in Dash with =C-c d=
 
 #+BEGIN_SRC emacs-lisp
 (use-package dash-at-point
-  :if (eq system-type 'drawin)
+  :if (eq system-type 'darwin)
+  :bind (:map prog-mode-map
+              ("C-c d" . dash-at-point))
   :ensure-system-package
   ("/Applications/Dash.app" . "brew cask install dash"))
 #+END_SRC
@@ -1308,11 +1415,11 @@ brackets with =evil= editing.
 
 **** Highlight info documentations
 
-Colorize function names/arguments in info doucmentations.
+Colorize function names/arguments in info documentations.
 
 #+BEGIN_SRC emacs-lisp
 (use-package info-colors
-  :config (add-hook 'Info-selection-hook 'info-colors-fontify-mode))
+  :config (add-hook 'Info-selection-hook 'info-colors-fontify-node))
 #+END_SRC
 
 *** Elixir
@@ -1328,7 +1435,14 @@ Colorize function names/arguments in info doucmentations.
 
   ;; Enable eglot for completion from LSP
   :config
-  (add-hook 'elixir-mode-hook 'eglot-ensure))
+  (add-hook 'elixir-mode-hook 'eglot-ensure)
+  (add-hook 'elixir-format-hook
+            (lambda ()
+              (if (projectile-project-p)
+                  (setq elixir-format-arguments
+                        (list "--dot-formatter"
+                              (concat (locate-dominating-file buffer-file-name ".formatter.exs") ".formatter.exs")))
+                (setq elixir-format-arguments nil)))))
 #+END_SRC
 
 **** Run ExUnit
@@ -1423,6 +1537,41 @@ Reformatting JSON.
   :mode (("\\.service\\'" . systemd-mode)
          ("\\.timer\\'" . systemd-mode)
          ("/etc/systemd/.*\\.conf\\'" . systemd-mode)))
+#+END_SRC
+
+*** Ansible
+
+#+BEGIN_SRC emacs-lisp
+(defun ansible-vault-mode-maybe ()
+  (when (ansible-vault--is-vault-file)
+    (ansible-vault-mode 1)))
+
+(use-package ansible-vault
+  :commands (ansible-vault--is-vault-file ansible-vault-mode)
+  :hook (yaml-mode . ansible-vault-mode-maybe))
+#+END_SRC
+
+*** Idris
+
+#+BEGIN_SRC emacs-lisp
+(use-package idris-mode
+  :after popwin
+  :mode (("\\.idr\\'" . idris-mode))
+  :config
+  (add-to-list 'popwin:special-display-config 'idris-compiler-notes-mode)
+  (add-to-list 'popwin:special-display-config
+               '(idris-info-mode :stick t))
+  (add-to-list 'popwin:special-display-config
+               '(idris-repl-mode :height 0.2
+                                 :noselect nil
+                                 :position bottom
+                                 :stick t)))
+#+END_SRC
+** Browse current file on github
+
+#+BEGIN_SRC emacs-lisp
+(use-package browse-at-remote
+  :bind ("C-c g g" . browse-at-remote))
 #+END_SRC
 
 * Org mode
@@ -1526,6 +1675,16 @@ programming though, so I only turns it off in org mode.
   (add-hook 'org-mode-hook (lambda () (setq-local evil-auto-indent nil))))
 #+END_SRC
 
+*** Company completion
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :config
+  (defun add-org-completion-backend ()
+    (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
+  (add-hook 'org-mode-hook 'add-org-completion-backend))
+#+END_SRC
+
 ** Visual Tweaks
 *** Turn on native source fontification in org buffer
 
@@ -1604,6 +1763,19 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
   :custom
   (org-log-done 'time)
   (org-log-into-drawer t))
+#+END_SRC
+*** Customize TODO colors
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :custom
+  (org-log-done 'time)
+  (org-log-into-drawer t)
+  (org-todo-keyword-faces
+   '(("TODO" . "#a6b255")
+     ("IN-PROG" . "#f2f9c1")
+     ("TOREAD" . "#879434")
+     ("WAIT" . "#c07993"))))
 #+END_SRC
 
 ** Taking note with =deft=
@@ -1703,16 +1875,58 @@ don't need to leave Emacs for that.
                      (org-file-path "agenda.org")
                      (org-file-path "todo.org")
                      (org-file-path "work.org")
-                     (org-file-path "diary.org")
                      (org-file-path "to-read.org")
                      (org-file-path "gcal.org"))))
+#+END_SRC
+
+*** Extend toady to 6:00am into next morning
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :custom
+  (org-extend-today-until 6)
+  (org-use-effective-time t))
 #+END_SRC
 
 *** Agenda view
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :custom (org-agenda-start-on-weekday nil))
+  :custom
+  (org-agenda-start-on-weekday nil)
+  ;; do not show repeating items in future timeline
+  (org-agenda-show-future-repeats t)
+
+  (org-agenda-sorting-strategy
+   '((agenda category-keep habit-up todo-state-up priority-down time-up)
+     (todo priority-down category-keep)
+     (tags priority-down category-keep)
+     (search category-keep))))
+#+END_SRC
+
+*** Enable habit
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :custom
+  (org-habit-graph-column 60)
+  (org-habit-preceding-days 14)
+  (org-habit-following-days 3)
+
+  :config
+  (add-to-list 'org-modules 'org-habit)
+
+  ;; clear out the face set by current theme, the default is good enough.
+  (custom-theme-set-faces
+   shou/current-theme
+   '(org-habit-alert-face)
+   '(org-habit-ready-face)
+   '(org-habit-clear-face)
+   '(org-habit-overdue-face)
+   '(org-habit-alert-future-face)
+   '(org-habit-clear-future-face)
+   '(org-habit-ready-future-face)
+   '(org-habit-overdue-future-face)))
 #+END_SRC
 
 ** Archiving
@@ -1750,31 +1964,27 @@ don't need to leave Emacs for that.
     (interactive)
     (let* ((all-headings (-map 'car (org-refile-get-targets "todo.org")))
            (filtered-headings (--remove (member it '("Chore")) all-headings))
-           (choice (completing-read "Select project:" filtered-headings)))
+           (choice (completing-read "Select project: " filtered-headings)))
       (s-concat "::" choice)))
 
   :custom
-  (org-capture-templates `(;; Task
-                           ("w" "Work task" entry (file+function "todo.org" shou/org-select-project)
-                            "* TODO %^{Task}\nSCHEDULED: %t\n%?\nAdded: %U\n")
+  (org-capture-templates `(;; Work task
+                           ("w" "Work task" entry (file+headline "todo.org" "Work")
+                            "* TODO %^{Task (Work)}\nSCHEDULED: %t\n%?\nAdded: %U\n")
 
                            ;; Personal task
-                           ("p" "Personal task %^g" entry (file+headline "todo.org" "Personal")
-                            "* TODO %^{Task}\nSCHEDULED: %t\n%?\nAdded: %U\n")
+                           ("p" "Personal task" entry (file+headline "todo.org" "Personal")
+                            "* TODO %^{Task (Personal)}\nSCHEDULED: %t\n%?\nAdded: %U\n")
 
                            ;; Add to currently clocking task
                            ("s" "Clocking task/step" checkitem (clock)
-                            "- [ ] %^{Step}"
-                            :immediate-finish t)
+                            "- [ ] %^{Step}\n"
+                            :immediate-finish t :empty-lines-before 1)
 
                            ;; Add to currently clocking task
                            ("S" "Clocking task/finished Step" checkitem (clock)
-                            "- [X] %^{Finished step}"
-                            :immediate-finish t)
-
-                           ;; Project
-                           ("P" "Project :WORK:" entry (file "todo.org")
-                            "* TODO %^{Project} :WORK:\nAdded: %U\n")
+                            "- [X] %^{Finished step}\n"
+                            :immediate-finish t :empty-lines-before t)
 
                            ;; Reading
                            ("r" "Reading" entry (file "to-read.org")
@@ -1783,13 +1993,16 @@ don't need to leave Emacs for that.
                            ;; Anki fragments
                            ("a" "Anki card" entry (file "anki-cards.org")
                             "* Item %u   %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic (and reversed card)\n:ANKI_DECK: Remember\n:END:\n** Front\n%^{Front}\n** Back\n%^{Back}\n")
-                           ))
 
-  )
+                           ;; Date plan entry
+                           ("d" "Date plan for today" checkitem (file+olp+datetree "plan.org")
+                            "- [ ] %a%?\n"
+                            :jump-to-captured t)
+                           )))
 #+END_SRC
 
 
-* Clocking
+** Clocking
 *** Clocking to "CLOCKING" drawer
 
 I like clocking info to be in a separate drawer from "LOGBOOK" to avoid mixing with
@@ -1814,29 +2027,31 @@ the clock.
 
 This section configures the following mechanisms:
 
-- when clock in, automatically change TODO to IN-PROG
-- when changing TODO to IN-PROG, automatically clock in
-- when changing IN-PROG to DONE, automatically clock out
+- when clock in, automatically change TODO to IN-PROG (1)
+- when changing TODO to IN-PROG, automatically clock in (2)
+- when changing IN-PROG to DONE, automatically clock out (3)
 
 [[http://doc.norang.ca/org-mode.html#sec-9-1][Org Mode - Organize Your Life In Plain Text!]]
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
   :custom
-  (org-clock-in-switch-to-state 'shou/clock-in-to-in-prog)
+  ;; (1)
+  ; (org-clock-in-switch-to-state 'shou/clock-in-to-in-prog)
+  ;; (3)
   (org-clock-out-when-done t)
 
   :config
   (defun shou/auto-clock-in ()
     "Automatically clock in if current task is changing to IN-PROG state"
     (when (member org-state '("IN-PROG"))
-      (let ((org-clock-continuously t))
-        (org-clock-in)
-        (message "State changed to IN-PROG, automatically clocking in"))))
+      (org-clock-in)
+      (message "State changed to IN-PROG, automatically clocking in")))
 
   (defun shou/clock-in-to-in-prog (_)
     "Switch a task from TODO to IN-PROG when clocking in"
     (when (member (org-get-todo-state) '("TODO")) "IN-PROG"))
+  ;; (2)
   (add-hook 'org-after-todo-state-change-hook 'shou/auto-clock-in))
 #+END_SRC
 
@@ -1865,6 +2080,77 @@ This section configures the following mechanisms:
 (use-package org
   :custom
   (org-clock-out-remove-zero-time-clocks t))
+#+END_SRC
+
+*** Pomodoro timer
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-pomodoro
+  :after org
+  :init
+  (evil-define-key 'motion org-agenda-mode-map (kbd "P") 'org-pomodoro)
+  :bind
+  (("C-c C-x C-p" . org-pomodoro)
+   :map org-mode-map
+   ("C-c C-x C-p" . org-pomodoro))
+  :custom
+  (org-pomodoro-format "Pomo %s")
+  (org-pomodoro-short-break-format "Break %s")
+  (org-pomodoro-long-break-format "Long break %s")
+  (org-pomodoro-start-sound-p t)
+  (org-pomodoro-ticking-sound-p t)
+  (org-pomodoro-ticking-sound-states '(:pomodoro))
+  (org-pomodoro-ticking-frequency 1)
+  :config
+  ;; automatically start next pomo after a break
+  (add-hook 'org-pomodoro-break-finished-hook (lambda () (interactive) (org-pomodoro '(16)))))
+#+END_SRC
+
+*** org-mru-clock
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-mru-clock
+  :bind (("C-c C-x C-j" . org-color-jump-to-current-task)
+         ("C-c C-x C-o" . org-clock-out)
+         ("C-c C-x C-i" . org-clock-in)
+         ("C-c C-x C-k" . org-mru-clock-in)
+         ("C-c C-x C-x" . org-clock-in-last))
+  :custom
+  (org-mru-clock-how-many 100)
+  (org-mru-clock-keep-formatting t)
+  (org-mru-clock-predicate nil))
+
+#+END_SRC
+
+*** Show clock in frame title
+
+Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][Re: {O} Clocking time in frame title bar]]
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :custom (org-clock-clocked-in-display 'both))
+
+mode-line-misc-info
+global-mode-string
+org-mode-line-string
+#+END_SRC
+
+
+*** Mark clocking task as done
+
+#+BEGIN_SRC emacs-lisp
+(defun shou/mark-clocking-task-as-done ()
+  "Find current clocking task and mark it as done."
+  (interactive)
+  (save-excursion
+    (if (org-clocking-p)
+        (progn
+          (org-clock-goto)
+          (org-todo 'done)
+          (save-buffer))
+      (message "No clock is active now."))))
+(bind-key "C-c C-x C-d" 'shou/mark-clocking-task-as-done)
+(bind-key "C-c C-x C-d" 'shou/mark-clocking-task-as-done org-mode-map)
 #+END_SRC
 
 ** Presentation
@@ -1911,7 +2197,8 @@ This section configures the following mechanisms:
 
 #+BEGIN_SRC emacs-lisp
 (use-package ox-twbs
-  :after (org ox))
+  :after (org ox)
+  (use-package htmlize))
 #+END_SRC
 
 *** Export to MediaWiki
@@ -1997,6 +2284,15 @@ installed (~pip install Pygments~).
 (use-package org
   :init
   (setq org-export-backends '(ascii html latex)))
+#+END_SRC
+
+** Google calendar integration
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :mode ("\\.diary\\'" . diary-mode)
+  :custom
+  (diary-file (org-file-path "diaries/main.diary")))
 #+END_SRC
 
 ** Customize source languages
