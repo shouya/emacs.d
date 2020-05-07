@@ -767,7 +767,8 @@ Use =M-$= to correct word at point.
 (use-package multiple-cursors
   :bind (("C-c m c" . mc/edit-lines)
          ("C->" . mc/mark-next-like-this)
-         ("C-<" . mc/unmark-next-like-this))
+         ("C-<" . mc/unmark-next-like-this)
+         ("M-<mouse-1>" . mc/add-cursor-on-click))
   :config (define-key mc/keymap (kbd "<return>") nil))
 #+END_SRC
 
@@ -926,15 +927,21 @@ I use =magit= to show git status.
   ;; automatically refresh after saving a file
   (add-hook 'after-save-hook 'magit-after-save-refresh-status t))
 #+END_SRC
-
-*** =GitHub= support
+*** Use =forge= for online features 
 
 #+BEGIN_SRC emacs-lisp
-(use-package magithub
-  :after magit
-  :config
-  (magithub-feature-autoinject t))
+(use-package forge
+  :after magit)
 #+END_SRC
+
+
+*** Browse current file on github
+
+#+BEGIN_SRC emacs-lisp
+(use-package browse-at-remote
+  :bind ("C-c g g" . browse-at-remote))
+#+END_SRC
+
 
 ** Search symbol at point in Dash with =C-c d=
 
@@ -1303,13 +1310,6 @@ Reformatting JSON.
                                  :position bottom
                                  :stick t)))
 #+END_SRC
-** Browse current file on github
-
-#+BEGIN_SRC emacs-lisp
-(use-package browse-at-remote
-  :bind ("C-c g g" . browse-at-remote))
-#+END_SRC
-
 * Org mode
 ** Use org mode
 
