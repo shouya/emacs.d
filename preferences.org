@@ -11,31 +11,6 @@
 #+END_SRC
 
 * Boot up
-** Suppress GC at startup
-
-Doing so will boost boot-up speed. See [[https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#avoid-garbage-collection-at-startup][Avoid garbage collection at startup]].
-
-#+BEGIN_SRC emacs-lisp
-(setq gc-cons-threshold most-positive-fixnum) ; 2^61 bytes
-
-;; reset it after load
-(add-hook 'emacs-startup-hook
-          (lambda () (setq gc-cons-threshold 800000)))
-#+END_SRC
-
-** Trick to make startup faster
-
-#+BEGIN_SRC emacs-lisp
-(defvar cfg--file-name-handler-alist file-name-handler-alist)
-(setq file-name-handler-alist nil)
-(add-hook 'emacs-startup-hook
-          (lambda () (setq file-name-handler-alist cfg--file-name-handler-alist)))
-(add-hook 'emacs-startup-hook
-          (lambda () (message "Emacs ready in %.2f seconds with %d garbage collections."
-                         (float-time (time-subtract after-init-time before-init-time))
-                         gcs-done)))
-#+END_SRC
-
 ** Enable packages are loadable
 
 =lisp/= stores modules I copied from [[https://github.com/purcell/emacs.d][purcell/emacs.d]].
@@ -106,7 +81,7 @@ Allow installing required system packages automatically.
 
 #+BEGIN_SRC emacs-lisp
 (use-package edit-server
-  :config (edit-server-start))
+  :hook (emacs-startup . edit-server-start))
 #+END_SRC
 
 ** Make window resizable by window manager
@@ -129,18 +104,7 @@ Allow installing required system packages automatically.
 #+END_SRC
 
 * General behavior
-** Sensible defaults
-
-https://raw.githubusercontent.com/hrs/sensible-defaults.el/master/sensible-defaults.el
-
-#+BEGIN_SRC emacs-lisp
-(require 'sensible-defaults)
-(sensible-defaults/use-all-settings)
-(sensible-defaults/backup-to-temp-directory)
-(sensible-defaults/show-matching-parens)
-#+END_SRC
-
-** Save customized settings in a seperate file
+** Save customized settings in a separate file
 
 By default the customization is saved into =init.el=. Avoid the mess by saving it
 in a seperate file =custom.el=.
@@ -247,16 +211,6 @@ I switched to readable mode after a web page is rendered.
 (setq eww-after-render-hook '())
 #+END_SRC
 
-** Run garbage collector on idle
-
-Garbage collection magic hack.
-
-#+BEGIN_SRC emacs-lisp
-; (use-package gcmh
-;   :hook (emacs-startup . gcmh-mode)
-;   :custom (gcmh-idle-timer 3))
-#+END_SRC
-
 ** Startup profiler
 
 #+BEGIN_SRC emacs-lisp
@@ -361,51 +315,6 @@ Doom modeline
   (doom-modeline-mode 1))
 #+END_SRC
 
-=Spaceline=
-
-#+BEGIN_SRC emacs-lisp
-;; (use-package spaceline
-;;   :hook (emacs-startup . spaceline-spacemacs-theme)
-;;   :custom
-;;   (powerline-default-separator 'box)
-;;   ;; use circled number for eyebrowse workspace name
-;;   (spaceline-workspace-numbers-unicode t)
-;;
-;;   ;; change color based on evil state
-;;   (spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
-;;
-;;   :config
-;;
-;;   (setq modeline-left-side
-;;         '(
-;;           (workspace-number
-;;            :fallback evil-state
-;;            :face highlight-face
-;;            :priority 10)
-;;           ((buffer-modified buffer-id remote-host)
-;;            :priority 9)
-;;           ((point-position line-column buffer-position)
-;;            :priority 7)
-;;           (major-mode :priority 9)
-;;           (process :when active)
-;;           ((flycheck-error flycheck-warning flycheck-info) :when active :priority 8)
-;;           (version-control :when active :priority 5)
-;;           ))
-;;
-;;   (setq modeline-right-side
-;;         '((org-clock :priority 9)
-;;           (which-function
-;;            (purpose :priority 7)
-;;            (selection-info :priority 7)
-;;            (global :when active)
-;;            )))
-;;
-;;   (apply 'spaceline-compile 'shou
-;;          modeline-left-side
-;;          modeline-right-side)
-;;   (setq mode-line-format '("%e" (:eval (spaceline-ml-shou)))))
-#+END_SRC
-
 ** Highlight current line
 
 #+BEGIN_SRC emacs-lisp
@@ -495,36 +404,6 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
 (global-unset-key (kbd "C-x o"))
 #+END_SRC
 
-** Window config switching
-
-#+BEGIN_SRC emacs-lisp
-; (use-package eyebrowse
-;   :hook (emacs-startup . eyebrowse-mode)
-;   :config
-;   ;; use M-0..M-9 to switch config
-;   (eyebrowse-setup-opinionated-keys))
-
-(use-package persp-mode
-  :hook (emacs-startup . persp-mode)
-  :bind (:map persp-key-map
-              ("c" . persp-frame-switch)
-              ("," . persp-rename))
-  :init
-  (setq persp-autokill-buffer-on-remove 'kill-weak)
-  (setq persp-keymap-prefix (kbd "M-n")))
-#+END_SRC
-
-** Auto restore session
-
-#+BEGIN_SRC emacs-lisp
-(require 'desktop)
-(setq desktop-dirname "~/tmp/emacs-desktop")
-(setq desktop-path (list desktop-dirname))
-(setq desktop-save t)
-(setq desktop-auto-save-timeout 30)
-(add-hook 'after-init-hook (lambda () (desktop-save-mode 1)))
-#+END_SRC
-
 ** Alert library
 
 #+BEGIN_SRC emacs-lisp
@@ -549,125 +428,6 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
         popwin:special-display-config)
   (push '("*idris-holes*" :noselect t)
         popwin:special-display-config))
-#+END_SRC
-
-* Evil mode
-** Load =evil=
-Set =evil-want-keybinding= to =nil= to disable a startup warning, see ([[https://github.com/emacs-evil/evil-collection/issues/60][related
-issue]]).
-
-Then load evil mode.
-
-#+BEGIN_SRC emacs-lisp
-(use-package evil
-  :init (setq evil-want-keybinding nil)
-  :hook (emacs-startup . evil-mode)
-  :demand t
-  :custom
-  ;; "*" Search by symbol instead of word, useful for snake_case
-  (evil-symbol-word-search t))
-#+END_SRC
-
-** A collection of Vim key bindings among modes
-Install evil-collection, which provides evil-friendly bindings for many modes.
-
-#+BEGIN_SRC emacs-lisp
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init)
-  (with-eval-after-load 'dired
-    ; (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
-    (evil-define-key 'normal dired-mode-map
-      (kbd "RET") 'dired-find-alternate-file)))
-#+END_SRC
-
-** Manipulate surroundings with Vim key bindings
-
-Available keys:
-
-| Key  | Action                                           |
-|------+--------------------------------------------------|
-| =S(=   | (Visual) surround selected text with ()          |
-| =d(=   | delete surrounding pair of ()                    |
-| =c("=  | change surrounding pair of () to ""              |
-| =ysw(= | surround pair of () around word (specified by =w=) |
-
-The =(=, ="= in above key bindings can be replace with arbitrary Surround objects:
-
-| name            | object  | info          | d/c object |
-|-----------------+---------+---------------+------------|
-| tag             | =<q>=     | =<q>= and =</q>=  | =t=          |
-| quote           | =", '=    | ="= and ="=       | same       |
-| bracket         | =(, [, {= | =(= and =)=       | same       |
-| bracket w/space | =), ], }= | ="( "= and =" )"= | same       |
-| function call   | =fprint=  | =print(= and =)=  | =f=          |
-
-
-*** Code
-
-Enable surround everywhere.
-
-Note by default open brackets objects (e.g. =(=) insert extra space, while close
-bracket don't. I like it the other way around.
-
-#+BEGIN_SRC emacs-lisp
-(use-package evil-surround
-  :after evil
-  :hook (emacs-startup . global-evil-surround-mode)
-  :config
-  (dolist (x '((?\( . '("(" . ")"))
-               (?\[ . '("[" . "]"))
-               (?\{ . '("{" . "}"))
-               (?\) . '("( " . " )"))
-               (?\] . '("[ " . " ]"))
-               (?\} . '("{ " . " }"))))
-    (add-to-list 'evil-surround-pairs-alist x)))
-#+END_SRC
-
-** Org mode
-
-Use =evil= key bindings with Org agendas.
-
-#+BEGIN_SRC emacs-lisp
-(use-package evil-org
-  :after (org evil)
-  :hook ((org-mode . evil-org-mode)
-         (org-agenda-mode . evil-org-agenda-set-keys)
-         (evil-org-mode . evil-org-set-key-theme))
-  :config
-  (require 'evil-org-agenda)
-  (evil-define-key 'motion org-mode-map (kbd "TAB") 'org-cycle))
-
-#+END_SRC
-
-** Set shift size to 2
-
-Triggered with =<<= and =>>=.
-
-#+BEGIN_SRC emacs-lisp
-(use-package evil
-  :custom (evil-shift-width 2))
-#+END_SRC
-
-** Match =begin =... =end= with =%=
-
-#+BEGIN_SRC emacs-lisp
-(use-package evil-matchit
-  :after evil
-  :hook (emacs-startup . global-evil-matchit-mode))
-#+END_SRC
-
-** Increment/Decrement numbers
-
-Works just like C-a/C-x in vim.
-
-#+BEGIN_SRC emacs-lisp
-(use-package evil-numbers
-  :bind (:map evil-normal-state-map
-              ("+" . evil-numbers/inc-at-pt)
-              ("-" . evil-numbers/dec-at-pt)
-              ("_" . evil-numbers/dec-at-pt)))
 #+END_SRC
 
 * Dired
@@ -715,11 +475,11 @@ Hit =.= key to reveal the files.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dired-hide-dotfiles
-  :after (evil dired)
+  :after (dired)
   :hook (dired-mode . dired-hide-dotfiles-mode)
-  :config
-  (evil-define-key 'normal dired-mode-map
-    (kbd ".") 'dired-hide-dotfiles-mode))
+
+  ;(evil-define-key 'normal dired-mode-map (kbd ".") 'dired-hide-dotfiles-mode)
+)
 #+END_SRC
 
 ** Hide details by default
@@ -761,26 +521,13 @@ So it doesn't block the main UI when copying large files.
 
 #+BEGIN_SRC emacs-lisp
 (use-package vterm
-  :after evil-collection
+  ; :after evil-collection
   :commands (vterm vterm-other-window)
   :bind ("C-c t" . vterm)
   :custom
   (vterm-max-scrollback 20000)
   :config
   (define-key vterm-mode-map (kbd "C-c C-l") vterm-clear-scrollback))
-#+END_SRC
-
-** Use =multi-term= to manage terminal sessions
-
-#+BEGIN_SRC emacs-lisp
-(use-package multi-term
-  :commands multi-term
-  :config
-  ;; Use login shell
-  (setq-default multi-term-program-switches "--login")
-
-  ;; Make URLs clickable
-  (add-hook 'term-mode-hook 'goto-address-mode))
 #+END_SRC
 
 * Editing
@@ -893,9 +640,10 @@ entered.
   :bind (("C-=" . er/expand-region)
          ("C--" . er/contract-region)
 
-         :map evil-visual-state-map
-         ("=" . er/expand-region)
-         ("-" . er/contract-region)))
+         ; :map evil-visual-state-map
+         ;("=" . er/expand-region)
+         ;("-" . er/contract-region)
+))
 #+END_SRC
 
 ** Writing prose
@@ -970,33 +718,40 @@ Use =M-$= to correct word at point.
     (add-hook hook 'auto-correct-mode)))
 #+END_SRC
 
-** Key cast mode
-
-#+BEGIN_SRC emacs-lisp
-(use-package keycast
-  :commands keycast-mode)
-#+END_SRC
-
-** Bind key for transpose char
-
+** Customize editing shortcuts
+*** Transpose char (=C-t=)
 #+BEGIN_SRC emacs-lisp
 (defun shou/transpose-next-char ()
   (interactive)
   (save-excursion
     (forward-char)
     (transpose-chars 1)))
-(with-eval-after-load 'evil
-  (define-key evil-normal-state-map (kbd "C-t") 'shou/transpose-next-char))
+
+(bind-key "C-t" 'shou/transpose-next-char)
 #+END_SRC
 
-** EPUB
+*** Join lines (=C-j=)
 
 #+BEGIN_SRC emacs-lisp
-(use-package nov
-  :mode ("\\.epub\\'" . nov-mode))
+(defun shou/join-line ()
+  (interactive)
+  (save-excursion
+    (next-line)
+    (delete-indentation)))
+(bind-key "C-j" 'shou/join-line)
 #+END_SRC
 
+*** Select whole line (=C-S-v=)
 
+#+BEGIN_SRC emacs-lisp
+(defun shou/mark-line ()
+  (interactive)
+  (when (not (region-active-p))
+    (forward-line 0)
+    (set-mark-command nil))
+  (forward-line))
+(bind-key "C-S-v" 'shou/mark-line)
+#+END_SRC
 
 ** Dictionary with =C-c C-d=
 
@@ -1004,6 +759,16 @@ Use =M-$= to correct word at point.
 (use-package osx-dictionary
   :if (eq system-type 'darwin)
   :bind ("C-c C-d" . osx-dictionary-search-word-at-point))
+#+END_SRC
+
+** Multi cursor
+
+#+BEGIN_SRC emacs-lisp
+(use-package multiple-cursors
+  :bind (("C-c m c" . mc/edit-lines)
+         ("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/unmark-next-like-this))
+  :config (define-key mc/keymap (kbd "<return>") nil))
 #+END_SRC
 
 ** TRAMP
@@ -1051,8 +816,7 @@ We use =dumb-jump=, which works out of the box for many languages.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dumb-jump
-  :after evil
-  :bind (:map evil-normal-state-map
+  :bind (:map prog-mode-map
               ("M-." . dumb-jump-go-other-window)
               ("M-," . dumb-jump-go))
   :custom
@@ -1083,7 +847,6 @@ We use =dumb-jump=, which works out of the box for many languages.
 #+BEGIN_SRC emacs-lisp
 (use-package deadgrep
   :ensure-system-package (rg . ripgrep)
-  :config (evil-collection-deadgrep-setup)
   :bind (("<f5>" . deadgrep)))
 #+END_SRC
 
@@ -1162,18 +925,6 @@ I use =magit= to show git status.
   :config
   ;; automatically refresh after saving a file
   (add-hook 'after-save-hook 'magit-after-save-refresh-status t))
-#+END_SRC
-
-*** Use evil motion keys in =magit=
-And enable =evil-magit= for evil-style motion.
-
-#+BEGIN_SRC emacs-lisp
-(use-package evil-magit
-  :after magit
-  :init (setq-default evil-magit-state 'motion)
-  :config
-  ;; Switch to evil insert state when entering commit message
-  (add-hook 'git-commit-mode-hook 'evil-insert-state))
 #+END_SRC
 
 *** =GitHub= support
@@ -1343,9 +1094,6 @@ We use =eglot= for LSP support. Since eglot has a hook that turns off any compan
 I customized several bindings because "C-<left>/<right>" is bound to
 "previous/next desktop" on my macOS.
 
-I loaded =evil-paredit= package to prevent accidentally creating mismatched
-brackets with =evil= editing.
-
 #+BEGIN_SRC emacs-lisp
 (use-package paredit
   :bind (:map paredit-mode-map
@@ -1362,19 +1110,7 @@ brackets with =evil= editing.
               ;; (|a b) => ((a) b)
               ("M-<up>" . paredit-wrap-sexp)
               ;; (|a b) => ((a) b)
-              ("M-(" . paredit-wrap-round))
-
-  :config
-  (use-package evil-paredit
-    :after evil
-    :hook (paredit-mode . evil-paredit-mode)
-    :config
-    ;; Fix some glitches when used alongside evil-surround mode
-    (add-to-list 'evil-surround-operator-alist
-                 '(evil-paredit-change . change))
-    (add-to-list 'evil-surround-operator-alist
-                 '(evil-paredit-delete . delete)))
-  )
+              ("M-(" . paredit-wrap-round)))
 #+END_SRC
 
 **** Use =rainbow-delimiters=
@@ -1663,18 +1399,6 @@ Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#in-collapsed-vie
   :custom (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+"))))
 #+END_SRC
 
-*** Avoid unwanted indentation
-
-By default =evil-open-below= inserts an unwanted indentation in the newline. Which is
-very annoying when editing definition lists. This feature is useful in
-programming though, so I only turns it off in org mode.
-
-#+BEGIN_SRC emacs-lisp
-(use-package org
-  :config
-  (add-hook 'org-mode-hook (lambda () (setq-local evil-auto-indent nil))))
-#+END_SRC
-
 *** Company completion
 
 #+BEGIN_SRC emacs-lisp
@@ -1800,9 +1524,9 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
       (nospace . "-")
       (case-fn . downcase))
     "apply certain rules when generating file name")
-  :config
-  ;; switch to insert state when starting deft
-  (add-hook 'deft-mode 'evil-insert-state))
+  )
+  
+  
 #+END_SRC
 
 ** Roam
@@ -1950,8 +1674,7 @@ don't need to leave Emacs for that.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :bind ("C-c c" . org-capture)
-  :hook (org-capture-mode . evil-insert-state))
+  :bind ("C-c c" . org-capture))
 #+END_SRC
 
 *** Capture templates
@@ -2087,8 +1810,8 @@ This section configures the following mechanisms:
 #+BEGIN_SRC emacs-lisp
 (use-package org-pomodoro
   :after org
-  :init
-  (evil-define-key 'motion org-agenda-mode-map (kbd "P") 'org-pomodoro)
+  ; :init
+  ; (evil-define-key 'motion org-agenda-mode-map (kbd "P") 'org-pomodoro)
   :bind
   (("C-c C-x C-p" . org-pomodoro)
    :map org-mode-map
@@ -2158,9 +1881,7 @@ org-mode-line-string
 #+BEGIN_SRC emacs-lisp
 (use-package epresent
   :after org
-  :commands epresent-run
-  :config
-  (add-hook 'epresent-start-presentation-hook 'evil-emacs-state))
+  :commands epresent-run)
 #+END_SRC
 
 ** Inline Image
