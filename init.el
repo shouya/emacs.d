@@ -4,7 +4,7 @@
 (setq gc-cons-threshold most-positive-fixnum) ; 2^61 bytes
 ;; reset it after load
 (add-hook 'emacs-startup-hook
-          (lambda () (setq gc-cons-threshold 800000)))
+          (lambda () (setq gc-cons-threshold (* 20 1024 1024))))
 
 ;; ----------- empty file handler alist --------
 (defvar cfg--file-name-handler-alist file-name-handler-alist)
@@ -16,5 +16,5 @@
                          (float-time (time-subtract after-init-time before-init-time))
                          gcs-done)))
 
-
+;; ----------- load custom config --------------
 (org-babel-load-file "~/.emacs.d/preferences.org")

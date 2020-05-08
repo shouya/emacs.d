@@ -221,16 +221,34 @@ I switched to readable mode after a web page is rendered.
 ** Backup
 
 #+BEGIN_SRC emacs-lisp
-(setq backup-directory-alist
-      `((".*" . "~/tmp/.emacs.d/backup/")))
-(setq auto-save-file-name-transforms
-      `((".*" "~/tmp/.emacs.d/backup/" t)))
+(let* ((base-dir (cond
+                  ((f-directory? "~/tmp") "~/tmp")
+                  (t "/tmp")))
+       (backup-dir (f-join base-dir "emacs-backup")))
+  (when (not (f-directory? backup-dir))(f-mkdir backup-dir))
+  (setq backup-directory-alist `((".*" . ,backup-dir))
+        auto-save-file-name-transforms `((".*" ,backup-dir t))))
 #+END_SRC
 
 ** Remove trailing whitespaces on save
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+END_SRC
+
+** Sensible defaults
+
+Copied from https://github.com/hrs/sensible-defaults.el/blob/master/sensible-defaults.el.
+
+#+BEGIN_SRC emacs-lisp
+;; Don't ask `yes/no?', ask `y/n?'.
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; If you save a file that doesn't end with a newline, automatically append one.
+(setq require-final-newline t)
+
+;; If some text is selected, and you type some text, delete the selected text and start inserting your typed text
+(delete-selection-mode t)
 #+END_SRC
 
 * UI
@@ -440,7 +458,10 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
   (push '("*elixir-format-errors*" :noselect t) popwin:special-display-config)
   (push "*idris-repl*" popwin:special-display-config)
   (push '("*idris-holes*" :noselect t) popwin:special-display-config)
-  (push "*Help*" popwin:special-display-config))
+  (push "*Help*" popwin:special-display-config)
+  (push "*Warnings*" popwin:special-display-config)
+)
+
 #+END_SRC
 
 ** Startup dashboard
@@ -736,13 +757,6 @@ Remember to install =aspell= command line tool.
 
 Use =M-$= to correct word at point.
 
-*** Enable auto wrap
-
-#+BEGIN_SRC emacs-lisp
-(dolist (hook text-mode-hooks)
-  (add-hook hook 'auto-fill-mode))
-#+END_SRC
-
 *** Auto correct frequent typo
 #+BEGIN_SRC emacs-lisp
 (use-package auto-correct
@@ -950,7 +964,7 @@ I use =magit= to show git status.
   :bind
   ("C-x g" . magit)
   ("C-x C-g" . magit-file-dispatch)
-  
+
   :demand t
   :after projectile
   :config
@@ -1229,7 +1243,18 @@ Colorize function names/arguments in info documentations.
                   (setq elixir-format-arguments
                         (list "--dot-formatter"
                               (concat (locate-dominating-file buffer-file-name ".formatter.exs") ".formatter.exs")))
-                (setq elixir-format-arguments nil)))))
+                (setq elixir-format-arguments nil))))
+
+  ;;; The original elixir syntax table is a bit awkward. I changed it
+  ;;; a little so things like symbol highlighting works a bit better.
+  ;;
+  ;; original: https://github.com/elixir-editors/emacs-elixir/blob/master/elixir-smie.el#L80
+  (modify-syntax-entry ?: "_" elixir-mode-syntax-table) ; make : a punctuation (was symbol)
+  (modify-syntax-entry ?@ "." elixir-mode-syntax-table) ; make @ a punctuation (was symbol)
+  (modify-syntax-entry ?& "." elixir-mode-syntax-table) ; make & a punctuation (was symbol)
+  (modify-syntax-entry ?? "_" elixir-mode-syntax-table) ; make ? a symbol (was word)
+  (modify-syntax-entry ?~ "_" elixir-mode-syntax-table) ; make ~ a punctuation (was word)
+)
 #+END_SRC
 
 **** Run ExUnit
@@ -1569,8 +1594,8 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
       (case-fn . downcase))
     "apply certain rules when generating file name")
   )
-  
-  
+
+
 #+END_SRC
 
 ** Roam
@@ -1606,7 +1631,7 @@ don't need to leave Emacs for that.
   (interactive)
   (when (and (eq major-mode 'org-mode)
              (> (length (anki-editor-map-note-entries t nil 'file)) 0)
-             (yes-or-no-p "Push cards to Anki?"))
+             (yes-sor-no-p "Push cards to Anki?"))
     (let ((progress-reporter
            (make-progress-reporter "Pushing cards to Anki..." nil nil)))
       (anki-editor-push-notes)
