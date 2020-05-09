@@ -164,8 +164,14 @@ Features:
 ** =C-x k= Kill current buffer
 
 #+BEGIN_SRC emacs-lisp
-(define-key global-map (kbd "C-x k")
+(bind-key "C-x k"
   (lambda () (interactive) (kill-buffer (current-buffer))))
+#+END_SRC
+
+** =C-x C-b= to view ibuffer
+
+#+BEGIN_SRC emacs-lisp
+(bind-key "C-x C-b" 'ibuffer)
 #+END_SRC
 
 ** Open scratch
@@ -238,17 +244,43 @@ I switched to readable mode after a web page is rendered.
 
 ** Sensible defaults
 
-Copied from https://github.com/hrs/sensible-defaults.el/blob/master/sensible-defaults.el.
+Copied from [[https://github.com/hrs/sensible-defaults.el/blob/master/sensible-defaults.el][hrs's config]] and [[https://github.com/technomancy/better-defaults/blob/master/better-defaults.el][technomancy's config]].
 
 #+BEGIN_SRC emacs-lisp
 ;; Don't ask `yes/no?', ask `y/n?'.
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; If you save a file that doesn't end with a newline, automatically append one.
-(setq require-final-newline t)
-
 ;; If some text is selected, and you type some text, delete the selected text and start inserting your typed text
 (delete-selection-mode t)
+
+(setq
+ ;; middle mouse button yank instead of click
+ mouse-yank-at-point t
+ ;; search apropos in docs
+ apropos-do-all t
+ ;; automatically append final new line
+ require-final-newline t
+ ;; visual bell
+ visible-bell t)
+
+;; was zap-to-char
+(bind-key* "M-z" 'zap-up-to-char)
+#+END_SRC
+
+** Save last position for each file
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'emacs-startup-hook (lambda () (save-place-mode t)))
+#+END_SRC
+
+** Replace region directly
+
+With this mode, when I select a region and start typing, the text will
+replace the active region automatically. Similar to the behavior of
+most GUI editors.
+
+#+BEGIN_SRC emacs-lisp
+(delete-selection-mode 1)
 #+END_SRC
 
 * UI
@@ -496,11 +528,19 @@ Load Dired X that comes with Emacs.
 
 #+BEGIN_SRC emacs-lisp
 (require 'dired)
-(define-key dired-mode-map
-  (kbd "RET") 'dired-find-alternate-file) ; was dired-advertised-find-file
-(define-key dired-mode-map
-  (kbd "^") (lambda () (interactive) (find-alternate-file "..")))  ; was dired-up-directory
-;; RET to find file in same window
+
+(defun shou/dired-go-up ()
+  (interactive)
+  (find-alternate-file ".."))
+
+(bind-keys :map dired-mode-map
+           ;; Open directory in the same window
+           ("RET" . dired-find-alternate-file)
+           ;; Open directory in alternative window
+           ("C-RET" . dired-find-file)
+           ;; Go up
+           ("^" . shou/dired-go-up))
+
 ;; do not show warning
 (put 'dired-find-alternate-file 'disabled nil)
 #+END_SRC
@@ -811,11 +851,15 @@ Use =M-$= to correct word at point.
 ** Multi cursor
 
 #+BEGIN_SRC emacs-lisp
+(global-unset-key (kbd "M-<down-mouse-1>"))
 (use-package multiple-cursors
-  :bind (("C-c m c" . mc/edit-lines)
-         ("C->" . mc/mark-next-like-this)
-         ("C-<" . mc/unmark-next-like-this)
-         ("M-<mouse-1>" . mc/add-cursor-on-click))
+  :bind (("C-x m" . mc/mark-all-dwim)
+         ("C-x SPC" . set-rectangular-region-anchor)
+         ("C->" . mc/mark-next-like-this-symbol)
+         ("C-<" . mc/unmark-next-like-this-symbol)
+         ("C-M->" . mc/mark-next-like-this-word)
+         ("C-M-<" . mc/unmark-next-like-this-word)
+   ("M-<mouse-1>" . mc/add-cursor-on-click))
   :config (define-key mc/keymap (kbd "<return>") nil))
 #+END_SRC
 
@@ -1124,32 +1168,6 @@ We use =eglot= for LSP support. Since eglot has a hook that turns off any compan
   :commands (eglot eglot-ensure)
   :after (company yasnippet)
   :config (setq-default eglot-stay-out-of '(company)))
-#+END_SRC
-
-*** Configure company backends
-
-#+BEGIN_SRC emacs-lisp
-;; (setq-default default-company-backends
-;;               '(company-files
-;;                 company-capf
-;;                 company-semantic
-;;                 company-dabbrev
-;;                 company-tabnine))
-;; (setq-default company-backend-alist
-;;               '((prog-mode-hook (company-files
-;;                                  company-dabbrev
-;;                                  company-capf))
-;;                 (emacs-lisp-mode-hook (company-files
-;;                                        company-elisp
-;;                                        company-dabbrev))))
-
-;; (setq company-backends default-company-backends)
-;; (dolist (pair company-backend-alist)
-;;   (let ((hook (car pair))
-;;         (backends (cadr pair)))
-;;     (add-hook hook
-;;               `(lambda () (interactive)
-;;                  (set (make-local-variable 'company-backends) ',backends)))))
 #+END_SRC
 
 ** Languages
