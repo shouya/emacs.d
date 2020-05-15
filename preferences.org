@@ -103,6 +103,13 @@ Allow installing required system packages automatically.
 (setq inhibit-startup-screen t)
 #+END_SRC
 
+** Load some basic libraries
+#+BEGIN_SRC emacs-lisp
+(use-package dash)
+(use-package f)
+(use-package s)
+#+END_SRC
+
 * General behavior
 ** Save customized settings in a separate file
 
@@ -322,11 +329,10 @@ Show file name in window title.
 I use "Input" as my default font face.
 
 #+BEGIN_SRC emacs-lisp
-(custom-theme-set-faces
- 'user
- '(variable-pitch ((t (:family "Helvetica"))))
- '(fixed-pitch ((t (:family "Input")))))
-(set-face-attribute 'default nil :font "Input")
+(add-to-list 'default-frame-alist '(font . "Input-14"))
+
+;; Experiment with different fonts here:
+;; (set-frame-font "Input-14")
 #+END_SRC
 
 ** Install all-the-icon
@@ -681,6 +687,7 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
   :demand t
   :bind
   ("C-s" . swiper)
+  ("C-r" . swiper-isearch-backward)
   ("M-x" . counsel-M-x)
   ("M-y" . counsel-yank-pop)
 
@@ -854,11 +861,11 @@ Use =M-$= to correct word at point.
 (global-unset-key (kbd "M-<down-mouse-1>"))
 (use-package multiple-cursors
   :bind (("C-x m" . mc/mark-all-dwim)
-         ("C-x SPC" . set-rectangular-region-anchor)
+         ("C-x C-SPC" . set-rectangular-region-anchor)
          ("C->" . mc/mark-next-like-this-symbol)
          ("C-<" . mc/unmark-next-like-this-symbol)
-         ("C-M->" . mc/mark-next-like-this-word)
-         ("C-M-<" . mc/unmark-next-like-this-word)
+         ("C-M->" . mc/mark-next-like-this)
+         ("C-M-<" . mc/unmark-next-like-this)
    ("M-<mouse-1>" . mc/add-cursor-on-click))
   :config (define-key mc/keymap (kbd "<return>") nil))
 #+END_SRC
@@ -866,7 +873,8 @@ Use =M-$= to correct word at point.
 ** TRAMP
 
 #+BEGIN_SRC emacs-lisp
-(setq tramp-default-method "ssh")
+(require 'tramp)
+(setq tramp-default-method "scp")
 #+END_SRC
 
 * Programming
@@ -1406,7 +1414,6 @@ Reformatting JSON.
   :commands (org-mode)
   :mode ("\\.org\\'" . org-mode))
 #+END_SRC
-
 ** Set org directory
 
 #+BEGIN_SRC emacs-lisp
@@ -1588,7 +1595,6 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
      ("TOREAD" . "#879434")
      ("WAIT" . "#c07993"))))
 #+END_SRC
-
 ** Taking note with =deft=
 
 =deft.el= provides National Velocity-like note browsing and editing experience.
@@ -1648,8 +1654,9 @@ don't need to leave Emacs for that.
 (defun shou/interactive-push-anki-notes ()
   (interactive)
   (when (and (eq major-mode 'org-mode)
+             (not (equal "anki-cards-archive" (f-base buffer-file-name)))
              (> (length (anki-editor-map-note-entries t nil 'file)) 0)
-             (yes-sor-no-p "Push cards to Anki?"))
+             (yes-or-no-p "Push cards to Anki?"))
     (let ((progress-reporter
            (make-progress-reporter "Pushing cards to Anki..." nil nil)))
       (anki-editor-push-notes)
@@ -1714,19 +1721,19 @@ don't need to leave Emacs for that.
      (tags priority-down category-keep)
      (search category-keep))))
 #+END_SRC
-
 *** Enable habit
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
+  :init
+  (add-to-list 'org-modules 'org-habit)
+
   :custom
   (org-habit-graph-column 60)
   (org-habit-preceding-days 14)
   (org-habit-following-days 3)
 
   :config
-  (add-to-list 'org-modules 'org-habit)
-
   ;; clear out the face set by current theme, the default is good enough.
   (custom-theme-set-faces
    shou/current-theme
@@ -1739,13 +1746,56 @@ don't need to leave Emacs for that.
    '(org-habit-ready-future-face)
    '(org-habit-overdue-future-face)))
 #+END_SRC
+*** Auto save
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :config
+  (add-hook 'org-agenda-mode-hook
+          (lambda ()
+            (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
+            (auto-save-mode))))
+#+END_SRC
+
+
+#+END_SRC
+
+*** Customize face
+
+Basically restoring the default face.
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :config
+  (custom-theme-set-faces
+   shou/current-theme
+   '(org-scheduled-previously)
+   '(org-upcoming-deadline)
+   '(org-agenda-dimmed-todo-face)
+   '(org-scheduled-today)
+   '(org-scheduled)
+   '(org-agenda-clocking)
+   '(org-agenda-date-today)
+   '(org-tag-faces)
+   '(org-agenda-done)
+   '(org-agenda-date)
+   '(org-agenda-date-weekend)
+   ))
+
+
+
+#+END_SRC
 
 ** Archiving
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :custom (org-archive-location (concat (org-file-path "archive.org") "::* From %s")))
+  :custom (org-archive-location (concat (org-file-path "archive.org") "::* From %s"))
+  :config
+  ;; save archive automatically
+  (advice-add 'org-archive-default-command :after #'org-save-all-org-buffers))
 #+END_SRC
+
 
 ** Capturing
 *** Use =org-clip-link= to insert title automatically
@@ -1920,7 +1970,7 @@ This section configures the following mechanisms:
 
 #+BEGIN_SRC emacs-lisp
 (use-package org-mru-clock
-  :bind (("C-c C-x C-j" . org-color-jump-to-current-task)
+  :bind (("C-c C-x C-j" . org-clock-jump-to-current-task)
          ("C-c C-x C-o" . org-clock-out)
          ("C-c C-x C-i" . org-clock-in)
          ("C-c C-x C-k" . org-mru-clock-in)
