@@ -80,8 +80,9 @@ Allow installing required system packages automatically.
 ** Start edit server (for browser extensions)
 
 #+BEGIN_SRC emacs-lisp
-(use-package edit-server
-  :hook (emacs-startup . edit-server-start))
+(use-package atomic-chrome
+  :hook (emacs-startup . atomic-chrome-start-server)
+  :if (display-graphic-p))
 #+END_SRC
 
 ** Make window resizable by window manager
@@ -109,6 +110,13 @@ Allow installing required system packages automatically.
 (use-package dash)
 (use-package f)
 (use-package s)
+#+END_SRC
+
+** Restart emacs command
+
+#+BEGIN_SRC emacs-lisp
+(use-package restart-emacs
+  :commands restart-emacs)
 #+END_SRC
 
 * General behavior
@@ -676,7 +684,7 @@ Some modes set this variable automatically, so we need to override them.
 
 #+BEGIN_SRC emacs-lisp
 (use-package undo-tree
-  :hook (emasc-startup . global-undo-tree-mode))
+  :hook (emacs-startup . global-undo-tree-mode))
 #+END_SRC
 
 ** Minibuffer Completion
@@ -690,7 +698,7 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
 (use-package counsel
   :demand t
   :bind
-  ("C-s" . swiper)
+  ;; ("C-s" . swiper)
   ("C-r" . swiper-isearch-backward)
   ("M-x" . counsel-M-x)
   ("M-y" . counsel-yank-pop)
@@ -724,6 +732,17 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
 (use-package ivy-prescient
   :after counsel
   :hook (emacs-startup . ivy-prescient-mode))
+#+END_SRC
+
+*** Use CtrlF to replace isearch
+
+#+BEGIN_SRC emacs-lisp
+(use-package ctrlf
+  :bind ("C-s" . ctrlf-forward-literal)
+  :bind ("C-r" . ctrlf-backward-literal)
+  :bind ("C-M-s" . ctrlf-forward-regexp)
+  :bind ("C-M-r" . ctrlf-backward-regexp)
+)
 #+END_SRC
 
 ** Combo key hints
