@@ -95,6 +95,7 @@ Allow installing required system packages automatically.
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'exec-path "~/.asdf/shims")
 (add-to-list 'exec-path "~/.local/bin")
+(add-to-list 'exec-path "~/.cargo/bin")
 #+END_SRC
 
 ** Inhibit startup screen
@@ -498,6 +499,7 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
   (push '("*idris-holes*" :noselect t) popwin:special-display-config)
   (push "*Help*" popwin:special-display-config)
   (push "*Warnings*" popwin:special-display-config)
+  (push "*rustfmt*" popwin:special-display-config)
 )
 
 #+END_SRC
@@ -655,7 +657,9 @@ Some modes set this variable automatically, so we need to override them.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dtrt-indent
-  :commands dtrt-indent-mode)
+  :commands dtrt-indent-mode
+  :hook (prog-mode . dtrt-indent-mode)
+)
 (defalias 'detect-indentation 'dtrt-indent-mode)
 (defalias 'detect-tab-size 'dtrt-indent-mode)
 #+END_SRC
@@ -861,7 +865,7 @@ Use =M-$= to correct word at point.
 (global-unset-key (kbd "M-<down-mouse-1>"))
 (use-package multiple-cursors
   :bind (("C-x m" . mc/mark-all-dwim)
-         ("C-x C-SPC" . set-rectangular-region-anchor)
+         ("C-x C-SPC" . mc/mark-next-lines)
          ("C->" . mc/mark-next-like-this-symbol)
          ("C-<" . mc/unmark-next-like-this-symbol)
          ("C-M->" . mc/mark-next-like-this)
@@ -1020,8 +1024,14 @@ I use =magit= to show git status.
   :demand t
   :after projectile
   :config
+
   ;; automatically refresh after saving a file
-  (add-hook 'after-save-hook 'magit-after-save-refresh-status t))
+  ;;
+  ;; Edit: I turned it off as it makes editing a bit laggy. Now please
+  ;; press 'g' manually to refresh.
+  ;;
+  ;; (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
+)
 #+END_SRC
 *** Use =forge= for online features
 
@@ -1053,6 +1063,12 @@ Hotkey to remember:
   :commands git-timemachine)
 #+END_SRC
 
+*** Follow symbolic links without warning
+
+#+BEGIN_SRC emacs-lisp
+(setq vc-follow-symlinks t)
+#+END_SRC
+
 ** Search symbol at point in Dash with =C-c d=
 
 #+BEGIN_SRC emacs-lisp
@@ -1075,21 +1091,9 @@ Use =company-mode= for auto completion.
   :hook (emacs-startup . global-company-mode)
 
   :custom
-  (company-idle-delay 0.4 "Show completion immediately")
+  (company-idle-delay 0.1 "Show completion almost immediately")
   (company-show-numbers t "Number the candidates (use M-1, M-2 etc to select completions)")
   (company-tooltip-align-annotations t)
-  (company-backends '(company-bbdb
-                      company-eclim
-                      company-semantic
-                      company-clang
-                      company-xcode
-                      company-cmake
-                      company-capf
-                      company-files
-                      (company-dabbrev-code company-gtags company-etags company-keywords)
-                      company-oddmuse
-                      company-dabbrev
-                      ))
 
   :config
   (define-key company-active-map (kbd "TAB")
@@ -1106,10 +1110,9 @@ Use =TabNine= for general text completion. Please remember to run
 #+BEGIN_SRC emacs-lisp
 (use-package company-tabnine
   :if (eq system-type 'darwin)
-  :commands company-tabnine
-  :after company
+  :commands company-complete
   :config
-  (setq company-backends (-snoc company-backends 'company-tabnine)))
+  (add-to-list 'company-backends #'company-tabnine))
 
 (defun shou/tabnine-off ()
   "turn off TabNine for this buffer"
@@ -1133,7 +1136,7 @@ Use =TabNine= for general text completion. Please remember to run
   :hook (company-mode . company-box-mode)
   :config
 
-  (setq-default company-box-enable-icon nil)
+  (setq-default company-box-enable-icon t)
   (setq-default company-box-icons-unknown 'fa_question_circle)
 
   (setq-default company-box-icons-elisp
@@ -1175,7 +1178,16 @@ We use =eglot= for LSP support. Since eglot has a hook that turns off any compan
 (use-package eglot
   :commands (eglot eglot-ensure)
   :after (company yasnippet)
-  :config (setq-default eglot-stay-out-of '(company)))
+  :bind (:map eglot-mode-map
+              ("M-." . xref-find-definitions-other-window)
+              ("M-," . xref-find-definitions))
+  :custom
+  ;; do not confirm when applying code actions
+  (eglot-confirm-server-initiated-edits nil)
+
+  ;; do not tamper company-backends
+  (eglot-stay-out-of '(company))
+)
 #+END_SRC
 
 ** Languages
@@ -1258,7 +1270,7 @@ Colorize function names/arguments in info documentations.
          ("\\.ex\\'" . elixir-mode))
 
   ;; Format with M-F
-  :bind (:map elixir-mode-map ("M-F" . elixir-format))
+  :bind (:map elixir-mode-map ("C-c C-f" . elixir-format))
 
   ;; Enable eglot for completion from LSP
   :config
@@ -1326,8 +1338,26 @@ Reformatting JSON.
 #+BEGIN_SRC emacs-lisp
 (use-package rust-mode
   :mode "\\.rs\\'"
+  :custom
+  (rust-rustfmt-bin "~/.cargo/bin/rustfmt")
+  (rust-cargo-bin "~/.cargo/bin/cargo")
+
+  ;; do not show a buffer for format errors
+  (rust-format-show-buffer nil)
+
+  ;; set default indent size to 2. Actual indent size will be auto-detected
+  (rust-indent-offset 2)
+
   :config
-  (setq-default rust-format-on-save t))
+  ;; quick way to run cargo commands (C-c C-c prefix)
+  (use-package cargo
+    :bind (:map cargo-minor-mode-map
+                ("C-c C-c C-l" . cargo-process-check))
+    :config
+    (add-hook 'rust-mode-hook 'cargo-minor-mode))r
+
+  ;; enable LSP for type info and more
+  (add-hook 'rust-mode-hook 'eglot-ensure))
 #+END_SRC
 
 *** Shell
@@ -1630,7 +1660,6 @@ don't need to leave Emacs for that.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org-roam
-  :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
   :after org
   :commands (org-roam org-roam-insert org-roam-mode)
   :custom
@@ -1751,10 +1780,7 @@ don't need to leave Emacs for that.
 #+BEGIN_SRC emacs-lisp
 (use-package org
   :config
-  (add-hook 'org-agenda-mode-hook
-          (lambda ()
-            (add-hook 'auto-save-hook 'org-save-all-org-buffers nil t)
-            (auto-save-mode))))
+  (add-hook 'org-mode-hook 'auto-save-mode))
 #+END_SRC
 
 

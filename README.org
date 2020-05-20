@@ -1,3 +1,6 @@
-* emacs.d
+* Static config for Emacs
 
-Here resides my personal emacs preferences.
+Usage:
+
+mkdir ~/.emacs.d
+ln -s -r ./* ~/.emacs.d
