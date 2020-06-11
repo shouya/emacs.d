@@ -4,7 +4,7 @@
 (setq gc-cons-threshold most-positive-fixnum) ; 2^61 bytes
 ;; reset it after load
 (add-hook 'emacs-startup-hook
-          (lambda () (setq gc-cons-threshold (* 20 1024 1024))))
+          (lambda () (setq gc-cons-threshold (* 1024 1024 20))))
 
 ;; ----------- empty file handler alist --------
 (defvar cfg--file-name-handler-alist file-name-handler-alist)
@@ -17,4 +17,8 @@
                          gcs-done)))
 
 ;; ----------- load custom config --------------
+(setq vc-follow-symlinks t)
+(when (file-newer-than-file-p "~/.emacs.d/preferences.org"
+                              "~/.emacs.d/preferences.el")
+  (delete-file "~/.emacs.d/preferences.el"))
 (org-babel-load-file "~/.emacs.d/preferences.org")

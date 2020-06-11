@@ -93,7 +93,7 @@
 (require 'font-lock)
 
 (eval-when-compile
-  (require 'cl) ;; incf
+  (require 'cl-lib) ;; incf
   (load-library "font-lock")) ;; Macro save-buffer-state
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
