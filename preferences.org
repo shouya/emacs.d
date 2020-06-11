@@ -42,7 +42,8 @@ lock file for specific version, some new packages depend on it.
          'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+  (load bootstrap-file nil 'nomessage)
+  (require 'straight-x))
 #+END_SRC
 
 ** Enable ELPA with straight
@@ -55,8 +56,10 @@ lock file for specific version, some new packages depend on it.
 Ensure =use-package= is installed.
 
 #+BEGIN_SRC emacs-lisp
-(straight-use-package 'use-package)
 (defvar use-package-compute-statistics)
+(defvar straight-use-package-by-default)
+
+(straight-use-package 'use-package)
 (setq use-package-compute-statistics t)
 (setq straight-use-package-by-default t)
 #+END_SRC
@@ -81,7 +84,7 @@ Allow installing required system packages automatically.
 
 #+BEGIN_SRC emacs-lisp
 (use-package atomic-chrome
-  :hook (emacs-startup . atomic-chrome-start-server)
+  ;;:hook (emacs-startup . atomic-chrome-start-server)
   :if (display-graphic-p))
 #+END_SRC
 
@@ -117,6 +120,17 @@ Allow installing required system packages automatically.
 #+BEGIN_SRC emacs-lisp
 (use-package restart-emacs
   :commands restart-emacs)
+#+END_SRC
+
+** Inherit shell environment
+
+#+BEGIN_SRC emacs-lisp
+(use-package exec-path-from-shell
+  :when (memq window-system '(mac ns x))
+  :hook (emacs-startup . exec-path-from-shell-initialize)
+  :custom
+  (exec-path-from-shell-variables '("PATH"))
+  (exec-path-from-shell-arguments '("-i")))
 #+END_SRC
 
 * General behavior
@@ -299,6 +313,19 @@ most GUI editors.
 (delete-selection-mode 1)
 #+END_SRC
 
+** Watch for long pause and explain them
+
+#+BEGIN_SRC emacs-lisp
+(use-package explain-pause-mode
+  :straight (:host github :repo "lastquestion/explain-pause-mode")
+  :disabled
+  :hook (emacs-startup . explain-pause-mode)
+
+  ;; only report if the pauses exceed 100ms
+  :custom (explain-pause-blocking-too-long-ms 100)
+)
+#+END_SRC
+
 * UI
 ** Tweak main UI
 
@@ -405,9 +432,7 @@ Doom modeline
 
 #+BEGIN_SRC emacs-lisp
 (use-package diff-hl
-  :hook ((prog-mode . turn-on-diff-hl-mode)
-         (dired-mode . diff-hl-dired-mode)
-         (vc-dir-mode . turn-on-diff-hl-mode)))
+  :hook (emacs-startup . global-diff-hl-mode))
 #+END_SRC
 
 ** Highlight bracket
@@ -508,6 +533,8 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
   (push "*Help*" popwin:special-display-config)
   (push "*Warnings*" popwin:special-display-config)
   (push "*rustfmt*" popwin:special-display-config)
+  (push "*explain-pause-log*" popwin:special-display-config)
+  (push "*explain-pause-profiles*" popwin:special-display-config)
 )
 
 #+END_SRC
@@ -516,6 +543,8 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
 
 #+BEGIN_SRC emacs-lisp
 (use-package dashboard
+  ;; this is no longer working because it depends on the legacy cl lib
+  :disabled
   :config
   (dashboard-setup-startup-hook)
   (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
@@ -623,6 +652,12 @@ So it doesn't block the main UI when copying large files.
   ;;  'neotree-projectile-action
   ;;  "switch to neotree to projectile root dir")
 )
+#+END_SRC
+
+** Show human readable sizes
+
+#+BEGIN_SRC emacs-lisp
+(setq dired-listing-switches "-alh")
 #+END_SRC
 
 * Terminal
@@ -822,7 +857,11 @@ Remember to install =aspell= command line tool.
   (flyspell-lazy-mode 1)
 
   ;; enable flyspell-mode for text modes
-  (dolist (hook text-mode-hooks) (add-hook hook 'flyspell-mode)))
+  (dolist (hook text-mode-hooks)
+    (add-hook hook (lambda ()
+                     (unless (derived-mode-p 'git-commit-mode)
+                       (flyspell-mode t)))))
+  )
 #+END_SRC
 
 Use =M-$= to correct word at point.
@@ -1110,9 +1149,13 @@ Use =company-mode= for auto completion.
   :hook (emacs-startup . global-company-mode)
 
   :custom
-  (company-idle-delay 0.1 "Show completion almost immediately")
+  (company-idle-delay 0.3 "Show completion almost immediately")
   (company-show-numbers t "Number the candidates (use M-1, M-2 etc to select completions)")
   (company-tooltip-align-annotations t)
+  (company-dabbrev-code-everywhere t)
+
+  ;; only enable these options
+  (company-backends '(company-dabbrev-code company-capf company-files))
 
   :config
   (define-key company-active-map (kbd "TAB")
@@ -1128,25 +1171,39 @@ Use =TabNine= for general text completion. Please remember to run
 
 #+BEGIN_SRC emacs-lisp
 (use-package company-tabnine
+  ;; use my own build with async enabled
+  :straight (:host github :repo "shouya/company-tabnine")
   :if (eq system-type 'darwin)
-  :commands company-complete
+  :custom
+  (company-tabnine-log-file-path "~/tmp/tabnine.log")
+  (company-tabnine-executable-args '("--log-level" "Trace"))
   :config
-  (add-to-list 'company-backends #'company-tabnine))
+  (add-to-list 'company-backends 'company-tabnine))
 
 (defun shou/tabnine-off ()
   "turn off TabNine for this buffer"
   (interactive)
-  (setq-local company-backends (delete 'company-tabnine company-backends))
-  (company-mode 1))
+  (setq-local company-backends (delete 'company-tabnine company-backends)))
+
 
 (defun shou/tabnine-on ()
   "turn on TabNine for this buffer"
   (interactive)
-  (setq-local company-backends (add-to-list 'company-backends 'company-tabnine))
-  (company-mode 1))
+  (setq-local company-backends (add-to-list 'company-backends 'company-tabnine)))
+  #+END_SRC
+
+*** Company completion
+
+#+BEGIN_SRC emacs-lisp
+(use-package company-quickhelp
+  :hook (company-mode-hook . company-quickhelp-mode)
+  :after company
+  :custom (company-quickhelp-delay 0)
+)
 #+END_SRC
 
 *** Company completion icons on GUI
+
 #+BEGIN_SRC emacs-lisp
 (use-package company-box
   :init (require 'icons-in-terminal)
@@ -1197,16 +1254,27 @@ We use =eglot= for LSP support. Since eglot has a hook that turns off any compan
 (use-package eglot
   :commands (eglot eglot-ensure)
   :after (company yasnippet)
-  :bind (:map eglot-mode-map
-              ("M-." . xref-find-definitions-other-window)
-              ("M-," . xref-find-definitions))
   :custom
   ;; do not confirm when applying code actions
   (eglot-confirm-server-initiated-edits nil)
 
   ;; do not tamper company-backends
   (eglot-stay-out-of '(company))
+
+  ;; use async connection only
+  (eglot-sync-connect nil)
 )
+#+END_SRC
+
+*** Formatting code with apheleia
+
+#+BEGIN_SRC emacs-lisp
+;; (use-package apheleia
+;;   :straight (:host github :repo "raxod502/apheleia")
+;;   :custom
+;;   (apheleia-formatters '((mix . ("mix" "format" file))))
+;;   (apheleia-mode-alias '((elixir-mode . mix)))
+;;   )
 #+END_SRC
 
 ** Languages
@@ -1285,33 +1353,38 @@ Colorize function names/arguments in info documentations.
 
 #+BEGIN_SRC emacs-lisp
 (use-package elixir-mode
+  :straight (:host github :repo "elixir-editors/emacs-elixir" :flavor nil)
   :mode (("\\.exs\\'" . elixir-mode)
          ("\\.ex\\'" . elixir-mode))
 
-  ;; Format with M-F
+  ;; Format with C-c C-f
   :bind (:map elixir-mode-map ("C-c C-f" . elixir-format))
 
   ;; Enable eglot for completion from LSP
   :config
   (add-hook 'elixir-mode-hook 'eglot-ensure)
+
+  ;; we don't enable eglot's auto completion functionality
+  (add-hook 'elixir-mode-hook (lambda ()
+                                (setq-local 'company-backends '(company-tabnine))))
+
   (add-hook 'elixir-format-hook
             (lambda ()
               (if (projectile-project-p)
                   (setq elixir-format-arguments
                         (list "--dot-formatter"
                               (concat (locate-dominating-file buffer-file-name ".formatter.exs") ".formatter.exs")))
-                (setq elixir-format-arguments nil))))
+                (setq elixir-format-arguments nil)))))
 
   ;;; The original elixir syntax table is a bit awkward. I changed it
   ;;; a little so things like symbol highlighting works a bit better.
   ;;
   ;; original: https://github.com/elixir-editors/emacs-elixir/blob/master/elixir-smie.el#L80
-  (modify-syntax-entry ?: "_" elixir-mode-syntax-table) ; make : a punctuation (was symbol)
-  (modify-syntax-entry ?@ "." elixir-mode-syntax-table) ; make @ a punctuation (was symbol)
-  (modify-syntax-entry ?& "." elixir-mode-syntax-table) ; make & a punctuation (was symbol)
-  (modify-syntax-entry ?? "_" elixir-mode-syntax-table) ; make ? a symbol (was word)
-  (modify-syntax-entry ?~ "_" elixir-mode-syntax-table) ; make ~ a punctuation (was word)
-)
+  ;(modify-syntax-entry ?: "_" elixir-mode-syntax-table) ; make : a punctuation (was symbol)
+  ;(modify-syntax-entry ?@ "." elixir-mode-syntax-table) ; make @ a punctuation (was symbol)
+  ;(modify-syntax-entry ?& "." elixir-mode-syntax-table) ; make & a punctuation (was symbol)
+  ;(modify-syntax-entry ?? "_" elixir-mode-syntax-table) ; make ? a symbol (was word)
+  ;(modify-syntax-entry ?~ "_" elixir-mode-syntax-table) ; make ~ a punctuation (was word)
 #+END_SRC
 
 **** Run ExUnit
@@ -1438,6 +1511,13 @@ Reformatting JSON.
   :hook (yaml-mode . ansible-vault-mode-maybe))
 #+END_SRC
 
+*** Haskell
+
+#+BEGIN_SRC emacs-lisp
+(use-package haskell-mode
+  :mode (("\\.hs\\'" . haskell-mode)))
+#+END_SRC
+
 *** Idris
 
 #+BEGIN_SRC emacs-lisp
@@ -1459,7 +1539,7 @@ Reformatting JSON.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :straight (org :local-repo nil)
+  ;; :straight (org :local-repo nil)
   :commands (org-mode)
   :mode ("\\.org\\'" . org-mode))
 #+END_SRC
@@ -1617,9 +1697,11 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
 (use-package org
   :config
   (add-to-list 'org-structure-template-alist
-               '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")
+               '("el" . "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
   (add-to-list 'org-structure-template-alist
-               '("lojban" "#+BEGIN_SRC lojban\n?\n#+END_SRC"))))
+               '("lojban" . "#+BEGIN_SRC lojban\n?\n#+END_SRC"))
+
+  (require 'org-tempo))
 #+END_SRC
 
 ** To-do settings
