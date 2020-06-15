@@ -97,9 +97,16 @@ Allow installing required system packages automatically.
 ** Set exec path
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'exec-path "~/.asdf/shims")
-(add-to-list 'exec-path "~/.local/bin")
-(add-to-list 'exec-path "~/.cargo/bin")
+(use-package exec-path-from-shell
+  :when (memq window-system '(mac ns x))
+  :hook (emacs-startup . exec-path-from-shell-initialize)
+  :custom
+  (exec-path-from-shell-variables '("PATH"))
+  (exec-path-from-shell-arguments '("-i"))
+
+  ;; do not check if i set path in zshenv or zshrc
+  (exec-path-from-shell-check-startup-files nil)
+)
 #+END_SRC
 
 ** Inhibit startup screen
@@ -120,17 +127,6 @@ Allow installing required system packages automatically.
 #+BEGIN_SRC emacs-lisp
 (use-package restart-emacs
   :commands restart-emacs)
-#+END_SRC
-
-** Inherit shell environment
-
-#+BEGIN_SRC emacs-lisp
-(use-package exec-path-from-shell
-  :when (memq window-system '(mac ns x))
-  :hook (emacs-startup . exec-path-from-shell-initialize)
-  :custom
-  (exec-path-from-shell-variables '("PATH"))
-  (exec-path-from-shell-arguments '("-i")))
 #+END_SRC
 
 * General behavior
@@ -295,6 +291,9 @@ Copied from [[https://github.com/hrs/sensible-defaults.el/blob/master/sensible-d
 
 ;; was zap-to-char
 (bind-key* "M-z" 'zap-up-to-char)
+
+;; I don't use bidir text at all. This hugely increase scroll speed.
+(setq-default bidi-inhibit-bpa t)
 #+END_SRC
 
 ** Save last position for each file
@@ -733,10 +732,11 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
 (use-package counsel
   :demand t
   :bind
-  ;; ("C-s" . swiper)
-  ("C-r" . swiper-isearch-backward)
   ("M-x" . counsel-M-x)
   ("M-y" . counsel-yank-pop)
+  ("C-x C-f" . counsel-find-file)
+  (:map ivy-minibuffer-map
+        ("M-RET" . ivy-immediate-done))
 
   :config
   (setq ivy-count-format "(%d/%d) ")
@@ -754,6 +754,9 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
 
   ;; Retain the window after backward-deleted last char
   (setq ivy-on-del-error-function nil)
+
+  ;; Find file at point
+  (setq counsel-find-file-at-point t)
 
   ;; Start ivy
   (ivy-mode))
@@ -874,6 +877,31 @@ Use =M-$= to correct word at point.
     (add-hook hook 'auto-correct-mode)))
 #+END_SRC
 
+*** Visual line mode for text modes
+
+#+begin_src emacs-lisp
+(dolist (hook text-mode-hooks)
+  (add-hook hook 'visual-line-mode))
+#+end_src
+
+*** Set fill column for visual line mode
+
+By default =visual-line-mode= wraps around at the edge of the frames. Which makes it difficult to read if the frame is too wide.
+
+=visual-fill-column-mode= enhances this by enforcing the wrapping earlier.
+
+#+begin_src emacs-lisp
+(use-package visual-fill-column
+  :hook (visual-line-mode . visual-fill-column-mode)
+  :custom
+
+  (visual-fill-column-width 90)
+
+  :config
+  (setq-default split-window-preferred-function
+                'visual-fill-column-split-window-sensibly))
+#+end_src
+
 ** Customize editing shortcuts
 *** Transpose char (=C-t=)
 #+BEGIN_SRC emacs-lisp
@@ -978,9 +1006,8 @@ We use =dumb-jump=, which works out of the box for many languages.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dumb-jump
-  :bind (:map prog-mode-map
-              ("M-." . dumb-jump-go-other-window)
-              ("M-," . dumb-jump-go))
+  :bind (("M-." . dumb-jump-go-other-window)
+         ("M-," . dumb-jump-go))
   :custom
   (dumb-jump-selector 'ivy)
   (dumb-jump-force-searcher 'rg))
@@ -1154,10 +1181,11 @@ Use =company-mode= for auto completion.
   (company-tooltip-align-annotations t)
   (company-dabbrev-code-everywhere t)
 
-  ;; only enable these options
-  (company-backends '(company-dabbrev-code company-capf company-files))
-
   :config
+  ;; only enable these options
+  (setq company-backends
+        '(company-dabbrev-code company-capf company-files))
+
   (define-key company-active-map (kbd "TAB")
     (lambda () (interactive) (company-complete-common-or-cycle +1)))
   (define-key company-active-map (kbd "S-TAB")
@@ -1174,6 +1202,7 @@ Use =TabNine= for general text completion. Please remember to run
   ;; use my own build with async enabled
   :straight (:host github :repo "shouya/company-tabnine")
   :if (eq system-type 'darwin)
+  :after company
   :custom
   (company-tabnine-log-file-path "~/tmp/tabnine.log")
   (company-tabnine-executable-args '("--log-level" "Trace"))
@@ -1254,6 +1283,9 @@ We use =eglot= for LSP support. Since eglot has a hook that turns off any compan
 (use-package eglot
   :commands (eglot eglot-ensure)
   :after (company yasnippet)
+  :bind (:map eglot-mode-map
+              ("M-." . xref-find-definitions-other-window)
+              ("M-," . xref-find-definitions))
   :custom
   ;; do not confirm when applying code actions
   (eglot-confirm-server-initiated-edits nil)
@@ -1366,7 +1398,7 @@ Colorize function names/arguments in info documentations.
 
   ;; we don't enable eglot's auto completion functionality
   (add-hook 'elixir-mode-hook (lambda ()
-                                (setq-local 'company-backends '(company-tabnine))))
+                                (setq-local company-backends '(company-tabnine))))
 
   (add-hook 'elixir-format-hook
             (lambda ()
@@ -1539,7 +1571,7 @@ Reformatting JSON.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  ;; :straight (org :local-repo nil)
+  :straight (org :local-repo nil)
   :commands (org-mode)
   :mode ("\\.org\\'" . org-mode))
 #+END_SRC
@@ -1697,9 +1729,9 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
 (use-package org
   :config
   (add-to-list 'org-structure-template-alist
-               '("el" . "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+               '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist
-               '("lojban" . "#+BEGIN_SRC lojban\n?\n#+END_SRC"))
+               '("lojban" . "src lojban"))
 
   (require 'org-tempo))
 #+END_SRC
@@ -1736,7 +1768,7 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
   :commands (deft)
   :custom
   (deft-extensions '("org" "txt" "md" "markdown"))
-  (deft-directory (org-file-path "deft"))
+  (deft-directory (org-file-path "random"))
   (deft-default-extension "org" "use org as default format")
   (deft-recursive t "search recursively")
   (deft-use-filename-as-title t)
@@ -1749,8 +1781,6 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
       (case-fn . downcase))
     "apply certain rules when generating file name")
   )
-
-
 #+END_SRC
 
 ** Roam
@@ -1767,16 +1797,22 @@ don't need to leave Emacs for that.
   (org-roam-mute-cache-build t)
   (org-roam-directory (org-file-path "roam/"))
 
-  :config
-  (org-roam-mode)
-
   :bind
   ("C-c r l" . org-roam)
   ("C-c r t" . org-roam-today)
   ("C-c r f" . org-roam-find-file)
   ("C-c r i" . org-roam-insert)
-  ("C-c r g" . org-roam-show-graph))
+  ("C-c r g" . org-roam-show-graph)
+  :config
+  (org-roam-mode)
+)
 #+END_SRC
+
+** Org protocol
+
+#+begin_src emacs-lisp
+(require 'org-protocol)
+#+end_src
 
 ** Anki deck
 
@@ -1846,17 +1882,17 @@ don't need to leave Emacs for that.
   (org-agenda-show-future-repeats t)
 
   (org-agenda-sorting-strategy
-   '((agenda category-keep habit-up todo-state-up priority-down time-up)
+   '((agenda category-keep habit-up priority-down todo-state-up time-up)
      (todo priority-down category-keep)
      (tags priority-down category-keep)
-     (search category-keep))))
+     (search priority-down category-keep))))
 #+END_SRC
 *** Enable habit
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
   :init
-  (add-to-list 'org-modules 'org-habit)
+  (require 'org-habit)
 
   :custom
   (org-habit-graph-column 60)
@@ -1912,6 +1948,8 @@ Basically restoring the default face.
 
 
 #+END_SRC
+
+
 
 ** Archiving
 
