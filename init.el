@@ -22,3 +22,4 @@
                               "~/.emacs.d/preferences.el")
   (delete-file "~/.emacs.d/preferences.el"))
 (org-babel-load-file "~/.emacs.d/preferences.org")
+(put 'downcase-region 'disabled nil)

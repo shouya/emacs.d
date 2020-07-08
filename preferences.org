@@ -892,9 +892,9 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 
 #+begin_src emacs-lisp
 (use-package visual-fill-column
-  :hook (visual-line-mode . visual-fill-column-mode)
-  :custom
+  :commands visual-fill-column-mode
 
+  :custom
   (visual-fill-column-width 90)
 
   :config
@@ -951,7 +951,7 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 (global-unset-key (kbd "M-<down-mouse-1>"))
 (use-package multiple-cursors
   :bind (("C-x m" . mc/mark-all-dwim)
-         ("C-x C-SPC" . mc/mark-next-lines)
+         ("C-M-SPC" . mc/mark-next-lines)
          ("C->" . mc/mark-next-like-this-symbol)
          ("C-<" . mc/unmark-next-like-this-symbol)
          ("C-M->" . mc/mark-next-like-this)
@@ -1541,6 +1541,9 @@ Reformatting JSON.
 (use-package ansible-vault
   :commands (ansible-vault--is-vault-file ansible-vault-mode)
   :hook (yaml-mode . ansible-vault-mode-maybe))
+
+(use-package jinja2-mode
+  :mode ("\\.hs\\'" . jinja2-mode))
 #+END_SRC
 
 *** Haskell
