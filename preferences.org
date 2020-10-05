@@ -226,13 +226,6 @@ one.
   (interactive "sURL: ")
   (switch-to-buffer-other-window (get-buffer-create "*eww*"))
   (eww-browse-url url))
-
-(setq browse-url-browser-function
-      `(("github\\.com" . browse-url-default-browser)
-        ("reddit\\.com" . browse-url-default-browser)
-        ("youtube\\.com" . browse-url-default-browser)
-        (".*" . browse-url-default-browser)
-        (".*" . shou/eww-browse-url-in-new-buffer)))
 #+END_SRC
 
 =eww-readable= makes the web page more readable by hiding unnecessary content, so
@@ -317,11 +310,11 @@ most GUI editors.
 #+BEGIN_SRC emacs-lisp
 (use-package explain-pause-mode
   :straight (:host github :repo "lastquestion/explain-pause-mode")
-  :disabled
+  ;; :disabled
   :hook (emacs-startup . explain-pause-mode)
 
   ;; only report if the pauses exceed 100ms
-  :custom (explain-pause-blocking-too-long-ms 100)
+  :custom (explain-pause-blocking-too-long-ms 30)
 )
 #+END_SRC
 
@@ -395,7 +388,12 @@ I use =sanityinc-tomorrow= theme because it's high contrast and colorful.
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
   :config
-  (load-theme shou/current-theme t))
+  (load-theme shou/current-theme t)
+  (setq ansi-color-names-vector
+        ["#c5c8c6" ; customized
+         "#cc6666" "#b5bd68" "#f0c674" "#81a2be" "#c9b4cf" "#8abeb7" "#c4c8c6"])
+  (setq ansi-color-map (ansi-color-make-color-map))
+)
 #+END_SRC
 
 ** Modeline customization
@@ -800,12 +798,14 @@ entered.
 #+BEGIN_SRC emacs-lisp
 (use-package expand-region
   :bind (("C-=" . er/expand-region)
-         ("C--" . er/contract-region)
+         ("C--" . er/contract-region))
+  :custom
+  (expand-region-subword-enabled t)
+  (expand-region-skip-whitespace nil)
 
-         ; :map evil-visual-state-map
-         ;("=" . er/expand-region)
-         ;("-" . er/contract-region)
-))
+  ;; mainly for qualified names like "Struct::method".
+  (er/enable-mode-expansions 'rust-mode 'er/add-cc-mode-expansions)
+)
 #+END_SRC
 
 ** Writing prose
@@ -864,6 +864,9 @@ Remember to install =aspell= command line tool.
     (add-hook hook (lambda ()
                      (unless (derived-mode-p 'git-commit-mode)
                        (flyspell-mode t)))))
+
+  ;; enable spellchecker for comments/strings in code
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
   )
 #+END_SRC
 
@@ -893,9 +896,11 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 #+begin_src emacs-lisp
 (use-package visual-fill-column
   :commands visual-fill-column-mode
+  :hook (emacs-startup . global-visual-fill-column-mode)
 
   :custom
   (visual-fill-column-width 90)
+  (visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
 
   :config
   (setq-default split-window-preferred-function
@@ -960,6 +965,13 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
   :config (define-key mc/keymap (kbd "<return>") nil))
 #+END_SRC
 
+** Visual query replace
+
+#+begin_src emacs-lisp
+(use-package visual-regexp
+  :bind (("M-%" . vr/query-replace)))
+#+end_src
+
 ** TRAMP
 
 #+BEGIN_SRC emacs-lisp
@@ -1006,8 +1018,8 @@ We use =dumb-jump=, which works out of the box for many languages.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dumb-jump
-  :bind (("M-." . dumb-jump-go-other-window)
-         ("M-," . dumb-jump-go))
+  :bind (("M-s-." . dumb-jump-go-other-window)
+         ("M-s-," . dumb-jump-go))
   :custom
   (dumb-jump-selector 'ivy)
   (dumb-jump-force-searcher 'rg))
@@ -1092,7 +1104,8 @@ I use =smartparens= package for the purpose.
               ;; ((a|) b) => (a| b)
               ("M-j" . sp-splice-sexp))
   :config
-  (require 'smartparens-config))
+  (require 'smartparens-config)
+  (sp-local-pair 'haskell-mode "'" nil :actions nil))
 #+END_SRC
 
 ** Git
@@ -1108,16 +1121,27 @@ I use =magit= to show git status.
 
   :demand t
   :after projectile
-  :config
 
+  :custom
+  ;; https://twitter.com/iLemming/status/1243322552828571649
+  (magit-save-repository-buffers 'save-all-and-dont-ask)
+
+  :config
+  ;; so it don't close other windows
+  (fset 'magit-restore-window-configuration (lambda (x) (kill-buffer-and-window)))
   ;; automatically refresh after saving a file
   ;;
   ;; Edit: I turned it off as it makes editing a bit laggy. Now please
   ;; press 'g' manually to refresh.
   ;;
   ;; (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
+
+  ;; do not override projectile keys
+  (unbind-key "M-p" magit-status-mode-map)
+  (unbind-key "M-n" magit-status-mode-map)
 )
 #+END_SRC
+
 *** Use =forge= for online features
 
 Hotkey to remember:
@@ -1235,6 +1259,7 @@ Use =TabNine= for general text completion. Please remember to run
 
 #+BEGIN_SRC emacs-lisp
 (use-package company-box
+  :disabled
   :init (require 'icons-in-terminal)
   :if (display-graphic-p)
   ;:disabled
@@ -1477,11 +1502,15 @@ Reformatting JSON.
   (use-package cargo
     :bind (:map cargo-minor-mode-map
                 ("C-c C-c C-l" . cargo-process-check))
+    :custom
+    (cargo-process--enable-rust-backtrace t)
+
     :config
-    (add-hook 'rust-mode-hook 'cargo-minor-mode))r
+    (add-hook 'cargo-process-mode-hook 'visual-line-mode))
 
   ;; enable LSP for type info and more
-  (add-hook 'rust-mode-hook 'eglot-ensure))
+  (add-hook 'rust-mode-hook 'eglot-ensure)
+  (add-hook 'rust-mode-hook 'cargo-minor-mode))
 #+END_SRC
 
 *** Shell
@@ -1550,7 +1579,24 @@ Reformatting JSON.
 
 #+BEGIN_SRC emacs-lisp
 (use-package haskell-mode
-  :mode (("\\.hs\\'" . haskell-mode)))
+  :bind (:map haskell-mode-map
+              ("C-c C-c" . haskell-compile)
+              ("C-c `" . haskell-interactive-bring)
+              ("C-c C-l" . haskell-process-load-or-reload)
+              ("C-c C-t" . haskell-process-do-type)
+              ("C-c C-i" . haskell-process-do-info)
+              ("M-." . haskell-mode-jump-to-def))
+  :mode (("\\.hs\\'" . haskell-mode))
+  :custom
+  ;; build with "stack build"
+  (haskell-compile-cabal-build-command "stack build")
+  ;; do not show error in a popup window
+  (haskell-interactive-popup-errors nil)
+  ;; show logs
+  (haskell-process-log t)
+  ;; auto load imports
+  (haskell-process-auto-import-modules t)
+)
 #+END_SRC
 
 *** Idris
