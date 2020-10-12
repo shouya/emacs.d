@@ -310,7 +310,7 @@ most GUI editors.
 #+BEGIN_SRC emacs-lisp
 (use-package explain-pause-mode
   :straight (:host github :repo "lastquestion/explain-pause-mode")
-  ;; :disabled
+  :disabled
   :hook (emacs-startup . explain-pause-mode)
 
   ;; only report if the pauses exceed 100ms
@@ -804,6 +804,7 @@ entered.
   (expand-region-skip-whitespace nil)
 
   ;; mainly for qualified names like "Struct::method".
+  (require 'cc-mode-expansions)
   (er/enable-mode-expansions 'rust-mode 'er/add-cc-mode-expansions)
 )
 #+END_SRC
@@ -1046,9 +1047,9 @@ We use =dumb-jump=, which works out of the box for many languages.
 *** Use =ripgrep= (=<f5>=)
 
 #+BEGIN_SRC emacs-lisp
-(use-package deadgrep
+(use-package rg
   :ensure-system-package (rg . ripgrep)
-  :bind (("<f5>" . deadgrep)))
+  :bind (("<f5>" . rg)))
 #+END_SRC
 
 *** Use =projectile= to open files within project
@@ -1102,7 +1103,12 @@ I use =smartparens= package for the purpose.
               ;; ((a |b)) => (a (|b))
               ("M-S-l" . sp-backward-barf-sexp)
               ;; ((a|) b) => (a| b)
-              ("M-j" . sp-splice-sexp))
+              ("M-j" . sp-splice-sexp)
+
+              ;;
+              ("M-<right>" . sp-next-sexp)
+              ;;
+              ("M-<left>" . sp-previous-sexp))
   :config
   (require 'smartparens-config)
   (sp-local-pair 'haskell-mode "'" nil :actions nil))
