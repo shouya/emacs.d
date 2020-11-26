@@ -484,7 +484,8 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
 
 #+BEGIN_SRC emacs-lisp
 (use-package ace-window
-  :bind ("M-o" . ace-window)
+  ;; :bind ("M-o" . ace-window)
+  :bind ("M-o" . other-window)
   :custom
   ;; show current action in minibuffer
   (aw-minibuffer-flag t)
@@ -635,19 +636,26 @@ So it doesn't block the main UI when copying large files.
   (dired-async-mode 1))
 #+END_SRC
 
-** File tree view (=<f8>=)
+** Tree view
 
 #+BEGIN_SRC emacs-lisp
-(use-package neotree
-  :bind ("<f8>" . neotree-toggle)
-  :after projectile
+(use-package treemacs
+  :bind ("M-O" . treemacs-select-window)
+  :config
+  (use-package treemacs-magit
+    :after treemacs magit)
+  (use-package treemacs-projectile
+    :after treemacs projectile)
+
+  ;; customization
+  (treemacs-resize-icons 16)
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode t)
+
   :custom
-  (neo-theme (if (display-graphic-p) 'icons 'arrow))
-  (neo-smart-open t "auto find current file and jump to node")
-  (neo-vc-integration '(face))
-  ;; (projectile-switch-project-action
-  ;;  'neotree-projectile-action
-  ;;  "switch to neotree to projectile root dir")
+  (treemacs-width 20)
+
 )
 #+END_SRC
 
@@ -973,6 +981,14 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
   :bind (("M-%" . vr/query-replace)))
 #+end_src
 
+** Align expression
+
+#+begin_src emacs-lisp
+(use-package bind-key
+  :config
+  (bind-key "M-^" 'align-regexp))
+#+end_src
+
 ** TRAMP
 
 #+BEGIN_SRC emacs-lisp
@@ -1047,9 +1063,9 @@ We use =dumb-jump=, which works out of the box for many languages.
 *** Use =ripgrep= (=<f5>=)
 
 #+BEGIN_SRC emacs-lisp
-(use-package rg
+(use-package deadgrep
   :ensure-system-package (rg . ripgrep)
-  :bind (("<f5>" . rg)))
+  :bind (("<f5>" . deadgrep)))
 #+END_SRC
 
 *** Use =projectile= to open files within project
@@ -1308,26 +1324,24 @@ Use =TabNine= for general text completion. Please remember to run
 
 *** Support Language Server Protocols (LSP)
 
-We use =eglot= for LSP support. Since eglot has a hook that turns off any company backends
+**** LSP mode
 
-#+BEGIN_SRC emacs-lisp
-(use-package eglot
-  :commands (eglot eglot-ensure)
-  :after (company yasnippet)
-  :bind (:map eglot-mode-map
-              ("M-." . xref-find-definitions-other-window)
-              ("M-," . xref-find-definitions))
+#+begin_src emacs-lisp
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook (lsp-mode . lsp-enable-which-key-integration)
+  :config
+  (use-package lsp-ui)
+  (use-package lsp-treemacs)
+
   :custom
-  ;; do not confirm when applying code actions
-  (eglot-confirm-server-initiated-edits nil)
+  ;; performance tuning
+  (read-process-output-max (* 64 1024)) ;; 64k
 
-  ;; do not tamper company-backends
-  (eglot-stay-out-of '(company))
-
-  ;; use async connection only
-  (eglot-sync-connect nil)
+  ;; do not show code actions on sideline
+  (lsp-ui-sideline-show-code-actions nil)
 )
-#+END_SRC
+#+end_src
 
 *** Formatting code with apheleia
 
@@ -1339,6 +1353,12 @@ We use =eglot= for LSP support. Since eglot has a hook that turns off any compan
 ;;   (apheleia-mode-alias '((elixir-mode . mix)))
 ;;   )
 #+END_SRC
+
+** Compile mode configurations
+
+#+begin_src emacs-lisp
+(setq compilation-scroll-output 'first-error)
+#+end_src
 
 ** Languages
 *** Lisps
@@ -1583,6 +1603,11 @@ Reformatting JSON.
 
 *** Haskell
 
+**** Haskell mode
+
+I use haskell mode for syntax highlighting, indentation, and a variety of
+project related functionalities.
+
 #+BEGIN_SRC emacs-lisp
 (use-package haskell-mode
   :bind (:map haskell-mode-map
@@ -1604,6 +1629,14 @@ Reformatting JSON.
   (haskell-process-auto-import-modules t)
 )
 #+END_SRC
+
+**** LSP
+
+#+begin_src emacs-lisp
+(use-package lsp-haskell
+  :hook (haskell-mode . lsp-deferred)
+  :hook (haskell-literate-mode . lsp-deferred))
+#+end_src
 
 *** Idris
 
@@ -1913,7 +1946,6 @@ don't need to leave Emacs for that.
   (org-agenda-files (list
                      (org-file-path "agenda.org")
                      (org-file-path "todo.org")
-                     (org-file-path "work.org")
                      (org-file-path "to-read.org")
                      (org-file-path "gcal.org"))))
 #+END_SRC
@@ -1940,7 +1972,37 @@ don't need to leave Emacs for that.
    '((agenda category-keep habit-up priority-down todo-state-up time-up)
      (todo priority-down category-keep)
      (tags priority-down category-keep)
-     (search priority-down category-keep))))
+     (search priority-down category-keep)))
+
+  (org-agenda-compact-blocks t)
+
+  (org-agenda-custom-commands
+   '(("d" "Daily agenda"
+      ((agenda "" ((org-agenda-span 1)))
+       (todo "IN-PROG")))
+
+     ("w" "Today's work agenda"
+      ((agenda "" ((org-agenda-span 1)
+                   (org-agenda-tag-filter-preset '("+WORK"))))
+       (tags "WORK/IN-PROG")))
+
+     ("p" "Today's personal agenda"
+      ((agenda "" ((org-agenda-span 1)
+                   (org-agenda-tag-filter-preset '("+PERSONAL"))))
+       (tags "PERSONAL/IN-PROG")))
+
+     ("s" "Schedule view"
+      ((tags "WORK/TODO"
+             ((org-agenda-overriding-header "Work")
+              (org-agenda-skip-function
+               '(org-agenda-skip-entry-if 'scheduled 'deadline))))
+       (tags "PERSONAL/TODO"
+             ((org-agenda-overriding-header "Personal")
+              (org-agenda-skip-function
+               '(org-agenda-skip-entry-if 'scheduled 'deadline))))
+       ))
+     )))
+
 #+END_SRC
 *** Enable habit
 
@@ -2017,7 +2079,7 @@ Basically restoring the default face.
 #+END_SRC
 
 
-** Capturing
+** Capturingg
 *** Use =org-clip-link= to insert title automatically
 
 #+BEGIN_SRC emacs-lisp
@@ -2048,38 +2110,15 @@ Basically restoring the default face.
       (s-concat "::" choice)))
 
   :custom
-  (org-capture-templates `(;; Work task
-                           ("w" "Work task" entry (file+headline "todo.org" "Work")
-                            "* TODO %^{Task (Work)}\nSCHEDULED: %t\n%?\nAdded: %U\n")
-
-                           ;; Personal task
-                           ("p" "Personal task" entry (file+headline "todo.org" "Personal")
-                            "* TODO %^{Task (Personal)}\nSCHEDULED: %t\n%?\nAdded: %U\n")
-
-                           ;; Add to currently clocking task
-                           ("s" "Clocking task/step" checkitem (clock)
-                            "- [ ] %^{Step}\n"
-                            :immediate-finish t :empty-lines-before 1)
-
-                           ;; Add to currently clocking task
-                           ("S" "Clocking task/finished Step" checkitem (clock)
-                            "- [X] %^{Finished step}\n"
-                            :immediate-finish t :empty-lines-before t)
-
-                           ;; Reading
-                           ("r" "Reading" entry (file "to-read.org")
-                            "* %(org-cliplink-capture)\nSCHEDULED: %t\n%?\n\nAdded: %U\n")
-
-                           ;; Anki fragments
-                           ("a" "Anki card" entry (file "anki-cards.org")
-                            "* Item %u   %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic (and reversed card)\n:ANKI_DECK: Remember\n:END:\n** Front\n%^{Front}\n** Back\n%^{Back}\n")
-
-                           ;; Date plan entry
-                           ("d" "Date plan for today" checkitem (file+olp+datetree "plan.org")
-                            "- [ ] %a%?\n"
-                            :jump-to-captured t)
-                           )))
+  (org-capture-templates
+   `(("w" "Work TODO" entry (file+headline "todo.org" "Work")
+      "* TODO %^{Task (Work)}\n%?\nAdded: %U\n")
+     ("p" "Personal TODO" entry (file+headline "todo.org" "Personal")
+      "* TODO %^{Task (Personal)}\n%?\nAdded: %U\n")
+     ))
+  )
 #+END_SRC
+
 
 
 ** Clocking
