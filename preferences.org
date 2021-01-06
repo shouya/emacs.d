@@ -30,22 +30,6 @@
 =straight.el= allows loading packages directly from VC upstream, while keeping a
 lock file for specific version, some new packages depend on it.
 
-#+BEGIN_SRC emacs-lisp
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage)
-  (require 'straight-x))
-#+END_SRC
-
 ** Enable ELPA with straight
 
 #+BEGIN_SRC emacs-lisp
@@ -82,9 +66,11 @@ Allow installing required system packages automatically.
 
 ** Start edit server (for browser extensions)
 
+Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
+
 #+BEGIN_SRC emacs-lisp
 (use-package atomic-chrome
-  ;;:hook (emacs-startup . atomic-chrome-start-server)
+  :hook (emacs-startup . atomic-chrome-start-server)
   :if (display-graphic-p))
 #+END_SRC
 
@@ -533,6 +519,7 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
   (push "*rustfmt*" popwin:special-display-config)
   (push "*explain-pause-log*" popwin:special-display-config)
   (push "*explain-pause-profiles*" popwin:special-display-config)
+  (push '("*Flycheck errors*" :position bottom :stick t) popwin:special-display-config)
 )
 
 #+END_SRC
@@ -557,6 +544,18 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
   (dashboard-set-footer nil)
   )
 #+END_SRC
+
+** Lock window for purpose
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'bind-key
+  (unbind-key "C-c ," org-mode-map))
+
+(use-package window-purpose
+  :bind (("C-c , d" . purpose-toggle-window-purpose-dedicated)
+         ("C-c , D" . purpose-toggle-window-buffer-dedicated)))
+#+end_src
+
 
 * Dired
 ** Load =dired-x= by default
@@ -653,6 +652,7 @@ So it doesn't block the main UI when copying large files.
   (treemacs-filewatch-mode t)
   (treemacs-fringe-indicator-mode t)
 
+
   :custom
   (treemacs-width 20)
 
@@ -671,6 +671,7 @@ So it doesn't block the main UI when copying large files.
 #+BEGIN_SRC emacs-lisp
 (use-package vterm
   ; :after evil-collection
+  :disabled
   :commands (vterm vterm-other-window)
   :bind ("C-c t" . vterm)
   :custom
@@ -740,7 +741,13 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
   :bind
   ("M-x" . counsel-M-x)
   ("M-y" . counsel-yank-pop)
+  ("C-h v" . counsel-describe-variable)
+  ("C-h f" . counsel-describe-function)
   ("C-x C-f" . counsel-find-file)
+  ("C-c C-S-j" . counsel-org-goto-all)
+  ("C-c f" . counsel-recentf)
+  ("C-c i" . counsel-imenu)
+  ("C-c u" . counsel-unicode-char)
   (:map ivy-minibuffer-map
         ("M-RET" . ivy-immediate-done))
 
@@ -750,10 +757,13 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
   (setq ivy-wrap t)
   ;; Use recentf in switch buffers
   (setq ivy-use-virtual-buffers t)
+
   ;; Ignore order for searching words on files
   ;; Use regular matching for others
-  (setq ivy-re-builders-alist '((read-file-name-internal . ivy--regex-ignore-order)
-                                (t . ivy--regex-plus)))
+  (setq ivy-re-builders-alist
+        '((read-file-name-internal . ivy--regex-ignore-order)
+          ;; the following will get replaced by ivy-prescient
+          (t . ivy--regex-plus)))
 
   ;; Do not insert "^" automatically
   (setq ivy-initial-inputs-alist nil)
@@ -764,18 +774,39 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
   ;; Find file at point
   (setq counsel-find-file-at-point t)
 
+  ;; auto follow current imenu entry
+  (ivy-configure 'counsel-imenu :update-fn 'auto)
+
+  ;; this package allows richer message for describe variable, etc
+  (use-package ivy-rich)
+
   ;; Start ivy
-  (ivy-mode))
+  (ivy-mode)
+  (counsel-mode)
+
+  (ivy-rich-mode)
+  )
 #+END_SRC
 
-*** Sort the result produced by =ivy=
+*** Sort the result produced by =ivy= (ivy-prescient)
 
 =prescient.el= sort the result of ivy based on their "recency" metric.
 
 #+BEGIN_SRC emacs-lisp
 (use-package ivy-prescient
   :after counsel
-  :hook (emacs-startup . ivy-prescient-mode))
+  :hook (emacs-startup . ivy-prescient-mode)
+  :custom
+  ;; save result across sessions
+  (prescient-persist-mode t)
+
+  ;; skip prescient for the following commands
+  (ivy-prescient-sort-commands
+   '(:not swiper swiper-isearch ivy-switch-buffer counsel-imenu org-mru-clock-in))
+
+  ;; try to retain highlighting
+  (ivy-prescient-retain-classic-highlighting t)
+  )
 #+END_SRC
 
 *** Use CtrlF to replace isearch
@@ -809,7 +840,7 @@ entered.
          ("C--" . er/contract-region))
   :custom
   (expand-region-subword-enabled t)
-  (expand-region-skip-whitespace nil)
+  (expand-region-skip-whitespace t)
 
   ;; mainly for qualified names like "Struct::method".
   (require 'cc-mode-expansions)
@@ -996,6 +1027,14 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 (setq tramp-default-method "scp")
 #+END_SRC
 
+
+** Easy kill & mark
+
+#+begin_src emacs-lisp
+(use-package easy-kill
+  :bind ([remap kill-ring-save] . easy-kill))
+#+end_src
+
 * Programming
 ** Show column number
 
@@ -1035,8 +1074,8 @@ We use =dumb-jump=, which works out of the box for many languages.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dumb-jump
-  :bind (("M-s-." . dumb-jump-go-other-window)
-         ("M-s-," . dumb-jump-go))
+  :bind (("M-." . dumb-jump-go-other-window)
+         ("M-," . dumb-jump-go))
   :custom
   (dumb-jump-selector 'ivy)
   (dumb-jump-force-searcher 'rg))
@@ -1047,7 +1086,12 @@ We use =dumb-jump=, which works out of the box for many languages.
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
   :demand t
-  :commands (flycheck-mode))
+  :commands (flycheck-mode)
+  :config
+  ;; display pos-tip for flycheck errors
+  (use-package flycheck-pos-tip)
+  (flycheck-pos-tip-mode)
+  )
 #+END_SRC
 
 ** Highlight all occurrences word at point
@@ -1060,12 +1104,21 @@ We use =dumb-jump=, which works out of the box for many languages.
 #+END_SRC
 
 ** Project management
-*** Use =ripgrep= (=<f5>=)
+*** Use =ripgrep=
+
+I don't use deadgrep any more. rg + wgrep is better.
+
+Few shortcuts -
+
+- on search window,
 
 #+BEGIN_SRC emacs-lisp
-(use-package deadgrep
-  :ensure-system-package (rg . ripgrep)
-  :bind (("<f5>" . deadgrep)))
+(use-package rg
+  :bind (("C-c s s" . rg-dwim)
+         ("C-c s p" . rg-project)
+         ("C-c s r" . rg)
+         :map wgrep-mode-map
+         ("C-x C-q" . wgrep-toggle-readonly-area)))
 #+END_SRC
 
 *** Use =projectile= to open files within project
@@ -1111,9 +1164,9 @@ I use =smartparens= package for the purpose.
   :hook (prog-mode . smartparens-mode)
   :bind (:map smartparens-mode-map
               ;; ((a|) b) => ((a| b))
-              ("M-l" . sp-forward-slurp-sexp)
+              ("M-L" . sp-forward-slurp-sexp)
               ;; ((a| b)) => ((a|) b)
-              ("M-h" . sp-forward-barf-sexp)
+              ("M-H" . sp-forward-barf-sexp)
               ;; (a (|b)) => ((a |b))
               ("M-S-h" . sp-backward-slurp-sexp)
               ;; ((a |b)) => (a (|b))
@@ -1161,6 +1214,9 @@ I use =magit= to show git status.
   ;; do not override projectile keys
   (unbind-key "M-p" magit-status-mode-map)
   (unbind-key "M-n" magit-status-mode-map)
+
+  ;; do not show list of tags to faster
+  (remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
 )
 #+END_SRC
 
@@ -1222,7 +1278,7 @@ Use =company-mode= for auto completion.
   :hook (emacs-startup . global-company-mode)
 
   :custom
-  (company-idle-delay 0.3 "Show completion almost immediately")
+  (company-idle-delay 0.3 "Show completion with a small delay")
   (company-show-numbers t "Number the candidates (use M-1, M-2 etc to select completions)")
   (company-tooltip-align-annotations t)
   (company-dabbrev-code-everywhere t)
@@ -1230,7 +1286,7 @@ Use =company-mode= for auto completion.
   :config
   ;; only enable these options
   (setq company-backends
-        '(company-dabbrev-code company-capf company-files))
+        '(company-capf company-dabbrev-code company-files))
 
   (define-key company-active-map (kbd "TAB")
     (lambda () (interactive) (company-complete-common-or-cycle +1)))
@@ -1253,7 +1309,8 @@ Use =TabNine= for general text completion. Please remember to run
   (company-tabnine-log-file-path "~/tmp/tabnine.log")
   (company-tabnine-executable-args '("--log-level" "Trace"))
   :config
-  (add-to-list 'company-backends 'company-tabnine))
+  (setq company-backends
+        (append company-backends '(company-tabnine))))
 
 (defun shou/tabnine-off ()
   "turn off TabNine for this buffer"
@@ -1273,7 +1330,7 @@ Use =TabNine= for general text completion. Please remember to run
 (use-package company-quickhelp
   :hook (company-mode-hook . company-quickhelp-mode)
   :after company
-  :custom (company-quickhelp-delay 0)
+  :custom (company-quickhelp-delay 0.2)
 )
 #+END_SRC
 
@@ -1322,7 +1379,7 @@ Use =TabNine= for general text completion. Please remember to run
   (yas-reload-all))
 #+END_SRC
 
-*** Support Language Server Protocols (LSP)
+*** Spport Language Server Protocols (LSP)
 
 **** LSP mode
 
@@ -1330,16 +1387,24 @@ Use =TabNine= for general text completion. Please remember to run
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :hook (lsp-mode . lsp-enable-which-key-integration)
+  :bind (:map lsp-mode-map
+              ("C-c C-f" . lsp-format-buffer))
+
+  ;; so it can be registered
   :config
-  (use-package lsp-ui)
   (use-package lsp-treemacs)
+
+  ;; exclude watch files for elixir projects
+  (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.elixir_ls")
+  (add-to-list 'lsp-file-watch-ignored "\\.beam\\'")
 
   :custom
   ;; performance tuning
-  (read-process-output-max (* 64 1024)) ;; 64k
+  (read-process-output-max (* 1 1024 1024)) ;; 20mb
 
-  ;; do not show code actions on sideline
-  (lsp-ui-sideline-show-code-actions nil)
+  ;; only sort by position
+  (lsp-imenu-sort-methods '(position kind name))
+  (lsp-imenu-show-container-name t)
 )
 #+end_src
 
@@ -1436,21 +1501,15 @@ Colorize function names/arguments in info documentations.
 
 #+BEGIN_SRC emacs-lisp
 (use-package elixir-mode
-  :straight (:host github :repo "elixir-editors/emacs-elixir" :flavor nil)
   :mode (("\\.exs\\'" . elixir-mode)
          ("\\.ex\\'" . elixir-mode))
 
   ;; Format with C-c C-f
   :bind (:map elixir-mode-map ("C-c C-f" . elixir-format))
+  :hook (elixir-mode . lsp-deferred)
 
-  ;; Enable eglot for completion from LSP
   :config
-  (add-hook 'elixir-mode-hook 'eglot-ensure)
-
   ;; we don't enable eglot's auto completion functionality
-  (add-hook 'elixir-mode-hook (lambda ()
-                                (setq-local company-backends '(company-tabnine))))
-
   (add-hook 'elixir-format-hook
             (lambda ()
               (if (projectile-project-p)
@@ -1474,7 +1533,7 @@ Colorize function names/arguments in info documentations.
 #+BEGIN_SRC emacs-lisp
 (use-package exunit
   :after elixir-mode
-  :custom (exunit-environment "MIX_ENV=test"))
+  :custom (exunit-environment '("MIX_ENV=test")))
 #+END_SRC
 
 *** Protobuf
@@ -1504,6 +1563,7 @@ Reformatting JSON.
 (use-package json-reformat
   :after json-mode
   :functions json-reformat-format
+  :custom (json-reformat:indent-width 2)
   :config
   (define-key json-mode-map (kbd "M-F")
     (lambda () (interactive) (mark-whole-buffer) (json-reformat-format))))
@@ -1659,7 +1719,6 @@ project related functionalities.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :straight (org :local-repo nil)
   :commands (org-mode)
   :mode ("\\.org\\'" . org-mode))
 #+END_SRC
@@ -1685,72 +1744,44 @@ project related functionalities.
 #+END_SRC
 
 ** Behavior tweaks
-*** Indentation settings
 
-First, we enable =org-indent-mode=:
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :custom (org-indent-indentation-per-level 1)
+  :custom
+  ;; for org-indent-mode
+  (org-indent-indentation-per-level 1)
+  ;; do not automatically ident based on heading
+  (org-adapt-indentation nil)
+
+  ;; make TAB acts as in major mode
+  (org-src-tab-acts-natively t)
+
+  ;; Avoid inadvertent text edit in invisible area
+  (org-catch-invisible-edits 'show-and-error)
+
+  ;; Hide empty lines between subtrees in collapsed view
+  (org-cycle-separator-lines 0)
+
+  ;; use these set of bullets
+  (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
+
+
   :config
-  (add-hook 'org-mode-hook 'org-indent-mode))
-#+END_SRC
+  ;; We enable org-indent-mode to make contents align with their settings
+  (add-hook 'org-mode-hook 'org-indent-mode)
 
-Next we disable =org-mode='s built-in hard indentation:
-
-#+BEGIN_SRC emacs-lisp
-(use-package org
-  :custom (org-adapt-indentation nil))
-#+END_SRC
-
-*** Make TAB acts like major mode in source block
-
-#+BEGIN_SRC emacs-lisp
-(use-package org
-  :custom (org-src-tab-acts-natively t))
-#+END_SRC
-
-*** Let =<TAB>= fold current outline from anywhere in the section
-
-#+BEGIN_SRC emacs-lisp
-; (use-package org
-;   :custom (org-cycle-emulate-tab 'white))
-#+END_SRC
-
-*** Avoid inadvertent text edit in invisible area
-
-Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#avoid-inadvertent-text-edit-in-invisible-area][Org-mode Hidden Gems - 01 Document Structure]].
-
-#+BEGIN_SRC emacs-lisp
-(use-package org
-  :custom (org-catch-invisible-edits 'show-and-error))
-#+END_SRC
-
-*** Hide empty lines between subtrees in collapsed view
-
-Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#in-collapsed-view-hide-empty-lines-between-subtrees][Org-mode Hidden Gems - 01 Document Structure]].
-
-#+BEGIN_SRC emacs-lisp
-(use-package org
-  :custom (org-cycle-separator-lines 0))
-#+END_SRC
-
-*** List bullets
-
-#+BEGIN_SRC emacs-lisp
-(use-package org
-  :custom (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+"))))
-#+END_SRC
-
-*** Company completion
-
-#+BEGIN_SRC emacs-lisp
-(use-package org
-  :config
+  ;; add company completion backend
   (defun add-org-completion-backend ()
     (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
-  (add-hook 'org-mode-hook 'add-org-completion-backend))
+  (add-hook 'org-mode-hook 'add-org-completion-backend)
+
+  ;; do not insert blank line after new list items on M-Ret
+  (setcdr (assoc 'plain-list-item org-blank-before-new-entry) nil)
+  )
 #+END_SRC
+
+Reference: [[https://yiufung.net/post/org-mode-hidden-gems-pt1/#avoid-inadvertent-text-edit-in-invisible-area][Org-mode Hidden Gems - 01 Document Structure]]
 
 ** Visual Tweaks
 *** Turn on native source fontification in org buffer
@@ -1946,8 +1977,7 @@ don't need to leave Emacs for that.
   (org-agenda-files (list
                      (org-file-path "agenda.org")
                      (org-file-path "todo.org")
-                     (org-file-path "to-read.org")
-                     (org-file-path "gcal.org"))))
+                     (org-file-path "to-read.org"))))
 #+END_SRC
 
 *** Extend toady to 6:00am into next morning
@@ -1978,18 +2008,20 @@ don't need to leave Emacs for that.
 
   (org-agenda-custom-commands
    '(("d" "Daily agenda"
-      ((agenda "" ((org-agenda-span 1)))
+      ((agenda "" ((org-agenda-span 'day)))
        (todo "IN-PROG")))
 
      ("w" "Today's work agenda"
-      ((agenda "" ((org-agenda-span 1)
-                   (org-agenda-tag-filter-preset '("+WORK"))))
-       (tags "WORK/IN-PROG")))
+      ;; Please note that tags must go earlier than agenda, otherwise
+      ;; a weird bug would invalidate the effect of org-agenda-tag-filter-preset
+      ((tags "WORK/IN-PROG")
+       (agenda "" ((org-agenda-span 'day)
+                   (org-agenda-tag-filter-preset '("+WORK"))))))
 
      ("p" "Today's personal agenda"
-      ((agenda "" ((org-agenda-span 1)
-                   (org-agenda-tag-filter-preset '("+PERSONAL"))))
-       (tags "PERSONAL/IN-PROG")))
+      ((tags "PERSONAL/IN-PROG")
+       (agenda "" ((org-agenda-span 1)
+                   (org-agenda-tag-filter-preset '("+PERSONAL"))))))
 
      ("s" "Schedule view"
       ((tags "WORK/TODO"
@@ -2002,8 +2034,21 @@ don't need to leave Emacs for that.
                '(org-agenda-skip-entry-if 'scheduled 'deadline))))
        ))
      )))
-
 #+END_SRC
+
+*** org-ql
+
+#+begin_src emacs-lisp
+(use-package org-ql
+  :after org
+  :custom
+  (org-ql-views '(("Archive view"
+                   :buffer-files (org-file-path "todo.org")
+                   :query (closed :to -30)
+                   :sort (scheduled)
+                   :title "To archive: todo.org")
+                  )))
+#+end_src
 *** Enable habit
 
 #+BEGIN_SRC emacs-lisp
@@ -2112,9 +2157,18 @@ Basically restoring the default face.
   :custom
   (org-capture-templates
    `(("w" "Work TODO" entry (file+headline "todo.org" "Work")
-      "* TODO %^{Task (Work)}\n%?\nAdded: %U\n")
+      "* TODO %^{Task (Work)}\nAdded: %U\n\n%?")
      ("p" "Personal TODO" entry (file+headline "todo.org" "Personal")
-      "* TODO %^{Task (Personal)}\n%?\nAdded: %U\n")
+      "* TODO %^{Task (Personal)}\nAdded: %U\n\n%?")
+     ("d" "Day planning" plain (file+olp+datetree "plan.org")
+      ,(concat "Added: %U\n"
+               "gunka:\n- [ ]%?\n- [ ]\n"
+               "cilre:\n- [ ]\n- [ ]\n"
+               "chore:\n- [ ] vocab\n- [ ] diary\n- [ ] review\n"
+               "other:\n- [ ]")
+      :time-prompt t
+      :immediate-finish t
+      :jump-to-captured t)
      ))
   )
 #+END_SRC
@@ -2201,6 +2255,18 @@ This section configures the following mechanisms:
   (org-clock-out-remove-zero-time-clocks t))
 #+END_SRC
 
+*** Secretaria: Clocking task Reminder
+
+#+begin_src emacs-lisp
+(use-package secretaria
+  :after org
+  :custom
+  ;; remind me about every 10 minutes
+  (secretaria-clocked-in-reminder-every-minutes 10)
+  (secretaria-today-unknown-time-appt-remind-every 10)
+  )
+#+end_src
+
 *** Pomodoro timer
 
 #+BEGIN_SRC emacs-lisp
@@ -2229,7 +2295,7 @@ This section configures the following mechanisms:
 
 #+BEGIN_SRC emacs-lisp
 (use-package org-mru-clock
-  :bind (("C-c C-x C-j" . org-clock-jump-to-current-task)
+  :bind (("C-c C-x C-j" . org-clock-goto)
          ("C-c C-x C-o" . org-clock-out)
          ("C-c C-x C-i" . org-clock-in)
          ("C-c C-x C-k" . org-mru-clock-in)
@@ -2248,10 +2314,6 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
 #+BEGIN_SRC emacs-lisp
 (use-package org
   :custom (org-clock-clocked-in-display 'both))
-
-mode-line-misc-info
-global-mode-string
-org-mode-line-string
 #+END_SRC
 
 
@@ -2314,7 +2376,7 @@ org-mode-line-string
 
 #+BEGIN_SRC emacs-lisp
 (use-package ox-twbs
-  :after (org ox)
+  :after ox
   (use-package htmlize))
 #+END_SRC
 
@@ -2322,14 +2384,21 @@ org-mode-line-string
 
 #+BEGIN_SRC emacs-lisp
 (use-package ox-mediawiki
-  :after (org ox))
+  :after ox)
 #+END_SRC
 
 *** Export to Markdown (GFM)
 #+BEGIN_SRC emacs-lisp
 (use-package ox-gfm
-  :after (org ox))
+  :after ox)
 #+END_SRC
+
+*** Export to many formats via Pandoc
+
+#+begin_src emacs-lisp
+(use-package ox-pandoc
+  :after ox)
+#+end_src
 
 *** Export to PDF
 
@@ -2339,11 +2408,14 @@ Enable exporting to Beamer.
 (use-package ox-latex
   :straight nil
   :ensure nil
-  :after (org ox))
+  :after ox
+  :custom
+  (org-export-with-smart-quotes t)
+  )
 (use-package ox-beamer
   :straight nil
   :ensure nil
-  :after (org ox))
+  :after ox)
 #+END_SRC
 
 Enhance unicode characters support.
@@ -2385,7 +2457,33 @@ installed (~pip install Pygments~).
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :bind ("C-c l" . org-store-link))
+  :bind
+  ("C-c l" . org-store-link)
+  ("C-c L" . shou/copy-idlink-to-clipboard)
+
+  :config
+  ;; Adapted from Rainer's blog:
+  ;; https://koenig-haunstetten.de/2018/02/17/improving-my-orgmode-workflow/
+  (defun shou/copy-idlink-to-clipboard()
+    "Copy an ID link with the
+headline to killring, if no ID is there then create a new unique
+ID.  This function works only in org-mode or org-agenda buffers.
+
+The purpose of this function is to easily construct id:-links to
+org-mode items. If its assigned to a key it saves you marking the
+text and copying to the killring."
+    (interactive)
+    (when (eq major-mode 'org-agenda-mode) ;switch to orgmode
+      (org-agenda-show)
+      (org-agenda-goto))
+    (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
+      (setq mytmphead (nth 4 (org-heading-components)))
+      (setq mytmpid (funcall 'org-id-get-create))
+      (setq mytmplink (format "[[id:%s][%s]]" mytmpid mytmphead))
+      (kill-new mytmplink)
+      (message "Copied %s to killring (clipboard)" mytmplink)
+      ))
+  )
 #+END_SRC
 
 *** Use =C-c C-c= to save and quit =org-src-mode=
@@ -2436,3 +2534,15 @@ installed (~pip install Pygments~).
 #+END_SRC
 
 .i fanmo
+
+** Org babel
+
+#+begin_src emacs-lisp
+(use-package org
+  :config
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((ditaa . t)
+                                 (gnuplot .t)
+                                 (python . t)))
+  (use-package gnuplot :commands gnuplot-mode))
+#+end_src

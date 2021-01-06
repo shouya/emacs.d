@@ -32,6 +32,6 @@ download_and_import() {
 }
 
 
-download_and_import
+# download_and_import
 
 # Run this script periodically

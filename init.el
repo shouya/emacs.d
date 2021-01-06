@@ -2,9 +2,10 @@
 
 ;; ----------- disable gc on startup -----------
 (setq gc-cons-threshold most-positive-fixnum) ; 2^61 bytes
+(setq gc-cons-percentage 0.4)
 ;; reset it after load
 (add-hook 'emacs-startup-hook
-          (lambda () (setq gc-cons-threshold (* 1024 1024 20))))
+          (lambda () (setq gc-cons-threshold (* 60 1024 1024))))
 
 ;; ----------- empty file handler alist --------
 (defvar cfg--file-name-handler-alist file-name-handler-alist)
@@ -15,6 +16,22 @@
           (lambda () (message "Emacs ready in %.2f seconds with %d garbage collections."
                          (float-time (time-subtract after-init-time before-init-time))
                          gcs-done)))
+
+;; ----- load straight.el first ----------
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage)
+  (require 'straight-x))
+(straight-use-package 'org)
 
 ;; ----------- load custom config --------------
 (setq vc-follow-symlinks t)
