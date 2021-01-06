@@ -2384,67 +2384,33 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
 #+END_SRC
 
 ** Exporting
-*** Export to Bootstrap (HTML)
+
 
 #+BEGIN_SRC emacs-lisp
-(use-package ox-twbs
-  :after ox
-  (use-package htmlize))
-#+END_SRC
+(with-eval-after-load 'ox
+  ;; export to bootstrap html
+  (use-package ox-twbs
+    :config
+    (use-package htmlize))
 
-*** Export to MediaWiki
+  ;; gfm, mediawiki, etc
+  (use-package ox-pandoc)
 
-#+BEGIN_SRC emacs-lisp
-(use-package ox-mediawiki
-  :after ox)
-#+END_SRC
+  ;; latex options
+  (use-package ox-latex
+    :custom
+    (org-export-with-smart-quotes t)
+    (org-latex-pdf-process
+     '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+       "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+       "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+    (org-latex-compiler "xelatex")
+    (TeX-engine 'xetex)
+    (TeX-PDF-mode t))
 
-*** Export to Markdown (GFM)
-#+BEGIN_SRC emacs-lisp
-(use-package ox-gfm
-  :after ox)
-#+END_SRC
-
-*** Export to many formats via Pandoc
-
-#+begin_src emacs-lisp
-(use-package ox-pandoc
-  :after ox)
-#+end_src
-
-*** Export to PDF
-
-Enable exporting to Beamer.
-
-#+BEGIN_SRC emacs-lisp
-(use-package ox-latex
-  :straight nil
-  :ensure nil
-  :after ox
-  :custom
-  (org-export-with-smart-quotes t)
+  ;; slides
+  (use-package ox-beamer)
   )
-(use-package ox-beamer
-  :straight nil
-  :ensure nil
-  :after ox)
-#+END_SRC
-
-Enhance unicode characters support.
-
-Enable syntax highlighting. In a fresh install please make sure =pygements= is
-installed (~pip install Pygments~).
-
-#+BEGIN_SRC emacs-lisp
-(use-package org
-  :custom
-  (org-latex-pdf-process
-   '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-     "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-     "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-  (org-latex-compiler "xelatex")
-  (TeX-engine 'xetex)
-  (TeX-PDF-mode t))
 #+END_SRC
 
 
