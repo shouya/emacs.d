@@ -1104,21 +1104,33 @@ We use =dumb-jump=, which works out of the box for many languages.
 #+END_SRC
 
 ** Project management
-*** Use =ripgrep=
+*** Use =ripgrep= (rg)
 
-I don't use deadgrep any more. rg + wgrep is better.
+I don't use deadgrep any more. rg + wgrep is better in terms of speed and the display is nicer.
 
-Few shortcuts -
+Few shortcuts:
 
-- on search window,
+- press =C-c s s= to search current word
+- on search window, =m= to bring up the menu (refine search, change dir, etc)
+- on search window, =C-x C-q= to enable wgrep editing mode
 
 #+BEGIN_SRC emacs-lisp
 (use-package rg
   :bind (("C-c s s" . rg-dwim)
          ("C-c s p" . rg-project)
          ("C-c s r" . rg)
-         :map wgrep-mode-map
-         ("C-x C-q" . wgrep-toggle-readonly-area)))
+         :map rg-mode-map
+         ("C-x C-q" . wgrep-change-to-wgrep-mode))
+  :custom
+  ;; find when use
+  (rg-executable "rg")
+  (wgrep-auto-save-buffer t)
+
+  :config
+  (defun shou/switch-to-rg-buffer (&rest args)
+    (switch-to-buffer-other-window "*rg*"))
+  (advice-add 'rg-run :after #'shou/switch-to-rg-buffer)
+  )
 #+END_SRC
 
 *** Use =projectile= to open files within project
