@@ -2524,3 +2524,19 @@ text and copying to the killring."
                                  (python . t)))
   (use-package gnuplot :commands gnuplot-mode))
 #+end_src
+
+* Playground
+
+Try out stuff here and execute manually.
+
+#+begin_src emacs-lisp :eval query
+(+ 1 1)
+#+end_src
+
+
+#+RESULTS:
+: 2
+
+* fanmo
+
+.i fanmo
