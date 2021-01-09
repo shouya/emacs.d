@@ -304,6 +304,12 @@ most GUI editors.
 )
 #+END_SRC
 
+** Set =text-mode= as the default mode
+
+#+BEGIN_SRC emacs-lisp
+(setq-default initial-major-mode 'text-mode)
+#+END_SRC
+
 * UI
 ** Tweak main UI
 
@@ -1747,12 +1753,6 @@ project related functionalities.
 
 (use-package org
   :custom (org-default-notes-file (org-file-path "notes.org")))
-#+END_SRC
-
-** Set =org-mode= as the default mode
-
-#+BEGIN_SRC emacs-lisp
-(setq-default initial-major-mode 'org-mode)
 #+END_SRC
 
 ** Behavior tweaks
