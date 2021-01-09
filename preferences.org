@@ -1960,6 +1960,7 @@ don't need to leave Emacs for that.
       (progress-reporter-done progress-reporter))))
 
 (use-package anki-editor
+  :disabled
   :after org
   :commands (anki-editor-push-notes
              anki-editor-map-note-entries
