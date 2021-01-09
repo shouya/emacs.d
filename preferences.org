@@ -1778,6 +1778,8 @@ project related functionalities.
   ;; use these set of bullets
   (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
 
+  ;; increase the depth that imenu can reach
+  (org-imenu-depth 3)
 
   :config
   ;; We enable org-indent-mode to make contents align with their settings
@@ -2510,7 +2512,6 @@ text and copying to the killring."
    ))
 #+END_SRC
 
-.i fanmo
 
 ** Org babel
 
