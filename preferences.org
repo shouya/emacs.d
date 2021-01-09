@@ -1986,10 +1986,8 @@ don't need to leave Emacs for that.
 #+BEGIN_SRC emacs-lisp
 (use-package org
   :custom
-  (org-agenda-files (list
-                     (org-file-path "agenda.org")
-                     (org-file-path "todo.org")
-                     (org-file-path "to-read.org"))))
+  (org-agenda-files (list (org-file-path "projects.org"))))
+
 #+END_SRC
 
 *** Extend toady to 6:00am into next morning
@@ -2055,10 +2053,10 @@ don't need to leave Emacs for that.
   :after org
   :custom
   (org-ql-views '(("Archive view"
-                   :buffer-files (org-file-path "todo.org")
+                   :buffer-files (org-file-path "projects.org")
                    :query (closed :to -30)
                    :sort (scheduled)
-                   :title "To archive: todo.org")
+                   :title "To archive: projects.org")
                   )))
 #+end_src
 *** Enable habit
@@ -2136,7 +2134,7 @@ Basically restoring the default face.
 #+END_SRC
 
 
-** Capturingg
+** Capturing
 *** Use =org-clip-link= to insert title automatically
 
 #+BEGIN_SRC emacs-lisp
@@ -2161,17 +2159,17 @@ Basically restoring the default face.
   (defun shou/org-select-project ()
     "Prompt for a location to select a headline"
     (interactive)
-    (let* ((all-headings (-map 'car (org-refile-get-targets "todo.org")))
+    (let* ((all-headings (-map 'car (org-refile-get-targets "projects.org")))
            (filtered-headings (--remove (member it '("Chore")) all-headings))
            (choice (completing-read "Select project: " filtered-headings)))
       (s-concat "::" choice)))
 
   :custom
   (org-capture-templates
-   `(("w" "Work TODO" entry (file+headline "todo.org" "Work")
-      "* TODO %^{Task (Work)}\nAdded: %U\n\n%?")
-     ("p" "Personal TODO" entry (file+headline "todo.org" "Personal")
-      "* TODO %^{Task (Personal)}\nAdded: %U\n\n%?")
+   `(("w" "Work" entry (file+headline "projects.org" "Work")
+      "* %^{Task (Work)}\nAdded: %U\n\n%?")
+     ("p" "Personal" entry (file+headline "projects.org" "Personal")
+      "* %^{Task (Personal)}\nAdded: %U\n\n%?")
      ("d" "Day planning" plain (file+olp+datetree "plan.org")
       ,(concat "Added: %U\n"
                "gunka:\n- [ ]%?\n- [ ]\n"
