@@ -756,6 +756,8 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
   ("C-c u" . counsel-unicode-char)
   (:map ivy-minibuffer-map
         ("M-RET" . ivy-immediate-done))
+  (:map org-mode-map
+        ("C-c C-j" . counsel-org-goto))
 
   :config
   (setq ivy-count-format "(%d/%d) ")
