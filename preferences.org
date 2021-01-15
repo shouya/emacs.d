@@ -349,10 +349,10 @@ Show file name in window title.
 I use "Input" as my default font face.
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'default-frame-alist '(font . "Input-14"))
+;; (add-to-list 'default-frame-alist '(font . "Input-14"))
 
 ;; Experiment with different fonts here:
-;; (set-frame-font "Input-14")
+(set-frame-font "Iosevka Type-15")
 #+END_SRC
 
 ** Install all-the-icon
