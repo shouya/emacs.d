@@ -1744,7 +1744,14 @@ project related functionalities.
                                  :position bottom
                                  :stick t)))
 #+END_SRC
-* Org mode
+
+*** Python
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'python-mode
+  (setq python-shell-completion-native-enable nil))
+#+end_src
+
 ** Use org mode
 
 #+BEGIN_SRC emacs-lisp
@@ -2538,8 +2545,17 @@ text and copying to the killring."
   (org-babel-do-load-languages 'org-babel-load-languages
                                '((ditaa . t)
                                  (gnuplot .t)
-                                 (python . t)))
-  (use-package gnuplot :commands gnuplot-mode))
+                                 (python . t)
+                                 (haskell . t)
+                                 ))
+  (use-package gnuplot :commands gnuplot-mode)
+
+  :custom
+  (python-shell-completion-native-enable nil)
+
+  (haskell-process-type 'stack-ghci)
+  (haskell-program-name "ghci")
+  )
 #+end_src
 
 * Playground
