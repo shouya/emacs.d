@@ -2031,6 +2031,11 @@ don't need to leave Emacs for that.
 
   (org-agenda-compact-blocks t)
 
+  (org-agenda-prefix-format '((agenda . " %i  %?-12t% s")
+                              (todo . " %i %-12:c")
+                              (tags . " %i %-12:c")
+                              (search . " %i %-12:c")))
+
   (org-agenda-custom-commands
    '(("d" "Daily agenda"
       ((agenda "" ((org-agenda-span 'day)))
