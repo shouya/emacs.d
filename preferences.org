@@ -1617,8 +1617,6 @@ Reformatting JSON.
   :config
   ;; quick way to run cargo commands (C-c C-c prefix)
   (use-package cargo
-    :bind (:map cargo-minor-mode-map
-                ("C-c C-c C-l" . cargo-process-check))
     :custom
     (cargo-process--enable-rust-backtrace t)
 
@@ -1627,7 +1625,8 @@ Reformatting JSON.
 
   ;; enable LSP for type info and more
   (add-hook 'rust-mode-hook 'eglot-ensure)
-  (add-hook 'rust-mode-hook 'cargo-minor-mode))
+  (add-hook 'rust-mode-hook 'cargo-minor-mode)
+  )
 #+END_SRC
 
 *** Shell
