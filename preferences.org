@@ -2195,7 +2195,7 @@ Basically restoring the default face.
                "gunka:\n- [ ]%?\n- [ ]\n"
                "cilre:\n- [ ]\n- [ ]\n"
                "chore:\n- [ ] vocab\n- [ ] diary\n- [ ] review\n"
-               "other:\n- [ ]")
+               "sevzi:\n- [ ]")
       :time-prompt t
       :immediate-finish t
       :jump-to-captured t)
