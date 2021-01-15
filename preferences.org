@@ -2010,7 +2010,7 @@ don't need to leave Emacs for that.
 #+BEGIN_SRC emacs-lisp
 (use-package org
   :custom
-  (org-extend-today-until 6)
+  (org-extend-today-until 3)
   (org-use-effective-time t))
 #+END_SRC
 
