@@ -1276,6 +1276,17 @@ Hotkey to remember:
 (setq vc-follow-symlinks t)
 #+END_SRC
 
+*** Use =delta= to show better diff
+
+Delta supports highlighting language-syntax, within-line diff, etc.
+
+Install delta with the instruction here: https://github.com/dandavison/delta
+
+#+begin_src emacs-lisp
+(use-package magit-delta
+  :hook (magit-mode . magit-delta-mode))
+#+end_src
+
 ** Search symbol at point in Dash with =C-c d=
 
 #+BEGIN_SRC emacs-lisp
