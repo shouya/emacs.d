@@ -2424,20 +2424,19 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
   (use-package ox-pandoc)
 
   ;; latex options
-  (use-package ox-latex
-    :custom
-    (org-export-with-smart-quotes t)
-    (org-latex-pdf-process
-     '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-       "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-       "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-    (org-latex-compiler "xelatex")
-    (TeX-engine 'xetex)
-    (TeX-PDF-mode t))
+
+  (setq org-export-with-smart-quotes t)
+  (setq org-latex-pdf-process
+   '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  (setq org-latex-compiler "xelatex")
+  (setq TeX-engine 'xetex)
+  (setq TeX-PDF-mode t)
 
   ;; slides
-  (use-package ox-beamer)
-  )
+  ;; (use-package ox-beamer)
+)
 #+END_SRC
 
 
