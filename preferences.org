@@ -1758,6 +1758,14 @@ project related functionalities.
   (setq python-shell-completion-native-enable nil))
 #+end_src
 
+*** Kubernetes
+
+#+begin_src emacs-lisp
+(use-package k8s-mode
+  :defer t
+  :hook (k8s-mode . yas-minor-mode))
+#+end_src
+
 ** Use org mode
 
 #+BEGIN_SRC emacs-lisp
