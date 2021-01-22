@@ -810,7 +810,13 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
 
   ;; skip prescient for the following commands
   (ivy-prescient-sort-commands
-   '(:not swiper swiper-isearch ivy-switch-buffer counsel-imenu org-mru-clock-in))
+   '(:not swiper
+          swiper-isearch
+          ivy-switch-buffer
+          counsel-imenu
+          org-mru-clock-in
+          counsel-yank-pop
+          ))
 
   ;; try to retain highlighting
   (ivy-prescient-retain-classic-highlighting t)
