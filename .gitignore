@@ -67,3 +67,4 @@ projectile.cache
 /scripts/secrets.sh
 /request/
 persp-confs
+/secrets.el

@@ -2038,6 +2038,8 @@ don't need to leave Emacs for that.
 
   (org-agenda-compact-blocks t)
 
+  (org-agenda-span 'day)
+
   (org-agenda-prefix-format '((agenda . " %i  %?-12t% s")
                               (todo . " %i %-12:c")
                               (tags . " %i %-12:c")
@@ -2504,13 +2506,21 @@ text and copying to the killring."
   (setq org-export-backends '(ascii html latex)))
 #+END_SRC
 
-** Google calendar integration
+** Calendar integration
 
 #+BEGIN_SRC emacs-lisp
-(use-package org
-  :mode ("\\.diary\\'" . diary-mode)
+(use-package org-caldav
+  :defer t
   :custom
-  (diary-file (org-file-path "diaries/main.diary")))
+  (org-caldav-url
+   (concat "https://caldav.fastmail.com/dav/calendars/user/"
+           priv/fastmail-caldav-user))
+  (org-caldav-calendar-id priv/fastmail-caldav-calendar-id)
+  (org-caldav-inbox (org-file-path "time-blocking.org"))
+  (org-caldav-files (list (org-file-path "time-blocking.org")))
+  (org-caldav-sync-direction 'cal->org)
+  (org-icalendar-timezone "Asia/Shanghai")
+)
 #+END_SRC
 
 ** Customize source languages
