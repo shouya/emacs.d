@@ -352,7 +352,7 @@ I use "Input" as my default font face.
 ;; (add-to-list 'default-frame-alist '(font . "Input-14"))
 
 ;; Experiment with different fonts here:
-(set-frame-font "Iosevka Type-15")
+(set-frame-font "Fira Mono-14")
 #+END_SRC
 
 ** Install all-the-icon
