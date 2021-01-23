@@ -38,7 +38,7 @@
 (when (file-newer-than-file-p "~/.emacs.d/preferences.org"
                               "~/.emacs.d/preferences.el")
   (delete-file "~/.emacs.d/preferences.el"))
-(load-file "secrets.el")
+(load-file (expand-file-name "secrets.el" "~/.emacs.d"))
 (org-babel-load-file "~/.emacs.d/preferences.org")
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
