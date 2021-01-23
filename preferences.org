@@ -816,6 +816,7 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
           counsel-imenu
           org-mru-clock-in
           counsel-yank-pop
+          flyspell-correct-ivy
           ))
 
   ;; try to retain highlighting
@@ -891,9 +892,12 @@ entered.
 
 Remember to install =aspell= command line tool.
 
+Correct word with =C-;= key.
+
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell
-  :when (executable-find "aspell")
+  :hook ((git-commit-mode org-mode text-mode) . flyspell-mode)
+  :hook (prog-mode . flyspell-prog-mode)
   :ensure-system-package aspell
   :custom
   ;; personal dictionary
@@ -908,36 +912,34 @@ Remember to install =aspell= command line tool.
   ;; use aspell
   (ispell-program-name (executable-find "aspell"))
 
+  ;; automatically save to abbrev
+  (flyspell-abbrev-p t)
+  (flyspell-use-global-abbrev-table-p t)
+
   :config
   ;; run flyspell only on idle time to avoid performance issue
-  (use-package flyspell-lazy)
+  (use-package flyspell-lazy
+    :custom
+    ;; check recent change after idle for 0.5 seconds
+    (flyspell-lazy-idle-seconds 0.5)
+
+    ;; check entire visible window after 10 seconds
+    (flyspell-lazy-window-idle-seconds 10))
+
+  (use-package flyspell-correct
+    :bind (:map flyspell-mode-map
+                ("C-;" . flyspell-correct-wrapper)))
+  (use-package flyspell-correct-popup :after flyspell-correct)
+
+  ;; enable flyspell-lazy
   (flyspell-lazy-mode 1)
-
-  ;; enable flyspell-mode for text modes
-  (dolist (hook text-mode-hooks)
-    (add-hook hook (lambda ()
-                     (unless (derived-mode-p 'git-commit-mode)
-                       (flyspell-mode t)))))
-
-  ;; enable spellchecker for comments/strings in code
-  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
   )
-#+END_SRC
-
-Use =M-$= to correct word at point.
-
-*** Auto correct frequent typo
-#+BEGIN_SRC emacs-lisp
-(use-package auto-correct
-  :config
-  (dolist (hook text-mode-hooks)
-    (add-hook hook 'auto-correct-mode)))
 #+END_SRC
 
 *** Visual line mode for text modes
 
 #+begin_src emacs-lisp
-(dolist (hook text-mode-hooks)
+(dolist (hook '(org-mode-hook text-mode-hook))
   (add-hook hook 'visual-line-mode))
 #+end_src
 
@@ -1047,6 +1049,15 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 #+begin_src emacs-lisp
 (use-package easy-kill
   :bind ([remap kill-ring-save] . easy-kill))
+#+end_src
+
+** Autocorrection
+
+#+begin_src emacs-lisp
+(setq save-abbrevs 'silent)
+
+;; auto enable abbrev mode
+(setq-default abbrev-mode t)
 #+end_src
 
 * Programming
