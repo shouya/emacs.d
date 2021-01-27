@@ -898,7 +898,6 @@ Correct word with =C-;= key.
 (use-package flyspell
   :hook ((git-commit-mode org-mode text-mode) . flyspell-mode)
   :hook (prog-mode . flyspell-prog-mode)
-  :ensure-system-package aspell
   :custom
   ;; personal dictionary
   (ispell-personal-dictionary (expand-file-name "user-dict" user-emacs-directory))
