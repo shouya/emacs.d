@@ -1456,6 +1456,9 @@ Use =TabNine= for general text completion. Please remember to run
 )
 #+end_src
 
+#+RESULTS:
+: #s(hash-table size 65 test eql rehash-size 1.5 rehash-threshold 0.8125 data (:use-package (24591 63835 379792 0) :init (24591 63835 379706 0) :init-secs (0 0 8949 0) :use-package-secs (0 1 984825 0) :config (24591 63835 379701 0) :config-secs (0 0 8937 0)))
+
 *** Formatting code with apheleia
 
 #+BEGIN_SRC emacs-lisp
@@ -1775,6 +1778,12 @@ project related functionalities.
 (use-package k8s-mode
   :defer t
   :hook (k8s-mode . yas-minor-mode))
+#+end_src
+
+*** JavaScript
+
+#+begin_src emacs-lisp
+(use-package js2-mode :mode "\\.js\\'")
 #+end_src
 
 ** Use org mode
