@@ -1943,6 +1943,17 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
      ("TOREAD" . "#879434")
      ("WAIT" . "#c07993"))))
 #+END_SRC
+*** Enforce todo dependencies
+
+Make todos respect blocking state.
+
+#+begin_src emacs-lisp
+(use-package org
+  :config
+  (setq org-enforce-todo-dependencies t)
+  (setq org-agenda-dim-blocked-tasks 'invisible))
+#+end_src
+
 ** Taking note with =deft=
 
 =deft.el= provides National Velocity-like note browsing and editing experience.
