@@ -2600,14 +2600,18 @@ text and copying to the killring."
                                  (gnuplot .t)
                                  (python . t)
                                  (haskell . t)
+                                 (scheme . t)
                                  ))
   (use-package gnuplot :commands gnuplot-mode)
+  (use-package geiser)
 
   :custom
   (python-shell-completion-native-enable nil)
 
   (haskell-process-type 'stack-ghci)
   (haskell-program-name "ghci")
+
+  (geiser-default-implementation 'racket)
   )
 #+end_src
 
