@@ -2256,7 +2256,12 @@ Basically restoring the default face.
   )
 #+END_SRC
 
+*** Refile
 
+#+begin_src emacs-lisp
+(use-package org
+  :custom (org-refile-targets '(("projects.org" . (:tag . "PROJECT")))))
+#+end_src
 
 ** Clocking
 *** Clocking to "CLOCKING" drawer
