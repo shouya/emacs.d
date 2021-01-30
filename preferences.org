@@ -2240,9 +2240,9 @@ Basically restoring the default face.
   :custom
   (org-capture-templates
    `(("w" "Work" entry (file+headline "projects.org" "Work")
-      "* %^{Task (Work)}\nAdded: %U\n\n%?")
+      "* TODO %^{Task (Work)}\nAdded: %U\n\n%?")
      ("p" "Personal" entry (file+headline "projects.org" "Personal")
-      "* %^{Task (Personal)}\nAdded: %U\n\n%?")
+      "* TODO %^{Task (Personal)}\nAdded: %U\n\n%?")
      ("d" "Day planning" plain (file+olp+datetree "plan.org")
       ,(concat "Added: %U\n"
                "gunka:\n- [ ]%?\n- [ ]\n"
