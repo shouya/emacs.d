@@ -2070,6 +2070,9 @@ don't need to leave Emacs for that.
 #+BEGIN_SRC emacs-lisp
 (use-package org
   :custom
+  ;; show agenda on the same window I launched it, otherwise it destroys my dedicated window setting
+  (org-agenda-window-setup 'current-window)
+  ;; do not start on weekdays
   (org-agenda-start-on-weekday nil)
   ;; do not show repeating items in future timeline
   (org-agenda-show-future-repeats t)
