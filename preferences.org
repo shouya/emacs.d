@@ -1053,7 +1053,7 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 ** Autocorrection
 
 #+begin_src emacs-lisp
-(setq save-abbrevs 'silent)
+(setq save-abbrevs 'silently)
 
 ;; auto enable abbrev mode
 (setq-default abbrev-mode t)
