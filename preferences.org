@@ -1788,6 +1788,12 @@ project related functionalities.
 (use-package js2-mode :mode "\\.js\\'")
 #+end_src
 
+*** PHP
+
+#+begin_src emacs-lisp
+(use-package php-mode :mode "\\.php\\'")
+#+end_src
+
 ** Use org mode
 
 #+BEGIN_SRC emacs-lisp
