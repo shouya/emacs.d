@@ -898,6 +898,7 @@ Correct word with =C-;= key.
 (use-package flyspell
   :hook ((git-commit-mode org-mode text-mode) . flyspell-mode)
   :hook (prog-mode . flyspell-prog-mode)
+  :commands flyspell-mode
   :custom
   ;; personal dictionary
   (ispell-personal-dictionary (expand-file-name "user-dict" user-emacs-directory))
@@ -908,8 +909,8 @@ Correct word with =C-;= key.
   ;; save to personal dictionary without confirmation
   (ispell-silently-savep t)
 
-  ;; use aspell
-  (ispell-program-name (executable-find "aspell"))
+  ;; use aspell rather than ispell
+  (ispell-program-name "/usr/local/bin/aspell")
 
   ;; automatically save to abbrev
   (flyspell-abbrev-p t)
