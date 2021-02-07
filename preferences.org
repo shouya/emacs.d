@@ -2119,8 +2119,7 @@ don't need to leave Emacs for that.
 (use-package org
   :custom
   (org-agenda-files (list (org-file-path "projects.org")
-                          (org-file-path "mencti.org")))
-
+                          (org-file-path "mencti.org"))))
 #+END_SRC
 
 *** Extend toady to 6:00am into next morning
