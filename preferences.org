@@ -1474,18 +1474,28 @@ Use =TabNine= for general text completion. Please remember to run
 *** Formatting code with apheleia
 
 #+BEGIN_SRC emacs-lisp
-;; (use-package apheleia
-;;   :straight (:host github :repo "raxod502/apheleia")
-;;   :custom
-;;   (apheleia-formatters '((mix . ("mix" "format" file))))
-;;   (apheleia-mode-alias '((elixir-mode . mix)))
-;;   )
+(use-package apheleia
+  :straight (:host github :repo "raxod502/apheleia")
+  :config
+  (add-to-list 'apheleia-formatters '(mix . ("mix" "format" file)))
+  (add-to-list 'apheleia-formatters '(prettier . (npx "prettier" "--stdin-filepath" filepath)))
+
+  (add-to-list 'apheleia-mode-alist '(elixir-mode . mix))
+  )
 #+END_SRC
 
 ** Compile mode configurations
 
 #+begin_src emacs-lisp
 (setq compilation-scroll-output 'first-error)
+
+;; colorize using ansi color
+(require 'ansi-color)
+(add-hook 'compilation-filter-hook
+          (lambda ()
+            (toggle-read-only)
+            (ansi-color-apply-on-region compilation-filter-start (point))
+            (toggle-read-only)))
 #+end_src
 
 ** Languages
