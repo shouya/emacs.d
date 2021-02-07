@@ -1579,7 +1579,7 @@ Colorize function names/arguments in info documentations.
 
   ;; Format with C-c C-f
   :bind (:map elixir-mode-map ("C-c C-f" . elixir-format))
-  :hook (elixir-mode . lsp-deferred)
+  :hook (elixir-mode . lsp)
 
   :config
   ;; we don't enable eglot's auto completion functionality
@@ -1606,8 +1606,40 @@ Colorize function names/arguments in info documentations.
 #+BEGIN_SRC emacs-lisp
 (use-package exunit
   :after elixir-mode
+  :bind (:map elixir-mode-map
+              ("C-c C-t C-t" . exunit-verify-single)
+              ("C-c C-t C-v" . exunit-verify)
+              ("C-c C-t C-a" . exunit-verify-all))
   :custom (exunit-environment '("MIX_ENV=test")))
 #+END_SRC
+
+**** Alchemist
+
+Press 'g' in compile mode to rerun last command (original 'r').
+
+#+begin_src emacs-lisp
+(use-package alchemist
+  :after elixir-mode
+  :hook (elixir-mode . alchemist-mode)
+
+  :bind (:map alchemist-mode-map
+              ("C-c C-c C-c" . alchemist-mix-compile)
+              ("C-c C-c C-t" . alchemist-mix-test)
+         :map alchemist-mix-mode-map
+              ("g" . alchemist-mix-rerun-last-task))
+
+  :init
+  (setq alchemist-key-command-prefix (kbd "C-c C-a"))
+
+  :custom
+  (alchemist-mix-env "test")
+
+  :config
+  ;; conflicts with dumb-jump-go
+  (unbind-key "M-." alchemist-mode-map)
+  (unbind-key "M-," alchemist-mode-map)
+  )
+#+end_src
 
 *** Protobuf
 
@@ -1766,8 +1798,8 @@ project related functionalities.
 
 #+begin_src emacs-lisp
 (use-package lsp-haskell
-  :hook (haskell-mode . lsp-deferred)
-  :hook (haskell-literate-mode . lsp-deferred))
+  :hook (haskell-mode . lsp)
+  :hook (haskell-literate-mode . lsp))
 #+end_src
 
 *** Idris
@@ -1805,7 +1837,13 @@ project related functionalities.
 *** JavaScript
 
 #+begin_src emacs-lisp
-(use-package js2-mode :mode "\\.js\\'")
+(use-package js2-mode
+  :mode "\\.js\\'"
+  :hook (js2-mode . lsp)
+  :config
+  (setq-default js2-indent-level 2)
+  (unbind-key "C-c C-f" js2-mode-map)
+  )
 #+end_src
 
 *** PHP
