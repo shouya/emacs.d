@@ -499,6 +499,15 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
 (global-unset-key (kbd "C-x o"))
 #+END_SRC
 
+** Remember layout for undoing
+
+Use =C-c <left>= and =C-c <right>= to undo layout.
+
+#+begin_src emacs-lisp
+(use-package winner
+  :hook (emacs-startup . winner-mode))
+#+end_src
+
 ** Alert library
 
 #+BEGIN_SRC emacs-lisp
