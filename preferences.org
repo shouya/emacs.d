@@ -2118,7 +2118,8 @@ don't need to leave Emacs for that.
 #+BEGIN_SRC emacs-lisp
 (use-package org
   :custom
-  (org-agenda-files (list (org-file-path "projects.org"))))
+  (org-agenda-files (list (org-file-path "projects.org")
+                          (org-file-path "mencti.org")))
 
 #+END_SRC
 
@@ -2312,6 +2313,13 @@ Basically restoring the default face.
       "* TODO %^{Task (Work)}\nAdded: %U\n\n%?")
      ("p" "Personal" entry (file+headline "projects.org" "Personal")
       "* TODO %^{Task (Personal)}\nAdded: %U\n\n%?")
+     ("v" "Video (<15 min)" entry (file+headline "mencti.org" "Videos (Short)")
+      "* TODO %(org-cliplink-capture) %^g\nAdded: %U\n\n%?")
+     ("V" "Video (>15 min)" entry (file+headline "mencti.org" "Videos (Long)")
+      "* TODO %(org-cliplink-capture) %^g\nAdded: %U\n\n%?")
+     ("a" "Article" entry (file+headline "mencti.org" "Articles")
+      "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:Effort:%^{prompt|0:10|0:30|1:00|2:00}\n:END:\nAdded: %U\n\n%?"
+      )
      ("d" "Day planning" plain (file+olp+datetree "plan.org")
       ,(concat "Added: %U\n"
                "gunka:\n- [ ]%?\n- [ ]\n"
