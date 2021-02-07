@@ -2437,18 +2437,56 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
 
 
 *** Mark clocking task as done
+:PROPERTIES:
+:ID:       EEA9B2F1-4CE8-4D24-A0CB-4758E2CAF724
+:END:
 
 #+BEGIN_SRC emacs-lisp
+(setq shou/previously-clocking nil)
+(defun shou/temporarily-clock-out ()
+  (interactive)
+  (save-window-excursion
+    (if (org-clocking-p)
+        (progn
+          (org-clock-goto)
+          (setq shou/previously-clocking
+                (cons org-clock-heading (org-id-get-create)))
+          (org-clock-out))
+      (message "No clock is active now.")
+      )))
+
+(defun shou/resume-previous-clock ()
+  (interactive)
+  (if (null shou/previously-clocking)
+      (message "No previous clock is available.")
+    (let ((id (cdr shou/previously-clocking)))
+      (save-window-excursion
+        (org-id-goto id)
+        (org-clock-in)
+        (setq shou/previously-clocking nil)))))
+
 (defun shou/mark-clocking-task-as-done ()
   "Find current clocking task and mark it as done."
   (interactive)
-  (save-excursion
+  (save-window-excursion
     (if (org-clocking-p)
         (progn
           (org-clock-goto)
           (org-todo 'done)
           (save-buffer))
       (message "No clock is active now."))))
+
+(defun shou/mark-clocking-task-as-todo-and-clock-out ()
+  (interactive)
+  (save-window-excursion
+    (if (org-clocking-p)
+        (progn
+          (org-clock-goto)
+          (org-todo 'todo)
+          (org-clock-out)
+          (save-buffer))
+      (message "No clock is active now."))))
+
 (bind-key "C-c C-x C-d" 'shou/mark-clocking-task-as-done)
 (bind-key "C-c C-x C-d" 'shou/mark-clocking-task-as-done org-mode-map)
 #+END_SRC
