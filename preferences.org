@@ -2570,10 +2570,8 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
   :after org
   :commands (org-download-image org-download-enable org-download-screenshot)
   :hook (dired-mode . org-download-enable)
-  :custom (org-download-screenshot-method
-           (when (eq system-type 'darwin)
-             "screencapture -i %s"
-             "xclip -selection clipboard -t image/png -o > %s")))
+  )
+
 #+END_SRC
 
 ** Annotating documents
