@@ -2336,7 +2336,17 @@ Basically restoring the default face.
 
 #+begin_src emacs-lisp
 (use-package org
-  :custom (org-refile-targets '(("projects.org" . (:tag . "PROJECT")))))
+  :custom
+  (org-refile-targets '(("projects.org" . (:tag . "PROJECT"))
+                        ("mencti.org" . (:level . 0))
+                        (nil . (:maxlevel . 9))
+                        ))
+
+  ;; refile in one go
+  (org-outline-path-complete-in-steps nil)
+
+  ;; show full path
+  (org-refile-use-outline-path t))
 #+end_src
 
 ** Clocking
@@ -2620,7 +2630,7 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
 (bind-key "C-c n" 'open-org-file)
 #+END_SRC
 
-*** Use =C-c l= to collect links
+*** Use =C-c l= and =C-c L= to collect links
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
@@ -2645,12 +2655,13 @@ text and copying to the killring."
       (org-agenda-goto))
     (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
       (setq mytmphead (nth 4 (org-heading-components)))
+      ;; replace links with their description
+      (setq mytmphead (replace-regexp-in-string org-link-bracket-re "\\2" mytemphead))
       (setq mytmpid (funcall 'org-id-get-create))
       (setq mytmplink (format "[[id:%s][%s]]" mytmpid mytmphead))
       (kill-new mytmplink)
       (message "Copied %s to killring (clipboard)" mytmplink)
-      ))
-  )
+      )))
 #+END_SRC
 
 *** Use =C-c C-c= to save and quit =org-src-mode=
