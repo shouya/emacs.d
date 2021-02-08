@@ -2153,6 +2153,7 @@ don't need to leave Emacs for that.
 
   (org-agenda-span 'day)
 
+  ;; skip filename as it takes up precious space and useless
   (org-agenda-prefix-format '((agenda . " %i  %?-12t% s")
                               (todo . " %i %-12:c")
                               (tags . " %i %-12:c")
@@ -2338,15 +2339,15 @@ Basically restoring the default face.
 (use-package org
   :custom
   (org-refile-targets '(("projects.org" . (:tag . "PROJECT"))
-                        ("mencti.org" . (:level . 0))
-                        (nil . (:maxlevel . 9))
+                        ("mencti.org" . (:level . 1))
                         ))
 
   ;; refile in one go
   (org-outline-path-complete-in-steps nil)
 
   ;; show full path
-  (org-refile-use-outline-path t))
+  (org-refile-use-outline-path 'file)
+  )
 #+end_src
 
 ** Clocking
