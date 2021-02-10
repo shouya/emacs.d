@@ -1460,6 +1460,8 @@ Use =TabNine= for general text completion. Please remember to run
 
   ;; conflict with projectile prefix
   (unbind-key "M-p" lsp-signature-mode-map)
+  ;; unbind it as well as I never bother using it.
+  (unbind-key "M-n" lsp-signature-mode-map)
 
   :custom
   ;; performance tuning
