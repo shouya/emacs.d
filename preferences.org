@@ -2654,18 +2654,19 @@ The purpose of this function is to easily construct id:-links to
 org-mode items. If its assigned to a key it saves you marking the
 text and copying to the killring."
     (interactive)
-    (when (eq major-mode 'org-agenda-mode) ;switch to orgmode
-      (org-agenda-show)
-      (org-agenda-goto))
-    (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
-      (setq mytmphead (nth 4 (org-heading-components)))
-      ;; replace links with their description
-      (setq mytmphead (replace-regexp-in-string org-link-bracket-re "\\2" mytemphead))
-      (setq mytmpid (funcall 'org-id-get-create))
-      (setq mytmplink (format "[[id:%s][%s]]" mytmpid mytmphead))
-      (kill-new mytmplink)
-      (message "Copied %s to killring (clipboard)" mytmplink)
-      )))
+    (save-window-excursion
+      (when (eq major-mode 'org-agenda-mode) ;switch to orgmode
+        (org-agenda-show)
+        (org-agenda-goto))
+      (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
+        (let* ((head (nth 4 (org-heading-components)))
+               ;; replace links with their description
+               (clean-head (replace-regexp-in-string org-link-bracket-re "\\2" head))
+               (id (funcall 'org-id-get-create))
+               (link (format "[[id:%s][%s]]" id clean-head)))
+          (kill-new link)
+          (message "Copied %s to killring (clipboard)" link)
+        )))))
 #+END_SRC
 
 *** Use =C-c C-c= to save and quit =org-src-mode=
