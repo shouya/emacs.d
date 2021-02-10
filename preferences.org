@@ -2321,14 +2321,16 @@ Basically restoring the default face.
      ("V" "Video (>15 min)" entry (file+headline "mencti.org" "Videos (Long)")
       "* TODO %(org-cliplink-capture) %^g\nAdded: %U\n\n%?")
      ("a" "Article" entry (file+headline "mencti.org" "Articles")
-      "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:Effort:%^{prompt|0:10|0:30|1:00|2:00}\n:END:\nAdded: %U\n\n%?"
+      "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:Effort: %^{prompt|0:10|0:30|1:00|2:00}\n:END:\nAdded: %U\n\n%?"
       )
      ("d" "Day planning" plain (file+olp+datetree "plan.org")
       ,(concat "Added: %U\n"
                "gunka:\n- [ ]%?\n- [ ]\n"
                "cilre:\n- [ ]\n- [ ]\n"
                "chore:\n- [ ] vocab\n- [ ] diary\n- [ ] review\n"
-               "sevzi:\n- [ ]")
+               "sevzi:\n- [ ]\n"
+               "mencti:\n- [ ]\n"
+               )
       :time-prompt t
       :immediate-finish t
       :jump-to-captured t)
