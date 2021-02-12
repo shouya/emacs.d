@@ -1482,7 +1482,7 @@ Use =TabNine= for general text completion. Please remember to run
 (use-package apheleia
   :straight (:host github :repo "raxod502/apheleia")
   :config
-  (add-to-list 'apheleia-formatters '(mix . ("mix" "format" file)))
+  (add-to-list 'apheleia-formatters '(mix . ("mix" "format" "-")))
   (add-to-list 'apheleia-formatters '(prettier . (npx "prettier" "--stdin-filepath" filepath)))
 
   (add-to-list 'apheleia-mode-alist '(elixir-mode . mix))
