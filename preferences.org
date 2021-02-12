@@ -2190,6 +2190,11 @@ don't need to leave Emacs for that.
              ((org-agenda-overriding-header "Personal")
               (org-agenda-skip-function
                '(org-agenda-skip-entry-if 'scheduled 'deadline))))
+
+       (tags "MENCTI/TODO"
+             ((org-agenda-overriding-header "Mencti")
+              (org-agenda-skip-function
+               '(org-agenda-skip-entry-if 'scheduled 'deadline))))
        ))
      )))
 #+END_SRC
