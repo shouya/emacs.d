@@ -352,8 +352,24 @@ I use "Input" as my default font face.
 ;; (add-to-list 'default-frame-alist '(font . "Input-14"))
 
 ;; Experiment with different fonts here:
-(set-frame-font "Fira Mono-14")
+(set-frame-font "Fira Code-13")
 #+END_SRC
+
+** Ligature
+
+#+begin_src emacs-lisp
+(use-package ligature
+  :straight (:host github :repo "mickeynp/ligature.el")
+  :when (eq system-type 'darwin)
+  :config
+  (ligature-set-ligatures t '("www" "==" "===" "=/=" ":="
+                              ".." "..." "<=>" "=>" "->" "<-" "<->" "::"
+                              "##" "###" "####" "#####" "######"
+                              "<<" "<<<" ">>" ">>>" "//" "///"
+                              ))
+  (global-ligature-mode t)
+  )
+#+end_src
 
 ** Install all-the-icon
 
