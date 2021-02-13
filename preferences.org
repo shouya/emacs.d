@@ -2573,7 +2573,7 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
 (defun shou/remove-previous-clock (id)
   (when (not (null id))
     (setq shou/previously-clocking
-          (--remove (= id (cdr it)) shou/previously-clocking))))
+          (--remove (s-equals? id (cdr it)) shou/previously-clocking))))
 
 (defun shou/mark-clocking-task-as-done ()
   "Find current clocking task and mark it as done."
