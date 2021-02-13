@@ -45,7 +45,7 @@ non_clocking_menu() {
 
 previous_item() {
   cmd='(s-join "\n" (--map (s-concat (car it) "%%%" (cdr it)) shou/previously-clocking))'
-  eval echo -e "$(emacs_exec "$cmd")" | \
+  eval echo -ne "$(emacs_exec "$cmd")" | \
         awk -F'%%%' \
             "{print \":fast_forward: Resume\", \$1 \"|terminal=false bash=$0 param1=resume param2=\"\$2}"
   echo "---"
