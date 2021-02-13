@@ -6,6 +6,9 @@
 # task, with action buttons to clock out and mark current item as
 # done.
 
+# for jq
+PATH="/usr/local/bin:$PATH"
+
 emacs_exec() {
   /usr/local/bin/emacsclient \
     --eval "$1" \
@@ -18,16 +21,17 @@ clocking_p() {
 
 clocking_text() {
   emacs_exec "(substring-no-properties (org-clock-get-clock-string))" | \
-    sed -e 's/^\s+//g' -e 's/\s+$//g' -e 's/^" //' -e 's/"$//' | \
-    sed -e 's/(\(.*\))/\1/' | \
+    jq -r . | \
+    sed -e 's/^ //' -e 's/(\(.*\))/\1/' | \
     sed -e 's/^/:clock3:/' -e 's/$/|color=green/'
 }
 
 clocking_menu() {
   clocking_text
   echo "---"
-  echo ":no_entry_sign: Clock out|terminal=false bash=$0 param1=clock_out"
-  echo ":white_check_mark: Done and clock out|terminal=false bash=$0 param1=done_and_clock_out"
+  echo ":soon: Clock out (TODO)|terminal=false bash=$0 param1=clock_out"
+  echo ":on: Clock out (IN-PROG)|terminal=false bash=$0 param1=simply_clock_out"
+  echo ":end: Clock out (DONE)|terminal=false bash=$0 param1=done_and_clock_out"
   echo "---"
   echo "Open Emacs|terminal=false bash=$0 param1=open_emacs"
 }
@@ -35,7 +39,16 @@ clocking_menu() {
 non_clocking_menu() {
   echo "No clocking task"
   echo "---"
+  previous_item
   echo "Open Emacs|terminal=false bash=$0 param1=open_emacs"
+}
+
+previous_item() {
+  cmd='(s-join "\n" (--map (s-concat (car it) "%%%" (cdr it)) shou/previously-clocking))'
+  eval echo -e "$(emacs_exec "$cmd")" | \
+        awk -F'%%%' \
+            "{print \":fast_forward: Resume\", \$1 \"|terminal=false bash=$0 param1=resume param2=\"\$2}"
+  echo "---"
 }
 
 bitbar_show_menu() {
@@ -48,11 +61,19 @@ bitbar_show_menu() {
 
 case "$1" in
   clock_out)
-    emacs_exec "(org-clock-out)"
+    emacs_exec "(shou/mark-clocking-task-as-todo-and-clock-out)"
+    ;;
+
+  simply_clock_out)
+    emacs_exec "(shou/temporarily-clock-out)"
     ;;
 
   done_and_clock_out)
     emacs_exec "(shou/mark-clocking-task-as-done)"
+    ;;
+
+  resume)
+    emacs_exec "(shou/resume-previous-clock \"$2\")"
     ;;
 
   open_emacs)
