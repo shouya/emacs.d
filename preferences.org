@@ -2520,28 +2520,44 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
 :END:
 
 #+BEGIN_SRC emacs-lisp
-(setq shou/previously-clocking nil)
+(defvar shou/previously-clocking '())
+
 (defun shou/temporarily-clock-out ()
   (interactive)
   (save-window-excursion
     (if (org-clocking-p)
         (progn
           (org-clock-goto)
-          (setq shou/previously-clocking
-                (cons org-clock-heading (org-id-get-create)))
+          (add-to-list 'shou/previously-clocking
+                       (cons org-clock-heading (org-id-get-create)))
           (org-clock-out))
       (message "No clock is active now.")
       )))
 
-(defun shou/resume-previous-clock ()
+(defun shou/mark-clocking-task-as-todo-and-clock-out ()
   (interactive)
-  (if (null shou/previously-clocking)
-      (message "No previous clock is available.")
-    (let ((id (cdr shou/previously-clocking)))
-      (save-window-excursion
-        (org-id-goto id)
-        (org-clock-in)
-        (setq shou/previously-clocking nil)))))
+  (save-window-excursion
+    (if (org-clocking-p)
+        (progn
+          (org-clock-goto)
+          (add-to-list 'shou/previously-clocking
+                       (cons org-clock-heading (org-id-get-create)))
+          (org-todo 'todo)
+          (org-clock-out)
+          (save-buffer))
+      (message "No clock is active now."))))
+
+(defun shou/resume-previous-clock (id)
+  (interactive)
+  (save-window-excursion
+    (org-id-goto id)
+    (org-clock-in)
+    (shou/remove-previous-clock id)))
+
+(defun shou/remove-previous-clock (id)
+  (when (not (null id))
+    (setq shou/previously-clocking
+          (--remove (= id (cdr it)) shou/previously-clocking))))
 
 (defun shou/mark-clocking-task-as-done ()
   "Find current clocking task and mark it as done."
@@ -2551,17 +2567,7 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
         (progn
           (org-clock-goto)
           (org-todo 'done)
-          (save-buffer))
-      (message "No clock is active now."))))
-
-(defun shou/mark-clocking-task-as-todo-and-clock-out ()
-  (interactive)
-  (save-window-excursion
-    (if (org-clocking-p)
-        (progn
-          (org-clock-goto)
-          (org-todo 'todo)
-          (org-clock-out)
+          (shou/remove-previous-clock (org-id-get))
           (save-buffer))
       (message "No clock is active now."))))
 
