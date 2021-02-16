@@ -1121,9 +1121,14 @@ Also show a ruler at column 80.
 
 ** Show line number
 
+=nlinum= stops working for me somehow, I have to use display-line-numbers-mode.
+
 #+BEGIN_SRC emacs-lisp
 (use-package nlinum
+  :disabled
   :hook (prog-mode . nlinum-mode))
+
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
 ** Jump to definition (=M-.=)
