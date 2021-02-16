@@ -362,11 +362,19 @@ I use "Input" as my default font face.
   :straight (:host github :repo "mickeynp/ligature.el")
   :when (eq system-type 'darwin)
   :config
-  (ligature-set-ligatures t '("www" "==" "===" "=/=" ":="
+  ;; Fira code ligatures that I use
+  (ligature-set-ligatures t '("www" ":="
                               ".." "..." "<=>" "=>" "->" "<-" "<->" "::"
                               "##" "###" "####" "#####" "######"
                               "<<" "<<<" ">>" ">>>" "//" "///"
+                              "||" "&&"
                               ))
+  (ligature-set-ligatures 'prog-mode
+                          '("www" "==" "===" "=/=" "!="
+                            ".." "..." "<=>" "=>" "->" "<-" "<->" "::"
+                            "##" "###" "####" "#####" "######"
+                            "<<" "<<<" ">>" ">>>" "//" "///"
+                            "||" "&&" ))
   (global-ligature-mode t)
   )
 #+end_src
