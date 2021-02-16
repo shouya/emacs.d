@@ -1520,6 +1520,7 @@ Use =TabNine= for general text completion. Please remember to run
         (apply orig-fn args))))
 
   (advice-add 'apheleia-format-buffer :around #'shou/fix-apheleia-project-dir)
+  (apheleia-global-mode t)
   )
 #+END_SRC
 
