@@ -1087,15 +1087,7 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 (setq tramp-default-method "scp")
 #+END_SRC
 
-
-** Easy kill & mark
-
-#+begin_src emacs-lisp
-(use-package easy-kill
-  :bind ([remap kill-ring-save] . easy-kill))
-#+end_src
-
-** Autocorrection
+** Auto-correction
 
 #+begin_src emacs-lisp
 (setq save-abbrevs 'silently)
