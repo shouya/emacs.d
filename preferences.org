@@ -310,6 +310,16 @@ most GUI editors.
 (setq-default initial-major-mode 'text-mode)
 #+END_SRC
 
+** Unbind keys
+
+Here I unbind keyboard shortcuts that I frequently mistype.
+
+#+begin_src emacs-lisp
+;; It was bound to kill-region or something.
+;; I often accidentally deleted whole buffer with this key which is frastrating.
+(unbind-key "s-x")
+#+end_src
+
 * UI
 ** Tweak main UI
 
