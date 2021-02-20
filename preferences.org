@@ -1519,15 +1519,6 @@ Use =TabNine= for general text completion. Please remember to run
 
   (add-to-list 'apheleia-mode-alist '(elixir-mode . mix))
 
-  ;; apheleia by default only run formatter under current directory, this fix
-  ;; makes it run the command under project root.
-  (defun shou/fix-apheleia-project-dir (orig-fn &rest args)
-    (let ((project (project-current)))
-      (if (not (null project))
-          (let ((default-directory (project-root project))) (apply orig-fn args))
-        (apply orig-fn args))))
-
-  (advice-add 'apheleia-format-buffer :around #'shou/fix-apheleia-project-dir)
   (apheleia-global-mode t)
   )
 #+END_SRC
