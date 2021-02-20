@@ -915,7 +915,8 @@ entered.
 #+BEGIN_SRC emacs-lisp
 (use-package markdown-mode
   :commands gfm-mode
-  :mode (("\.md$" . gfm-mode))
+  :mode (("\.md$" . gfm-mode)
+         ("\.markdown$" . gfm-mode))
   :config
   (when (executable-find "pando")
     (setq-default markdown-command "pandoc --standalone --mathjax --from=markdown")))
