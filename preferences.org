@@ -605,6 +605,14 @@ Use =C-c <left>= and =C-c <right>= to undo layout.
          ("C-c , D" . purpose-toggle-window-buffer-dedicated)))
 #+end_src
 
+** Page break lines =^L=
+
+It render =^L= as a page break line, which is nicer to look at.
+
+#+begin_src emacs-lisp
+(use-package page-break-lines
+  :hook (emacs-startup . global-page-break-lines-mode))
+#+end_src
 
 * Dired
 ** Load =dired-x= by default
