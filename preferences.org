@@ -1573,9 +1573,8 @@ Use =TabNine= for general text completion. Please remember to run
 (require 'ansi-color)
 (add-hook 'compilation-filter-hook
           (lambda ()
-            (toggle-read-only)
-            (ansi-color-apply-on-region compilation-filter-start (point))
-            (toggle-read-only)))
+            (let ((inhibit-read-only t))
+              (ansi-color-apply-on-region compilation-filter-start (point)))))
 #+end_src
 
 ** Languages
