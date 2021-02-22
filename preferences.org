@@ -899,11 +899,52 @@ entered.
   :custom
   (expand-region-subword-enabled t)
   (expand-region-skip-whitespace t)
+  (expand-region-smart-cursor nil)
+
+  :config
+  (defun shou/er-this-expansion-is-better
+      (start end best-start best-end)
+    (and
+     (<= (point) start)
+     (> (mark) end)
+     ;; amplify the candidates that selects region that are closed to point.
+     (< (+ (expt (- start (point)) 2) (expt (- (mark) end) 2))
+        (+ (expt (- start best-start) 2) (expt (- best-end end) 2)))
+     ))
+
+
+  (advice-add 'er--this-expansion-is-better
+              :override 'shou/er-this-expansion-is-better)
+
+  (defun shou/er/mark-org-heading ()
+    (when (org-at-heading-p)
+      (end-of-line)
+      (push-mark nil t t)
+      (beginning-of-line)))
+
+  (require 'the-org-mode-expansions)
+  (defun shou/er/add-org-mode-expansions ()
+    (set (make-local-variable 'er/try-expand-list)
+         (append
+          (remove #'er/mark-defun er/try-expand-list)
+          '(org-mark-subtree
+            er/mark-org-element
+            er/mark-org-element-parent
+            er/mark-org-code-block
+            er/mark-sentence
+            er/mark-org-parent
+            er/mark-paragraph
+            shou/er/mark-org-heading
+            )))
+    (set (make-local-variable 'er/save-mode-excursion)
+         #'er/save-org-mode-excursion))
+
+  (er/enable-mode-expansions 'org-mode 'shou/er/add-org-mode-expansions)
 
   ;; mainly for qualified names like "Struct::method".
   (require 'cc-mode-expansions)
   (er/enable-mode-expansions 'rust-mode 'er/add-cc-mode-expansions)
-)
+  )
 #+END_SRC
 
 ** Writing prose
