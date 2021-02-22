@@ -1940,7 +1940,7 @@ project related functionalities.
 (use-package php-mode :mode "\\.php\\'")
 #+end_src
 
-** Use org mode
+* org mode
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
