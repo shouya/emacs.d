@@ -1282,6 +1282,17 @@ Let the project root to be where =mix.exs= is found. This function is used by
 (add-hook 'project-find-functions 'shou/elixir-project-finder)
 #+END_SRC
 
+** Code folding
+
+I use =yafolding= to fold structured code.
+
+I didn't use =origami.el= because it handles languages like js/json terribly. =yafolding,= on the other hand, is based on indentation alone. This means as long as the document is well-indented, =yafolding= is able to fold correctly.
+
+#+begin_src emacs-lisp
+(use-package yafolding
+  :hook (prog-mode . yafolding-mode))
+#+end_src
+
 ** Auto complete parentheses
 
 I use =smartparens= package for the purpose.
