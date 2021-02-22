@@ -2424,7 +2424,7 @@ Basically restoring the default face.
 #+begin_src emacs-lisp
 (use-package org
   :custom
-  (org-refile-targets '(("projects.org" . (:tag . "PROJECT"))
+  (org-refile-targets '(("projects.org" . (:maxlevel . 9))
                         ("mencti.org" . (:level . 1))
                         ))
 
