@@ -2095,7 +2095,7 @@ Make todos respect blocking state.
 #+begin_src emacs-lisp
 (use-package org
   :config
-  (setq org-enforce-todo-dependencies t)
+  ; (setq org-enforce-todo-dependencies t)
   (setq org-agenda-dim-blocked-tasks 'invisible))
 #+end_src
 
