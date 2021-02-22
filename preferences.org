@@ -1929,6 +1929,7 @@ project related functionalities.
   :hook (js2-mode . lsp)
   :config
   (setq-default js2-indent-level 2)
+  (setq-default js2-basic-offset 2)
   (unbind-key "C-c C-f" js2-mode-map)
   )
 #+end_src
