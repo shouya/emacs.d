@@ -2144,31 +2144,6 @@ Make todos respect blocking state.
   )
 #+END_SRC
 
-** Roam
-
-For building personal knowledge base, I like the idea of [[https://www.roamresearch.com/][Roam]], but it only have
-a web version. Fortunately someone build a replica in =org-mode=, so great that I
-don't need to leave Emacs for that.
-
-#+BEGIN_SRC emacs-lisp
-(use-package org-roam
-  :after org
-  :commands (org-roam org-roam-insert org-roam-mode)
-  :custom
-  (org-roam-mute-cache-build t)
-  (org-roam-directory (org-file-path "roam/"))
-
-  :bind
-  ("C-c r l" . org-roam)
-  ("C-c r t" . org-roam-today)
-  ("C-c r f" . org-roam-find-file)
-  ("C-c r i" . org-roam-insert)
-  ("C-c r g" . org-roam-show-graph)
-  :config
-  (org-roam-mode)
-)
-#+END_SRC
-
 ** Org protocol
 
 #+begin_src emacs-lisp
