@@ -1312,7 +1312,6 @@ I use =smartparens= package for the purpose.
               ("M-S-l" . sp-backward-barf-sexp)
               ;; ((a|) b) => (a| b)
               ("M-j" . sp-splice-sexp)
-
               ;;
               ("M-<right>" . sp-next-sexp)
               ;;
@@ -1950,6 +1949,13 @@ project related functionalities.
 
 #+begin_src emacs-lisp
 (use-package php-mode :mode "\\.php\\'")
+#+end_src
+
+*** Prolog
+
+#+begin_src emacs-lisp
+(use-package prolog
+  :mode "\\.pl\\'")
 #+end_src
 
 * org mode
