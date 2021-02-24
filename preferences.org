@@ -1300,7 +1300,8 @@ I use =smartparens= package for the purpose.
 #+BEGIN_SRC emacs-lisp
 (use-package smartparens
   :hook (prog-mode . smartparens-mode)
-  :bind (:map smartparens-mode-map
+  :bind (("M-r" . sp-rewrap-sexp)
+         :map smartparens-mode-map
               ;; ((a|) b) => ((a| b))
               ("M-L" . sp-forward-slurp-sexp)
               ;; ((a| b)) => ((a|) b)
