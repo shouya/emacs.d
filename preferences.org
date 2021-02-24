@@ -1955,7 +1955,8 @@ project related functionalities.
 
 #+begin_src emacs-lisp
 (use-package prolog
-  :mode "\\.pl\\'")
+  :mode (("\\.pl\\'" . prolog-mode)
+         ("\\.plt\\'" . prolog-mode)))
 #+end_src
 
 * org mode
