@@ -1273,6 +1273,22 @@ Let the project root to be where =mix.exs= is found. This function is used by
 (add-hook 'project-find-functions 'shou/elixir-project-finder)
 #+END_SRC
 
+** Run command
+
+#+begin_src emacs-lisp
+(defun shou/run-command-recipe ()
+  (list
+   (list :command-name "say-hello"
+         :command-line "echo hello"
+         )
+   ))
+(use-package run-command
+  :straight (:host github :repo "bard/emacs-run-command")
+  :commands run-command
+  :custom (run-command-recipes (list #'shou/run-command-recipe))
+  )
+#+end_src
+
 ** Code folding
 
 I use =yafolding= to fold structured code.
