@@ -320,6 +320,12 @@ Here I unbind keyboard shortcuts that I frequently mistype.
 (unbind-key "s-x")
 #+end_src
 
+** Confirm before quitting
+
+#+begin_src emacs-lisp
+(setq confirm-kill-emacs #'yes-or-no-p)
+#+end_src
+
 * UI
 ** Tweak main UI
 
@@ -1579,7 +1585,7 @@ Use =TabNine= for general text completion. Please remember to run
 
   (add-to-list 'apheleia-mode-alist '(elixir-mode . mix))
 
-  (apheleia-global-mode t)
+  (apheleia-global-mode 1)
   )
 #+END_SRC
 
