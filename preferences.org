@@ -2851,6 +2851,19 @@ text and copying to the killring."
   )
 #+end_src
 
+** Automatic backup
+
+I automatically backup my org files using git after idle for a while.
+
+#+begin_src emacs-lisp
+(use-package git-auto-commit-mode
+  :commands git-auto-commit-mode
+  :custom
+  (gac-automatically-push-p t)
+  (gac-debounce-interval 120)
+  (gac-commit-additional-flag "--no-gpg-sign"))
+#+end_src
+
 * Playground
 
 Try out stuff here and execute manually.
