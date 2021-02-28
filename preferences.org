@@ -2859,8 +2859,11 @@ I automatically backup my org files using git after idle for a while.
 (use-package git-auto-commit-mode
   :commands git-auto-commit-mode
   :custom
+  ;; auto push to remote
   (gac-automatically-push-p t)
+  ;; only backup after 120 secs
   (gac-debounce-interval 120)
+  ;; do not prompt for gpg signature
   (gac-commit-additional-flag "--no-gpg-sign"))
 #+end_src
 
