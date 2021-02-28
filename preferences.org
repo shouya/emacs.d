@@ -565,18 +565,18 @@ Use =C-c <left>= and =C-c <right>= to undo layout.
 #+BEGIN_SRC emacs-lisp
 (use-package popwin
   :hook (emacs-startup . popwin-mode)
+
   :config
   (push '("*elixir-format-errors*" :noselect t) popwin:special-display-config)
   (push "*idris-repl*" popwin:special-display-config)
   (push '("*idris-holes*" :noselect t) popwin:special-display-config)
-  (push "*Help*" popwin:special-display-config)
+  (push '("*Help*" :stick t) popwin:special-display-config)
   (push "*Warnings*" popwin:special-display-config)
   (push "*rustfmt*" popwin:special-display-config)
   (push "*explain-pause-log*" popwin:special-display-config)
   (push "*explain-pause-profiles*" popwin:special-display-config)
   (push '("*Flycheck errors*" :position bottom :stick t) popwin:special-display-config)
 )
-
 #+END_SRC
 
 ** Startup dashboard
