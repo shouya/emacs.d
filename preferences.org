@@ -1014,10 +1014,13 @@ Correct word with =C-;= key.
     ;; check entire visible window after 10 seconds
     (flyspell-lazy-window-idle-seconds 10))
 
+  ;; auto save words abbrev table
   (use-package flyspell-correct
     :bind (:map flyspell-mode-map
                 ("C-;" . flyspell-correct-wrapper)))
-  (use-package flyspell-correct-popup :after flyspell-correct)
+
+  ;; it doesn't display well with visual-line-mode
+  ;; (use-package flyspell-correct-popup :after flyspell-correct)
 
   ;; enable flyspell-lazy
   (flyspell-lazy-mode 1)
