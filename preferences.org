@@ -71,7 +71,11 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 #+BEGIN_SRC emacs-lisp
 (use-package atomic-chrome
   :hook (emacs-startup . atomic-chrome-start-server)
-  :if (display-graphic-p))
+  :if (display-graphic-p)
+  :custom
+  (atomic-chrome-url-major-mode-alist
+   '(("wiki\\.lain\\.li" . mediawiki-mode)
+     ("github\\.com" . gfm-mode))))
 #+END_SRC
 
 ** Make window resizable by window manager
