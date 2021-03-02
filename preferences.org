@@ -1043,7 +1043,7 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
   :hook (emacs-startup . global-visual-fill-column-mode)
 
   :custom
-  (visual-fill-column-width 90)
+  (visual-fill-column-width 100)
   (visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
 
   :config
