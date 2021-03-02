@@ -905,20 +905,6 @@ entered.
   (expand-region-smart-cursor nil)
 
   :config
-  (defun shou/er-this-expansion-is-better
-      (start end best-start best-end)
-    (and
-     (<= (point) start)
-     (> (mark) end)
-     ;; amplify the candidates that selects region that are closed to point.
-     (< (+ (expt (- start (point)) 2) (expt (- (mark) end) 2))
-        (+ (expt (- start best-start) 2) (expt (- best-end end) 2)))
-     ))
-
-
-  (advice-add 'er--this-expansion-is-better
-              :override 'shou/er-this-expansion-is-better)
-
   (defun shou/er/mark-org-heading ()
     (when (org-at-heading-p)
       (end-of-line)
