@@ -1140,6 +1140,14 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 (setq-default abbrev-mode t)
 #+end_src
 
+** MediaWiki
+
+#+begin_src emacs-lisp
+(use-package mediawiki
+  :commands mediawiki-mode)
+#+end_src
+
+
 * Programming
 ** Show column number
 
