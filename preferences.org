@@ -1695,7 +1695,9 @@ Colorize function names/arguments in info documentations.
          ("\\.ex\\'" . elixir-mode))
 
   ;; Format with C-c C-f
-  :bind (:map elixir-mode-map ("C-c C-f" . elixir-format))
+  :bind (:map elixir-mode-map
+              ("C-c C-f" . elixir-format)
+              ("M-q" . python-fill-paragraph))
   :hook (elixir-mode . lsp)
 
   :config
@@ -1706,7 +1708,21 @@ Colorize function names/arguments in info documentations.
                   (setq elixir-format-arguments
                         (list "--dot-formatter"
                               (concat (locate-dominating-file buffer-file-name ".formatter.exs") ".formatter.exs")))
-                (setq elixir-format-arguments nil)))))
+                (setq elixir-format-arguments nil))))
+
+  ;; this hack to make it work with multiline strings.
+  (setq python-fill-docstring-style 'django)
+  (defun shou/always-docstring () t)
+  (defun shou/pretend-python-mode (fun &rest xs)
+    (let ((old-major-mode major-mode)
+          (always-docstring (lambda () t)))
+      (advice-add 'python-info-docstring-p :override #'shou/always-docstring)
+      (python-mode)
+      (apply fun xs)
+      (advice-remove 'python-info-docstring-p #'shou/always-docstring)
+      (funcall old-major-mode)))
+  (advice-add 'python-fill-string :around #'shou/pretend-python-mode)
+  )
 
   ;;; The original elixir syntax table is a bit awkward. I changed it
   ;;; a little so things like symbol highlighting works a bit better.
