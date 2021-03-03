@@ -949,7 +949,13 @@ entered.
          ("\.markdown$" . gfm-mode))
   :config
   (when (executable-find "pando")
-    (setq-default markdown-command "pandoc --standalone --mathjax --from=markdown")))
+    (setq-default markdown-command "pandoc --standalone --mathjax --from=markdown"))
+  )
+
+;; edit-indirect is required to edit code blocks in markdown
+;; summon with <C-c '>
+(use-package edit-indirect
+  :commands edit-indirect-region)
 #+END_SRC
 
 *** Define the list of text mode hooks
