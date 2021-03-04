@@ -1283,14 +1283,24 @@ Let the project root to be where =mix.exs= is found. This function is used by
 ** Run command
 
 #+begin_src emacs-lisp
+(defun shou/run-command/submit-exercism ()
+  (when-let* ((root (projectile-project-root))
+              (_ (f-same? root "~/projects/exercism")))
+    (list :command-name "Submit exercism"
+          :command-line
+          (lambda ()
+            (->> (completing-read "Submit file: " (list (buffer-file-name)))
+                 (format "exercism submit %s"))))))
+
+
 (defun shou/run-command-recipe ()
   (list
-   (list :command-name "say-hello"
-         :command-line "echo hello"
-         )
+   (shou/run-command/titan-release)
+   (shou/run-command/submit-exercism)
    ))
 (use-package run-command
   :straight (:host github :repo "bard/emacs-run-command")
+  :bind ("<f6>" . run-command)
   :commands run-command
   :custom (run-command-recipes (list #'shou/run-command-recipe))
   )
