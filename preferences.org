@@ -863,6 +863,7 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
           org-mru-clock-in
           counsel-yank-pop
           flyspell-correct-ivy
+          flyspell-correct-wrapper
           ))
 
   ;; try to retain highlighting
