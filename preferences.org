@@ -2387,7 +2387,11 @@ Make todos respect blocking state.
 #+BEGIN_SRC emacs-lisp
 (use-package org
   :config
-  (add-hook 'org-mode-hook 'auto-save-mode))
+  (add-hook 'org-mode-hook 'auto-save-mode)
+
+  ; save but don't leave a message.
+  (setq auto-save-no-message t)
+  )
 #+END_SRC
 
 
