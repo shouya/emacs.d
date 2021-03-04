@@ -1293,13 +1293,25 @@ Let the project root to be where =mix.exs= is found. This function is used by
             (->> (read-file-name "Submit file: " nil nil nil (buffer-file-name))
                  (format "exercism submit %s"))))))
 
+(defun shou/run-command/yarn ()
+  (when-let* ((file-name (buffer-file-name))
+              (yarn-root (locate-dominating-file file-name "package.json")))
+    (list :command-name "Yarn"
+          :command-line
+          (let (default-directory yarn-root)
+            (lambda ()
+              (->> (completing-read "yarn " '(" " "test"))
+                   (format "yarn %s")))))))
+
 (defvar shou/run-command/custom/hist '())
 (defun shou/run-command/custom ()
   (list :command-name "Custom command"
         :command-line
         (lambda ()
-          (when-let (cmd(completing-read "Enter your command: "
-                                          (-map 'substring-no-properties shou/run-command/custom/hist)
+          (when-let (cmd (completing-read "Enter your command: "
+                                          (-map
+                                           'substring-no-properties
+                                           shou/run-command/custom/hist)
                                           nil nil nil
                                           'shou/run-command/custom/hist))
             cmd))))
@@ -1308,6 +1320,7 @@ Let the project root to be where =mix.exs= is found. This function is used by
   (list
    (shou/run-command/titan-release)
    (shou/run-command/submit-exercism)
+   (shou/run-command/yarn)
    (shou/run-command/custom)
    ))
 
