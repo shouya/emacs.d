@@ -5,7 +5,7 @@
 defmodule ${1:`(let* ((file-path (f-relative (f-this-file) (projectile-project-root)))
        (short-path (f-relative (f-no-ext file-path) "lib"))
        (to-seg (lambda (file) (s-join "" (-map 's-capitalize (s-split "_" file))))))
-  (s-join "." (-map to-seg (f-split short-path)))) `} do
+       (s-chop-prefix "...Test." (s-join "." (-map to-seg (f-split short-path))))) `} do
   @moduledoc ${2:false}
   $0
 end
