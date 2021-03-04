@@ -384,7 +384,7 @@ I use "Input" as my default font face.
   :config
   ;; Fira code ligatures that I use
   (ligature-set-ligatures t '("www" ":="
-                              ".." "..." "<=>" "=>" "->" "<-" "<->" "::"
+                              ".." "..." "<=>" "=>" "->" "->>" "<-" "<->" "::"
                               "##" "###" "####" "#####" "######"
                               "<<" "<<<" ">>" ">>>" "//" "///"
                               "||" "&&"
