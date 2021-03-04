@@ -1256,6 +1256,7 @@ Few shortcuts:
   (projectile-enable-caching t)
   (projectile-indexing-method 'alien)
   (projectile-globally-ignored-file-suffixes '("beam"))
+  (projectile-create-missing-test-files t)
 
   :hook (emacs-startup . projectile-mode)
 
