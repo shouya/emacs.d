@@ -1,0 +1,5 @@
+# key: code
+# name: code
+# binding: [f7 96]
+# --
+<code>`yas-selected-text`$0</code>

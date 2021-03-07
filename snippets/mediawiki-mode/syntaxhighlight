@@ -1,0 +1,6 @@
+# key: syn
+# name: syntaxhighlight
+# --
+<syntaxhighlight lang="${1:bash}">
+`yas-selected-text`$0
+</syntaxhighlight>
