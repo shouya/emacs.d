@@ -2490,8 +2490,12 @@ Basically restoring the default face.
       :time-prompt t
       :immediate-finish t
       :jump-to-captured t)
-     ))
-  )
+
+     ("L" "Org protocol link" entry (file+headline "mencti.org" "Captures")
+      "* TODO [[%:link][%:description]]\nSCHEDULED: %t\nAdded: %U"
+      :immediate-finish t)
+
+     )))
 #+END_SRC
 
 *** Refile
