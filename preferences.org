@@ -2912,12 +2912,7 @@ text and copying to the killring."
   (haskell-process-type 'stack-ghci)
   (haskell-program-name "ghci")
 
-  (geiser-default-implementation 'racket)
-
-  :config
-  ;; this key is used to interrupt geiser
-  (unbind-key "C-c C-k" org-mode-map)
-  )
+  (geiser-default-implementation 'racket))
 #+end_src
 
 ** Automatic backup
