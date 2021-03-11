@@ -1140,7 +1140,11 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 
 #+begin_src emacs-lisp
 (use-package mediawiki
-  :commands mediawiki-mode)
+  :commands mediawiki-mode
+  :config
+  (unbind-key "<tab>" mediawiki-mode-map)
+  (unbind-key "S-<tab>" mediawiki-mode-map)
+  )
 #+end_src
 
 
