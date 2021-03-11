@@ -2075,6 +2075,9 @@ project related functionalities.
   ;; increase the depth that imenu can reach
   (org-imenu-depth 3)
 
+  ;; use cookies like <width> to define width for columns
+  (org-startup-shrink-all-tables t)
+
   :config
   ;; We enable org-indent-mode to make contents align with their settings
   (add-hook 'org-mode-hook 'org-indent-mode)
