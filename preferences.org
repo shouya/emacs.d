@@ -1186,6 +1186,15 @@ Also show a ruler at column 80.
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
+** String edit in separate buffer
+
+#+begin_src emacs-lisp
+(use-package string-edit
+  :hook prog-mode
+  :bind (:map prog-mode-map
+              ("C-c '" . string-edit-at-point)))
+#+end_src
+
 ** Jump to definition (=M-.=)
 
 We use =dumb-jump=, which works out of the box for many languages.
