@@ -2485,18 +2485,18 @@ Basically restoring the default face.
   :custom
   (org-capture-templates
    `(("w" "Work" entry (file+headline "projects.org" "Work")
-      "* TODO %^{Task (Work)}\nAdded: %U\n\n%?")
+      "* TODO %^{Task (Work)}\n:PROPERTIES:\n:ADDED: %U\n:END:\n%?")
      ("p" "Personal" entry (file+headline "projects.org" "Personal")
-      "* TODO %^{Task (Personal)}\nAdded: %U\n\n%?")
+      "* TODO %^{Task (Personal)}\n:PROPERTIES:\n:ADDED: %U\n:END:\n%?")
      ("v" "Video (<15 min)" entry (file+headline "mencti.org" "Videos (Short)")
-      "* TODO %(org-cliplink-capture) %^g\nAdded: %U\n\n%?")
+      "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:ADDED: %U\n:END:\n%?")
      ("V" "Video (>15 min)" entry (file+headline "mencti.org" "Videos (Long)")
-      "* TODO %(org-cliplink-capture) %^g\nAdded: %U\n\n%?")
+      "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:ADDED: %U\n:END:\n%?")
      ("a" "Article" entry (file+headline "mencti.org" "Articles")
-      "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:Effort: %^{prompt|0:10|0:30|1:00|2:00}\n:END:\nAdded: %U\n\n%?"
+      "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:Effort: %^{prompt|0:10|0:30|1:00|2:00}\n:Added: %U\n:END:\n\n\n%?"
       )
      ("d" "Day planning" plain (file+olp+datetree "plan.org")
-      ,(concat "Added: %U\n"
+      ,(concat ":PROPERTIES:\n:ADDED: %U\n:END:\n"
                "gunka:\n- [ ]%?\n- [ ]\n"
                "cilre:\n- [ ]\n- [ ]\n"
                "chore:\n- [ ] vocab\n- [ ] diary\n- [ ] email\n"
@@ -2508,9 +2508,8 @@ Basically restoring the default face.
       :jump-to-captured t)
 
      ("L" "Org protocol link" entry (file+headline "mencti.org" "Captures")
-      "* TODO [[%:link][%:description]]\nSCHEDULED: %t\nAdded: %U"
+      "* TODO [[%:link][%:description]]\n:PROPERTIES:\n:ADDED: %U\n:END:\nSCHEDULED: %t\n"
       :immediate-finish t)
-
      )))
 #+END_SRC
 
