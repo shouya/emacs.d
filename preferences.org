@@ -1492,7 +1492,7 @@ Use =company-mode= for auto completion.
   :hook (emacs-startup . global-company-mode)
 
   :custom
-  (company-idle-delay 0.1 "Show completion with a small delay")
+  (company-idle-delay 0.3 "Show completion with a small delay")
   (company-show-numbers t "Number the candidates (use M-1, M-2 etc to select completions)")
   (company-tooltip-align-annotations t)
   (company-dabbrev-code-everywhere t)
