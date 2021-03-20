@@ -2208,7 +2208,8 @@ Make todos respect blocking state.
 (use-package org
   :config
   ; (setq org-enforce-todo-dependencies t)
-  (setq org-agenda-dim-blocked-tasks 'invisible))
+  (setq org-agenda-dim-blocked-tasks 'invisible)
+  )
 #+end_src
 
 ** Taking note with =deft=
@@ -2499,9 +2500,8 @@ Basically restoring the default face.
       ,(concat ":PROPERTIES:\n:ADDED: %U\n:END:\n"
                "gunka:\n- [ ]%?\n- [ ]\n"
                "cilre:\n- [ ]\n- [ ]\n"
-               "chore:\n- [ ] vocab\n- [ ] diary\n- [ ] email\n"
+               "chore:\n- [ ] vocab\n- [ ] diary\n- [ ] email\n- [ ] mencti\n"
                "sevzi:\n- [ ]\n"
-               "mencti:\n- [ ]\n"
                )
       :time-prompt t
       :immediate-finish t
