@@ -1190,7 +1190,7 @@ Also show a ruler at column 80.
 
 #+begin_src emacs-lisp
 (use-package string-edit
-  :hook prog-mode
+  :commands string-edit-at-point
   :bind (:map prog-mode-map
               ("C-c '" . string-edit-at-point)))
 #+end_src
@@ -2044,10 +2044,16 @@ project related functionalities.
 
 #+begin_src emacs-lisp
 (use-package proof-general
-  :mode ("\\.v\\'" . coq-mode))
+  :mode ("\\.v\\'" . coq-mode)
+  :config
+  ;; more contrast between locked face and comment face
+  (custom-theme-set-faces
+   shou/current-theme
+   '(proof-locked-face nil :background "#001010"))
+  )
 
 (use-package company-coq
-  :after proof-general)
+  :hook (coq-mode . company-coq-mode))
 #+end_src
 
 * org mode
