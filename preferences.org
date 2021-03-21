@@ -2524,7 +2524,7 @@ Basically restoring the default face.
       :jump-to-captured t)
 
      ("L" "Org protocol link" entry (file+headline "mencti.org" "Captures")
-      "* TODO [[%:link][%:description]]\n:PROPERTIES:\n:ADDED: %U\n:END:\nSCHEDULED: %t\n"
+      "* TODO %:description\n:PROPERTIES:\n:ADDED: %U\n:END:\nSCHEDULED: %t\n%:link\n"
       :immediate-finish t)
      )))
 #+END_SRC
