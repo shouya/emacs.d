@@ -2040,6 +2040,16 @@ project related functionalities.
          ("\\.plt\\'" . prolog-mode)))
 #+end_src
 
+*** Coq
+
+#+begin_src emacs-lisp
+(use-package proof-general
+  :mode ("\\.v\\'" . coq-mode))
+
+(use-package company-coq
+  :after proof-general)
+#+end_src
+
 * org mode
 
 #+BEGIN_SRC emacs-lisp
