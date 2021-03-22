@@ -499,15 +499,6 @@ Doom modeline
 (define-key global-map (kbd "C-x |") 'split-window-right)
 #+END_SRC
 
-** Keep track of cursor whenever window scrolls
-
-#+BEGIN_SRC emacs-lisp
-(use-package beacon
-  :commands beacon-mode
-  :hook (emacs-startup . beacon-mode)
-  :custom (beacon-color "#d3d3d3"))
-#+END_SRC
-
 ** Turn off auto window scroll to get faster movement
 
 This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-pointcursor-movement-lag/28746][motion - Emacs point(cursor) movement lag]].
