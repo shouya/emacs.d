@@ -418,6 +418,7 @@ I use =sanityinc-tomorrow= theme because it's high contrast and colorful.
 
 #+BEGIN_SRC emacs-lisp
 (setq shou/current-theme 'doom-tomorrow-night)
+(setq custom--inhibit-theme-enable nil)
 
 (use-package doom-themes
   :custom
@@ -2040,7 +2041,10 @@ project related functionalities.
   ;; more contrast between locked face and comment face
   (custom-theme-set-faces
    shou/current-theme
-   '(proof-locked-face nil :background "#001010"))
+   '(proof-locked-face ((t (:background "#001010"))) t)
+   '(proof-queue-face ((t (:background "#003030"))) t)
+   )
+  (setq coq-mode-abbrev-table '())
   )
 
 (use-package company-coq
