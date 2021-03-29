@@ -2035,20 +2035,39 @@ project related functionalities.
 *** Coq
 
 #+begin_src emacs-lisp
+;; do not display splash screen
+(setq proof-splash-enable nil)
+
 (use-package proof-general
   :mode ("\\.v\\'" . coq-mode)
+  :custom
+  ;; do not stuck on comments.
+  (proof-script-fly-past-comments t)
   :config
-  ;; more contrast between locked face and comment face
   (custom-theme-set-faces
    shou/current-theme
    '(proof-locked-face ((t (:background "#001010"))) t)
    '(proof-queue-face ((t (:background "#003030"))) t)
    )
-  (setq coq-mode-abbrev-table '())
-  )
+
+  ;; disable built-in abbrev completions which are pretty annoying.
+  (add-hook 'coq-mode-hook
+            (lambda ()
+              (define-abbrev-table 'coq-mode-abbrev-table '())
+              (define-abbrev coq-mode-abbrev-table "refl" "reflexivity")
+              (define-abbrev coq-mode-abbrev-table "trans" "transitivity")
+              (define-abbrev coq-mode-abbrev-table "discr" "discriminate")
+              (define-abbrev coq-mode-abbrev-table "gd" "generalize dependent")
+              ))
 
 (use-package company-coq
-  :hook (coq-mode . company-coq-mode))
+  :hook (coq-mode . company-coq-mode)
+  :custom
+  (company-coq-disabled-features
+   '(alerts ;; disabling it makes evaluation much faster
+     code-folding ;; I don't need it. It's pretty annoying and sometimes misbehaves.
+     ))
+  )
 #+end_src
 
 * org mode
@@ -2494,6 +2513,9 @@ Basically restoring the default face.
            (choice (completing-read "Select project: " filtered-headings)))
       (s-concat "::" choice)))
 
+  (defun shou/org-time-stamp-string ()
+    (s-with (with-temp-buffer (org-time-stamp nil)) (s-chop-prefix "<") (s-chop-suffix ">")))
+
   :custom
   (org-capture-templates
    `(("w" "Work" entry (file+headline "projects.org" "Work")
@@ -2506,6 +2528,10 @@ Basically restoring the default face.
       "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:ADDED: %U\n:END:\n%?")
      ("a" "Article" entry (file+headline "mencti.org" "Articles")
       "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:Effort: %^{prompt|0:10|0:30|1:00|2:00}\n:Added: %U\n:END:\n\n\n%?"
+      )
+     ("l" "Log" entry (file "inbox.org")
+      "* %(shou/org-time-stamp-string)\n:PROPERTIES:\n:Added: %U\n:END:\n\n\n%?"
+      :jump-to-captured t
       )
      ("d" "Day planning" plain (file+olp+datetree "plan.org")
       ,(concat ":PROPERTIES:\n:ADDED: %U\n:END:\n"
