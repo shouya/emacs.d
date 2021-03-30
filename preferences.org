@@ -2043,29 +2043,36 @@ project related functionalities.
   :custom
   ;; do not stuck on comments.
   (proof-script-fly-past-comments t)
+
   :config
-  (custom-theme-set-faces
-   shou/current-theme
-   '(proof-locked-face ((t (:background "#001010"))) t)
-   '(proof-queue-face ((t (:background "#003030"))) t)
-   )
 
   ;; disable built-in abbrev completions which are pretty annoying.
-  (add-hook 'coq-mode-hook
-            (lambda ()
-              (define-abbrev-table 'coq-mode-abbrev-table '())
-              (define-abbrev coq-mode-abbrev-table "refl" "reflexivity")
-              (define-abbrev coq-mode-abbrev-table "trans" "transitivity")
-              (define-abbrev coq-mode-abbrev-table "discr" "discriminate")
-              (define-abbrev coq-mode-abbrev-table "gd" "generalize dependent")
-              ))
+  (defun shou/coq-mode-settings ()
+    ;; disable built-in abbrev completions which are pretty annoying.
+    (setq coq-mode-abbrev-table nil)
+    (define-abbrev-table 'coq-mode-abbrev-table '())
+    (define-abbrev coq-mode-abbrev-table "refl" "reflexivity")
+    (define-abbrev coq-mode-abbrev-table "trans" "transitivity")
+    (define-abbrev coq-mode-abbrev-table "discr" "discriminate")
+    (define-abbrev coq-mode-abbrev-table "gd" "generalize dependent")
+
+    (custom-theme-set-faces
+     shou/current-theme
+     '(proof-locked-face ((t (:background "#001010"))) t)
+     '(proof-queue-face ((t (:background "#003030"))) t)
+     )
+    )
+
+  (add-hook 'coq-mode-hook #'shou/coq-mode-settings 100)
 
 (use-package company-coq
   :hook (coq-mode . company-coq-mode)
   :custom
   (company-coq-disabled-features
-   '(alerts ;; disabling it makes evaluation much faster
-     code-folding ;; I don't need it. It's pretty annoying and sometimes misbehaves.
+   '(;; disabling it makes evaluation much faster
+     alerts
+     ;; I don't need it. It's pretty annoying and sometimes misbehaves.
+     code-folding
      ))
   )
 #+end_src
