@@ -2040,30 +2040,32 @@ project related functionalities.
 
 (use-package proof-general
   :mode ("\\.v\\'" . coq-mode)
-  :custom
-  ;; do not stuck on comments.
-  (proof-script-fly-past-comments t)
-
-  :config
-
-  ;; disable built-in abbrev completions which are pretty annoying.
+  :init
   (defun shou/coq-mode-settings ()
     ;; disable built-in abbrev completions which are pretty annoying.
-    (setq coq-mode-abbrev-table nil)
-    (define-abbrev-table 'coq-mode-abbrev-table '())
+    (abbrev-mode -1)
+    (clear-abbrev-table coq-mode-abbrev-table)
     (define-abbrev coq-mode-abbrev-table "refl" "reflexivity")
     (define-abbrev coq-mode-abbrev-table "trans" "transitivity")
     (define-abbrev coq-mode-abbrev-table "discr" "discriminate")
     (define-abbrev coq-mode-abbrev-table "gd" "generalize dependent")
+    (abbrev-mode 1)
 
     (custom-theme-set-faces
      shou/current-theme
      '(proof-locked-face ((t (:background "#001010"))) t)
      '(proof-queue-face ((t (:background "#003030"))) t)
      )
+
+    (message "coq hook")
     )
 
   (add-hook 'coq-mode-hook #'shou/coq-mode-settings 100)
+
+  :custom
+  ;; do not stuck on comments.
+  (proof-script-fly-past-comments t)
+  )
 
 (use-package company-coq
   :hook (coq-mode . company-coq-mode)
