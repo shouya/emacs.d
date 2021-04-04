@@ -2065,6 +2065,8 @@ project related functionalities.
   :custom
   ;; do not stuck on comments.
   (proof-script-fly-past-comments t)
+  ;; manually clear response with C-c C-w
+  (proof-tidy-response nil)
   )
 
 (use-package company-coq
@@ -2076,6 +2078,9 @@ project related functionalities.
      ;; I don't need it. It's pretty annoying and sometimes misbehaves.
      code-folding
      ))
+
+  ;; load symbols and tactics defined externally
+  (company-coq-live-on-the-edge t)
   )
 #+end_src
 
