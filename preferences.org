@@ -2052,7 +2052,6 @@ project related functionalities.
     (abbrev-mode -1)
     (clear-abbrev-table coq-mode-abbrev-table)
     (define-abbrev coq-mode-abbrev-table "refl" "reflexivity")
-    (define-abbrev coq-mode-abbrev-table "trans" "transitivity")
     (define-abbrev coq-mode-abbrev-table "discr" "discriminate")
     (define-abbrev coq-mode-abbrev-table "gd" "generalize dependent")
     (abbrev-mode 1)
@@ -2071,8 +2070,6 @@ project related functionalities.
   :custom
   ;; do not stuck on comments.
   (proof-script-fly-past-comments t)
-  ;; manually clear response with C-c C-w
-  (proof-tidy-response nil)
   )
 
 (use-package company-coq
