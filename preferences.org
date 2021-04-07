@@ -511,9 +511,15 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
 ** Window management with =ace-window=
 
 #+BEGIN_SRC emacs-lisp
+(defun shou/other-window-backwards ()
+  (interactive)
+  (other-window -1))
+
 (use-package ace-window
   ;; :bind ("M-o" . ace-window)
-  :bind ("M-o" . other-window)
+  :bind
+  ("M-o" . other-window)
+  ("M-O" . shou/other-window-backwards)
   :custom
   ;; show current action in minibuffer
   (aw-minibuffer-flag t)
