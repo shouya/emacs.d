@@ -2051,7 +2051,7 @@ project related functionalities.
     ;; disable built-in abbrev completions which are pretty annoying.
     (abbrev-mode -1)
     (clear-abbrev-table coq-mode-abbrev-table)
-    (define-abbrev coq-mode-abbrev-table "refl" "reflexivity")
+    (define-abbrev coq-mode-abbrev-table "ref" "reflexivity")
     (define-abbrev coq-mode-abbrev-table "discr" "discriminate")
     (define-abbrev coq-mode-abbrev-table "gd" "generalize dependent")
     (abbrev-mode 1)
