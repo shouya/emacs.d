@@ -1651,8 +1651,20 @@ Use =TabNine= for general text completion. Please remember to run
 
   (advice-add 'apheleia-format-buffer :around #'shou/fix-apheleia-project-dir)
 
+  ;; sometimes apheleia erase the whole buffer, which is pretty annoying.
+  ;; fix it by detecting this scenario and simply doing no-op
+  (defun shou/fix-apheleia-accidental-deletion
+      (orig-fn old-buffer new-buffer callback)
+    (if (and (=  0 (buffer-size new-buffer))
+             (/= 0 (buffer-size old-buffer)))
+        ;; do not override anything
+        nil
+        (funcall orig-fn old-buffer new-buffer callback)))
+
+  (advice-add 'apheleia--create-rcs-patch :around #'shou/fix-apheleia-accidental-deletion)
+
   (apheleia-global-mode 1)
-  )
+
 #+END_SRC
 
 ** Compile mode configurations
