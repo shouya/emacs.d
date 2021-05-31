@@ -1,0 +1,33 @@
+# -*- mode: snippet -*-
+# name: kustomization
+# key: kustomization
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region nil))
+# --
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ${1:default}
+
+commonLabels:
+  app: $2
+
+configMapGenerator:
+  - name: my-dynamic-config
+    files:
+      - file1.properties
+      - file2.properties
+
+resources:
+  - namespace.yml
+  - service.yml
+  - deployment.yml
+  - ingressroute.yml
+
+patches:
+  - target:
+      group: traefik.containo.us
+      version: v1alpha1
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          kubernetes.io/ingress.class: traefik-public
