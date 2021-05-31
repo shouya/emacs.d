@@ -809,6 +809,9 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
         ("C-c C-j" . counsel-org-goto))
 
   :config
+  ;; to unblock ctrlf-search-backwards
+  (unbind-key "C-r" minibuffer-local-map)
+
   (setq ivy-count-format "(%d/%d) ")
   ;; Wrap around when reaches last page
   (setq ivy-wrap t)
@@ -878,10 +881,12 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
 
 #+BEGIN_SRC emacs-lisp
 (use-package ctrlf
-  :bind ("C-s" . ctrlf-forward-literal)
-  :bind ("C-r" . ctrlf-backward-literal)
-  :bind ("C-M-s" . ctrlf-forward-regexp)
-  :bind ("C-M-r" . ctrlf-backward-regexp)
+  :bind ("C-s" . ctrlf-forward-default)
+  :bind ("C-r" . ctrlf-backward-default)
+  :bind ("C-M-s" . ctrlf-forward-alternate)
+  :bind ("C-M-r" . ctrlf-backward-alternate)
+  :bind ("M-s _" . ctrlf-forward-symbol)
+  :bind ("M-s ." . ctrlf-forward-symbol-at-point)
 )
 #+END_SRC
 
