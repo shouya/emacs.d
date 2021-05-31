@@ -709,7 +709,6 @@ So it doesn't block the main UI when copying large files.
 
 #+BEGIN_SRC emacs-lisp
 (use-package treemacs
-  :bind ("M-O" . treemacs-select-window)
   :config
   (use-package treemacs-magit
     :after treemacs magit)
@@ -1677,8 +1676,7 @@ Use =TabNine= for general text completion. Please remember to run
 
   (advice-add 'apheleia--create-rcs-patch :around #'shou/fix-apheleia-accidental-deletion)
 
-  (apheleia-global-mode 1)
-
+  (apheleia-global-mode 1))
 #+END_SRC
 
 ** Compile mode configurations
