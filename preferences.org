@@ -2129,9 +2129,7 @@ project related functionalities.
 * org mode
 
 #+BEGIN_SRC emacs-lisp
-(use-package org
-  :commands (org-mode)
-  :mode ("\\.org\\'" . org-mode))
+(use-package org)
 #+END_SRC
 ** Set org directory
 
