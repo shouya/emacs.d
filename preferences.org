@@ -1254,6 +1254,7 @@ Few shortcuts:
   :bind (("C-c s s" . rg-dwim)
          ("C-c s p" . rg-project)
          ("C-c s r" . rg)
+         ("C-c s t" . rg-literal)
          :map rg-mode-map
          ("C-x C-q" . wgrep-change-to-wgrep-mode))
   :custom
