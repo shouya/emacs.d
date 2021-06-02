@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: configMapGenerator
+# key: configMapGenerator
+# --
+configMapGenerator:
+  - name: ${1}
+    files:
+      - ${2}
