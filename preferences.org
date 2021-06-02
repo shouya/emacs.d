@@ -808,9 +808,6 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
         ("C-c C-j" . counsel-org-goto))
 
   :config
-  ;; to unblock ctrlf-search-backwards
-  (unbind-key "C-r" minibuffer-local-map)
-
   (setq ivy-count-format "(%d/%d) ")
   ;; Wrap around when reaches last page
   (setq ivy-wrap t)
@@ -842,6 +839,9 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
   ;; Start ivy
   (ivy-mode)
   (counsel-mode)
+
+  ;; release the key to unblock ctrlf-search-backwards
+  (unbind-key "C-r" minibuffer-local-map)
 
   (ivy-rich-mode)
   )
