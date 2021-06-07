@@ -2113,10 +2113,12 @@ project related functionalities.
   :hook (coq-mode . company-coq-mode)
   :custom
   (company-coq-disabled-features
-   '(;; disabling it makes evaluation much faster
+   '(;; disabling it makes evaluation much faster.
      alerts
      ;; I don't need it. It's pretty annoying and sometimes misbehaves.
      code-folding
+     ;; spinner somehow caused the processing too slow.
+     spinner
      ))
 
   ;; load symbols and tactics defined externally
