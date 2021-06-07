@@ -680,10 +680,7 @@ Hit =.= key to reveal the files.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dired-hide-dotfiles
-  :after (dired)
   :hook (dired-mode . dired-hide-dotfiles-mode)
-
-  ;(evil-define-key 'normal dired-mode-map (kbd ".") 'dired-hide-dotfiles-mode)
 )
 #+END_SRC
 
@@ -2445,19 +2442,6 @@ Make todos respect blocking state.
      )))
 #+END_SRC
 
-*** org-ql
-
-#+begin_src emacs-lisp
-(use-package org-ql
-  :after org
-  :custom
-  (org-ql-views '(("Archive view"
-                   :buffer-files (org-file-path "projects.org")
-                   :query (closed :to -30)
-                   :sort (scheduled)
-                   :title "To archive: projects.org")
-                  )))
-#+end_src
 *** Enable habit
 
 #+BEGIN_SRC emacs-lisp
@@ -2519,9 +2503,6 @@ Basically restoring the default face.
    '(org-agenda-date)
    '(org-agenda-date-weekend)
    ))
-
-
-
 #+END_SRC
 
 
