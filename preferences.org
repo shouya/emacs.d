@@ -1450,6 +1450,7 @@ Hotkey to remember:
   :bind (("C-c g g" . browse-at-remote)
          ("C-c g G" . browse-at-remote-kill)
          ;; mimic "open-at-point" behaviour
+         :map prog-mode-map
          ("C-c C-o" . browse-at-remote)))
 #+END_SRC
 
@@ -2972,9 +2973,9 @@ text and copying to the killring."
      ("C++" . c++)
      ("screen" . shell-script)
      ("shell" . sh)
-     ("bash" . sh))
+     ("bash" . sh)
      ("lojban" . lojban)
-   ))
+   )))
 #+END_SRC
 
 

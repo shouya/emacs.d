@@ -31,6 +31,8 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage)
   (require 'straight-x))
+
+;; 9.4.4 without the following line, otherwise 9.4.6
 (straight-use-package 'org)
 
 ;; ----------- load custom config --------------
