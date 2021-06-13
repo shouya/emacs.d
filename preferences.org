@@ -693,29 +693,6 @@ So it doesn't block the main UI when copying large files.
   (dired-async-mode 1))
 #+END_SRC
 
-** Tree view
-
-#+BEGIN_SRC emacs-lisp
-(use-package treemacs
-  :config
-  (use-package treemacs-magit
-    :after treemacs magit)
-  (use-package treemacs-projectile
-    :after treemacs projectile)
-
-  ;; customization
-  (treemacs-resize-icons 16)
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
-  (treemacs-fringe-indicator-mode t)
-
-
-  :custom
-  (treemacs-width 20)
-
-)
-#+END_SRC
-
 ** Show human readable sizes
 
 #+BEGIN_SRC emacs-lisp
