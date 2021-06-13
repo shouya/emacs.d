@@ -329,7 +329,7 @@ Hide the title bar, menu bar, as well as the scroll bar.
 #+BEGIN_SRC emacs-lisp
 ;; this one turns off slower so I deferred it to execute after boot
 (when (boundp 'tool-bar-mode)
-  (add-hook 'emacs-startup-hook (lambda () (tool-bar-mode -1))))
+  (tool-bar-mode -1))
 (when (boundp 'menu-bar-mode)
   (menu-bar-mode -1))
 (when (boundp 'scroll-bar-mode)
