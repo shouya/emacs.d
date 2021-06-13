@@ -4,8 +4,10 @@
 (setq gc-cons-threshold most-positive-fixnum) ; 2^61 bytes
 (setq gc-cons-percentage 0.4)
 ;; reset it after load
-(add-hook 'emacs-startup-hook
+(add-hook 'after-init-hook
           (lambda () (setq gc-cons-threshold (* 60 1024 1024))))
+;; force garbage collect when out of focus
+(add-hook 'focus-out-hook 'garbage-collect)
 
 ;; ----------- empty file handler alist --------
 (defvar cfg--file-name-handler-alist file-name-handler-alist)
