@@ -1685,7 +1685,7 @@ I customized several bindings because "C-<left>/<right>" is bound to
 
 #+BEGIN_SRC emacs-lisp
 (use-package rainbow-delimiters
-  :hook prog-mode)
+  :hook (prog-mode . rainbow-delimiters-mode))
 #+END_SRC
 
 **** Enable above two modes for all lisp languages
