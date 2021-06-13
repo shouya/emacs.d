@@ -1244,7 +1244,7 @@ Few shortcuts:
   (projectile-globally-ignored-file-suffixes '("beam"))
   (projectile-create-missing-test-files t)
 
-  :hook (emacs-startup . projectile-mode)
+  :hook (prog-mode . projectile-mode)
 
   :bind-keymap
   ("M-p" . projectile-command-map)
