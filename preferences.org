@@ -52,11 +52,9 @@ Allow installing required system packages automatically.
 ** Start server automatically
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'after-init-hook
-          (lambda ()
-            (require 'server)
-            (unless (server-running-p)
-              (server-start))))
+(use-package server
+  :straight (:type built-in)
+  :hook (after-init . server-start))
 #+END_SRC
 
 ** Start edit server (for browser extensions)
