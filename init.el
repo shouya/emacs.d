@@ -21,6 +21,14 @@
 
 ;; ----- load straight.el first ----------
 (defvar bootstrap-version)
+
+;; makes booting a lot faster by avoiding checking modifications made
+;; in package source codes, which I rarely do.
+
+(setq straight-check-for-modifications nil)
+;; prevent the unnecessary package-initialize by package.el which is
+;; very slow
+(setq package-activated-list nil)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
       (bootstrap-version 5))
