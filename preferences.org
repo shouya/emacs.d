@@ -543,7 +543,7 @@ Use =C-c <left>= and =C-c <right>= to undo layout.
 
 #+begin_src emacs-lisp
 (use-package winner
-  :hook (emacs-startup . winner-mode))
+  :defer t)
 #+end_src
 
 ** Alert library
@@ -562,7 +562,7 @@ Use =C-c <left>= and =C-c <right>= to undo layout.
 
 #+BEGIN_SRC emacs-lisp
 (use-package popwin
-  :hook (emacs-startup . popwin-mode)
+  :defer t
 
   :config
   (push '("*elixir-format-errors*" :noselect t) popwin:special-display-config)
@@ -756,7 +756,6 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
 
 #+BEGIN_SRC emacs-lisp
 (use-package counsel
-  :demand t
   :bind
   ("M-x" . counsel-M-x)
   ("M-y" . counsel-yank-pop)
@@ -1369,7 +1368,6 @@ I use =magit= to show git status.
   ("C-x g" . magit)
   ("C-x C-g" . magit-file-dispatch)
 
-  :demand t
   :after projectile
 
   :custom
@@ -1561,7 +1559,7 @@ Use =TabNine= for general text completion. Please remember to run
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
   :commands (yas-global-mode yas-minor-mode)
-  :hook (emacs-startup . yas-global-mode)
+  :hook (prog-mode . yas-minor-mode)
 
   :config
   (setq-default yas-snippet-dirs
@@ -1686,7 +1684,8 @@ I customized several bindings because "C-<left>/<right>" is bound to
 **** Use =rainbow-delimiters=
 
 #+BEGIN_SRC emacs-lisp
-(use-package rainbow-delimiters)
+(use-package rainbow-delimiters
+  :hook prog-mode)
 #+END_SRC
 
 **** Enable above two modes for all lisp languages
@@ -2351,7 +2350,10 @@ Make todos respect blocking state.
 ** Org protocol
 
 #+begin_src emacs-lisp
-(require 'org-protocol)
+(use-package org
+  :defer t
+  :config
+  (require 'org-protocol))
 #+end_src
 
 ** Anki deck
@@ -3021,7 +3023,7 @@ text and copying to the killring."
                                  (scheme . t)
                                  ))
   (use-package gnuplot :commands gnuplot-mode)
-  (use-package geiser)
+  (use-package geiser :defer t)
 
   :custom
   (python-shell-completion-native-enable nil)
