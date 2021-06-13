@@ -4,7 +4,7 @@
 (setq gc-cons-threshold most-positive-fixnum) ; 2^61 bytes
 (setq gc-cons-percentage 0.4)
 ;; reset it after load
-(add-hook 'after-init-hook
+(add-hook 'emacs-startup-hook
           (lambda () (setq gc-cons-threshold (* 60 1024 1024))))
 ;; force garbage collect when out of focus
 (add-hook 'focus-out-hook 'garbage-collect)
@@ -16,7 +16,7 @@
           (lambda () (setq file-name-handler-alist cfg--file-name-handler-alist)))
 (add-hook 'emacs-startup-hook
           (lambda () (message "Emacs ready in %.2f seconds with %d garbage collections."
-                         (float-time (time-subtract after-init-time before-init-time))
+                         (float-time (time-subtract (current-time) before-init-time))
                          gcs-done)))
 
 ;; ----- load straight.el first ----------
