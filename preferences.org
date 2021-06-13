@@ -81,9 +81,9 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 
 ** Load some basic libraries
 #+BEGIN_SRC emacs-lisp
-(use-package dash)
-(use-package f)
-(use-package s)
+(use-package dash :demand t)
+(use-package f :demand t)
+(use-package s :demand t)
 #+END_SRC
 
 ** Set exec path
@@ -624,45 +624,38 @@ It render =^L= as a page break line, which is nicer to look at.
 Load Dired X that comes with Emacs.
 
 #+BEGIN_SRC emacs-lisp
-(require 'dired-x)
+(use-package dired-x
+  :defer t
+  :straight (:type built-in))
 #+END_SRC
 
 ** Retain the same window when browsing
 
 #+BEGIN_SRC emacs-lisp
-(require 'dired)
-
-(defun shou/dired-go-up ()
-  (interactive)
-  (find-alternate-file ".."))
-
-(bind-keys :map dired-mode-map
-           ;; Open directory in the same window
-           ("RET" . dired-find-alternate-file)
-           ;; Open directory in alternative window
-           ("C-RET" . dired-find-file)
-           ;; Go up
-           ("^" . shou/dired-go-up))
-
-;; do not show warning
-(put 'dired-find-alternate-file 'disabled nil)
-#+END_SRC
-
-** Copy file to split window
-
-#+BEGIN_SRC emacs-lisp
-(eval-after-load 'dired
-  (setq dired-dwim-target t))
-#+END_SRC
-
-** Recursive copy and delete
-
-#+BEGIN_SRC emacs-lisp
-;; Always copy recursively
-(setq-default dired-recursive-copies 'always)
-
-;; Ask once before deleting
-(setq-default dired-recursive-deletes 'top)
+(use-package dired
+  :defer t
+  :straight (:type built-in)
+  :bind (:map dired-mode-map
+              ;; Open directory in the same window
+              ("RET" . dired-find-alternate-file)
+              ;; Open directory in alternative window
+              ("C-RET" . dired-find-file)
+              ;; Go up
+              ("^" . shou/dired-go-up))
+  :config
+  (defun shou/dired-go-up ()
+    (interactive)
+    (find-alternate-file ".."))
+  ;; do not show warning
+  (put 'dired-find-alternate-file 'disabled nil)
+  :custom
+  ;; Copy file to split window
+  (dired-dwim-target t)
+  ;; Always copy recursively
+  (dired-recursive-copies 'always)
+  ;; Ask once before deleting
+  (dired-recursive-deletes 'top)
+  )
 #+END_SRC
 
 ** Hide dot files by default
@@ -671,6 +664,7 @@ Hit =.= key to reveal the files.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dired-hide-dotfiles
+  :after dired
   :hook (dired-mode . dired-hide-dotfiles-mode)
 )
 #+END_SRC
@@ -756,6 +750,7 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
 
 #+BEGIN_SRC emacs-lisp
 (use-package counsel
+  :demand t
   :bind
   ("M-x" . counsel-M-x)
   ("M-y" . counsel-yank-pop)
@@ -766,6 +761,7 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
   ("C-c f" . counsel-recentf)
   ("C-c i" . counsel-imenu)
   ("C-c u" . counsel-unicode-char)
+  ("C-x b" . ivy-switch-buffer)
   (:map ivy-minibuffer-map
         ("M-RET" . ivy-immediate-done))
   (:map org-mode-map
@@ -1579,7 +1575,7 @@ Use =TabNine= for general text completion. Please remember to run
 
   ;; so it can be registered
   :config
-  (use-package lsp-treemacs)
+  (use-package lsp-treemacs :defer t)
 
   ;; exclude watch files for elixir projects
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.elixir_ls")
@@ -3015,17 +3011,18 @@ text and copying to the killring."
 #+begin_src emacs-lisp
 (use-package org
   :config
-  (org-babel-do-load-languages 'org-babel-load-languages
+  (use-package gnuplot :commands gnuplot-mode)
+  (use-package geiser :defer t)
+
+  :custom
+  (org-babel-load-languages 'org-babel-load-languages
                                '((ditaa . t)
                                  (gnuplot .t)
                                  (python . t)
                                  (haskell . t)
                                  (scheme . t)
                                  ))
-  (use-package gnuplot :commands gnuplot-mode)
-  (use-package geiser :defer t)
 
-  :custom
   (python-shell-completion-native-enable nil)
 
   (haskell-process-type 'stack-ghci)
