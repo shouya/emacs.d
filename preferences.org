@@ -2718,7 +2718,7 @@ This section configures the following mechanisms:
 
 #+begin_src emacs-lisp
 (use-package secretaria
-  :after org
+  :defer t
   :custom
   ;; remind me about every 10 minutes
   (secretaria-clocked-in-reminder-every-minutes 10)
