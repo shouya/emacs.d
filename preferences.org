@@ -25,11 +25,6 @@
 (add-to-list 'load-path (expand-file-name "site-lisp" user-emacs-directory))
 #+END_SRC
 
-** Configure =straight.el=
-
-=straight.el= allows loading packages directly from VC upstream, while keeping a
-lock file for specific version, some new packages depend on it.
-
 ** Enable ELPA with straight
 
 #+BEGIN_SRC emacs-lisp
