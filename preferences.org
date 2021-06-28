@@ -92,6 +92,7 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 (add-to-list 'exec-path (f-expand "~/.asdf/shims"))
 (add-to-list 'exec-path (f-expand "~/.asdf/bin"))
 (add-to-list 'exec-path (f-expand "~/.cargo/bin"))
+(add-to-list 'exec-path (f-expand "~/.shell/bin"))
 (setenv "PATH" (s-join ":" exec-path))
 #+END_SRC
 
