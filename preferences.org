@@ -1762,6 +1762,8 @@ Colorize function names/arguments in info documentations.
                               (concat (locate-dominating-file buffer-file-name ".formatter.exs") ".formatter.exs")))
                 (setq elixir-format-arguments nil))))
 
+  (require 'python)
+
   ;; this hack to make it work with multiline strings.
   (setq python-fill-docstring-style 'django)
   (defun shou/always-docstring () t)
@@ -2007,8 +2009,12 @@ project related functionalities.
 *** Python
 
 #+begin_src emacs-lisp
-(with-eval-after-load 'python-mode
-  (setq python-shell-completion-native-enable nil))
+(use-package python
+  :straight (:type built-in)
+  :commands (python-fill-paragraph)
+  :custom
+  (python-shell-completion-native-enable nil)
+  )
 #+end_src
 
 *** Kubernetes
