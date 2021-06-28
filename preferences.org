@@ -1238,8 +1238,10 @@ Few shortcuts:
   (projectile-indexing-method 'alien)
   (projectile-globally-ignored-file-suffixes '("beam"))
   (projectile-create-missing-test-files t)
+  ;; speed up tramp (https://emacs.stackexchange.com/questions/17543/tramp-mode-is-much-slower-than-using-terminal-to-ssh)
+  (projectile-mode-line "Projectile")
 
-  :hook (prog-mode . projectile-mode)
+  :hook (after-init . projectile-mode)
 
   :bind-keymap
   ("M-p" . projectile-command-map)
