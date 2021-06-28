@@ -2355,6 +2355,17 @@ Make todos respect blocking state.
       (nospace . "-")
       (case-fn . downcase))
     "apply certain rules when generating file name")
+  :config
+
+  ;; fix freeze with message "Deft initializing..."
+  ;; See:
+  ;; - https://github.com/jrblevin/deft/issues/100
+  ;; - https://old.reddit.com/r/emacs/comments/nnk2im
+  (defun deft-parse-summary (contents title)
+  "Parse the file CONTENTS, given the TITLE, and extract a summary.
+The summary is a string extracted from the contents following the
+title."
+  title)
   )
 #+END_SRC
 
