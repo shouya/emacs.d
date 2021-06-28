@@ -1090,6 +1090,7 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 #+BEGIN_SRC emacs-lisp
 (require 'tramp)
 (setq tramp-default-method "scp")
+(setq remote-file-name-inhibit-cache nil)
 #+END_SRC
 
 ** Auto-correction
