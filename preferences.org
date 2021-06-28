@@ -1316,6 +1316,19 @@ Let the project root to be where =mix.exs= is found. This function is used by
   )
 #+end_src
 
+** Eshell
+
+#+begin_src emacs-lisp
+(use-package eshell
+  :bind ("C-x e" . eshell)
+  :defer t
+  :config
+  (setenv "KUBECONFIG"
+          (s-join ":" (-map 'f-expand
+                            (cons "~/.kube/config" (f-glob "~/.kube/config.d/*")))))
+  )
+#+end_src
+
 ** Code folding
 
 I use =yafolding= to fold structured code.
