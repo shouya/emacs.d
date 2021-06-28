@@ -3041,13 +3041,12 @@ text and copying to the killring."
   (use-package geiser :defer t)
 
   :custom
-  (org-babel-load-languages 'org-babel-load-languages
-                               '((ditaa . t)
-                                 (gnuplot .t)
-                                 (python . t)
-                                 (haskell . t)
-                                 (scheme . t)
-                                 ))
+  (org-babel-load-languages '((ditaa . t)
+                              (gnuplot .t)
+                              (python . t)
+                              (haskell . t)
+                              (scheme . t)
+                              ))
 
   (python-shell-completion-native-enable nil)
 
