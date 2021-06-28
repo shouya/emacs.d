@@ -1590,7 +1590,7 @@ Use =TabNine= for general text completion. Please remember to run
 
   ;; so it can be registered
   :config
-  (use-package lsp-treemacs :defer t)
+  ;; (use-package lsp-treemacs :defer t)
 
   ;; exclude watch files for elixir projects
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.elixir_ls")
