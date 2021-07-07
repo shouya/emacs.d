@@ -689,7 +689,7 @@ So it doesn't block the main UI when copying large files.
 ** Show human readable sizes
 
 #+BEGIN_SRC emacs-lisp
-(setq dired-listing-switches "-alh")
+(setq dired-listing-switches "-lah")
 #+END_SRC
 
 * Editing
@@ -1896,7 +1896,7 @@ Reformatting JSON.
     (add-hook 'cargo-process-mode-hook 'visual-line-mode))
 
   ;; enable LSP for type info and more
-  (add-hook 'rust-mode-hook 'eglot-ensure)
+  (add-hook 'rust-mode-hook 'lsp)
   (add-hook 'rust-mode-hook 'cargo-minor-mode)
   )
 #+END_SRC
