@@ -1249,7 +1249,18 @@ Few shortcuts:
   :config
   (setq projectile-globally-ignored-directories
         (append projectile-globally-ignored-directories
-                '(".elixir_ls" "_build"))))
+                '(".elixir_ls" "_build")))
+
+  ;; Elixir: jump to *_test.exs instead of *_test.ex
+  (defun shou/fix-exs-test-file-name (name)
+    (cond
+     ((string-suffix-p "_test.ex" name) (concat name "s"))
+     (t name)))
+
+  (advice-add #'projectile--test-name-for-impl-name
+              :filter-return
+              #'shou/fix-exs-test-file-name)
+  )
 #+END_SRC
 
 *** Customize project-find-functions to find multi-project vc
