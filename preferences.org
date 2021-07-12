@@ -1821,6 +1821,7 @@ Press 'g' in compile mode to rerun last command (original 'r').
 
 #+begin_src emacs-lisp
 (use-package alchemist
+  :disabled t
   :after elixir-mode
   :hook (elixir-mode . alchemist-mode)
 
