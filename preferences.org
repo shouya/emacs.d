@@ -1595,6 +1595,10 @@ Use =TabNine= for general text completion. Please remember to run
 
 #+begin_src emacs-lisp
 (use-package lsp-mode
+  :straight (:host github :repo "emacs-lsp/lsp-mode")
+  :init
+  ;; to fix a weird bug
+  (add-to-list 'load-path (concat (straight--repos-dir) "lsp-mode/" "clients"))
   :commands (lsp lsp-mode lsp-deferred)
   :bind (:map lsp-mode-map
               ("C-c C-f" . lsp-format-buffer))
