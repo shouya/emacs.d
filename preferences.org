@@ -1721,7 +1721,9 @@ I customized several bindings because "C-<left>/<right>" is bound to
       '(clojure-mode-hook
         emacs-lisp-mode-hook
         lisp-mode-hook
-        scheme-mode-hook))
+        scheme-mode-hook
+        racket-mode-hook
+        ))
 
 (dolist (hook lispy-mode-hooks)
   (add-hook hook
