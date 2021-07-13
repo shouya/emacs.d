@@ -2668,7 +2668,7 @@ Basically restoring the default face.
       ,(concat ":PROPERTIES:\n:ADDED: %U\n:END:\n"
                "gunka:\n- [ ]%?\n- [ ]\n"
                "cilre:\n- [ ]\n- [ ]\n"
-               "chore:\n- [ ] vocab\n- [ ] diary\n- [ ] email\n- [ ] mencti\n"
+               "chore:\n- [ ] vocab\n- [ ] diary\n- [ ] email\n- [ ] mencti\n- [ ] workout\n"
                "sevzi:\n- [ ]\n"
                )
       :time-prompt t
