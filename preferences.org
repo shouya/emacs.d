@@ -2140,7 +2140,11 @@ project related functionalities.
 
 (use-package racket-mode
   :mode ("\\.rkt\\'" . racket-mode)
-  :hook (racket-mode . lsp))
+  :hook (racket-mode . lsp)
+  :config
+  ;; not sure why but this module doesn't autoload
+  (require 'lsp-racket)
+  )
 #+end_src
 
 * org mode
