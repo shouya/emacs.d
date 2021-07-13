@@ -2128,19 +2128,19 @@ project related functionalities.
 *** Racket
 
 #+begin_src emacs-lisp
-  (let ((racket-paths (f-glob "/Applications/Racket */bin")))
-    (when (> (length racket-paths) 0)
-      (add-to-list 'exec-path (car racket-paths))))
+(let ((racket-paths (f-glob "/Applications/Racket */bin")))
+  (when (> (length racket-paths) 0)
+    (add-to-list 'exec-path (car racket-paths))))
 
-  ;;; having some issue with geiser-racket
-  ;; (use-package geiser-racket
-  ;;   :commands geiser-mode
-  ;;   :custom
-  ;;   (geiser-default-implementation 'racket))
+;;; having some issue with geiser-racket
+;; (use-package geiser-racket
+;;   :commands geiser-mode
+;;   :custom
+;;   (geiser-default-implementation 'racket))
 
-  (use-package racket-mode
-    :mode ("\\.rkt\\'" . racket-mode)
-    :hook (racket-mode . lsp))
+(use-package racket-mode
+  :mode ("\\.rkt\\'" . racket-mode)
+  :hook (racket-mode . lsp))
 #+end_src
 
 * org mode
