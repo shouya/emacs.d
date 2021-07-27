@@ -2664,6 +2664,9 @@ Basically restoring the default face.
      ("a" "Article" entry (file+headline "mencti.org" "Articles")
       "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:Effort: %^{prompt|0:10|0:30|1:00|2:00}\n:Added: %U\n:END:\n\n\n%?"
       )
+     ("c" "Literature" entry (file+headline "mencti.org" "Literature")
+      "* TODO %^{Literature name}\n:PROPERTIES:\n:Added: %U\n:END:\n\n\n%?"
+      )
      ("l" "Log" entry (file "inbox.org")
       "* %(shou/org-time-stamp-string)\n:PROPERTIES:\n:Added: %U\n:END:\n\n\n%?"
       :jump-to-captured t
