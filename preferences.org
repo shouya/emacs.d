@@ -1615,7 +1615,6 @@ Use =TabNine= for general text completion. Please remember to run
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]deps\\'")
 
   (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
-  (add-hook 'lsp-mode-hook 'lsp-headerline--disable-breadcrumb)
   (add-hook 'lsp-mode-hook 'lsp-lens-mode)
 
   ;; conflict with projectile prefix
@@ -1623,7 +1622,9 @@ Use =TabNine= for general text completion. Please remember to run
   ;; unbind it as well as I never bother using it.
   (unbind-key "M-n" lsp-signature-mode-map)
 
-  (use-package lsp-ui)
+  (use-package lsp-ui
+    :custom
+    (lsp-ui-doc-enable nil))
 
   :custom
   ;; performance tuning
@@ -1632,6 +1633,9 @@ Use =TabNine= for general text completion. Please remember to run
   ;; only sort by position
   (lsp-imenu-sort-methods '(position kind name))
   (lsp-imenu-show-container-name t)
+
+  ;; do not show breadcrumb
+  (lsp-headerline-breadcrumb-enable nil)
 )
 #+end_src
 
