@@ -1890,12 +1890,9 @@ Reformatting JSON.
 
 *** Rust
 #+BEGIN_SRC emacs-lisp
-(use-package rust-mode
-  :mode "\\.rs\\'"
+(use-package rustic
+  :mode ("\\.rs\\'" . rustic-mode)
   :custom
-  (rust-rustfmt-bin "~/.cargo/bin/rustfmt")
-  (rust-cargo-bin "~/.cargo/bin/cargo")
-
   ;; do not show a buffer for format errors
   (rust-format-show-buffer nil)
 
@@ -1903,21 +1900,12 @@ Reformatting JSON.
   (rust-indent-offset 2)
 
   :config
-  ;; quick way to run cargo commands (C-c C-c prefix)
-  (use-package cargo
-    :custom
-    (cargo-process--enable-rust-backtrace t)
-
-    :config
-    (add-hook 'cargo-process-mode-hook 'visual-line-mode))
-
   ;; Rusty Object Notation
   (use-package ron-mode
     :mode "\\.ron\\'")
 
   ;; enable LSP for type info and more
-  (add-hook 'rust-mode-hook 'lsp)
-  (add-hook 'rust-mode-hook 'cargo-minor-mode)
+  (add-hook 'rustic-mode-hook #'lsp)
   )
 #+END_SRC
 
