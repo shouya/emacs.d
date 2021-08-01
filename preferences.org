@@ -1902,6 +1902,10 @@ Reformatting JSON.
     :config
     (add-hook 'cargo-process-mode-hook 'visual-line-mode))
 
+  ;; Rusty Object Notation
+  (use-package ron-mode
+    :mode "\\.ron\\'")
+
   ;; enable LSP for type info and more
   (add-hook 'rust-mode-hook 'lsp)
   (add-hook 'rust-mode-hook 'cargo-minor-mode)
