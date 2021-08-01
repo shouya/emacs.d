@@ -1001,6 +1001,7 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 
 #+begin_src emacs-lisp
 (use-package visual-fill-column
+  :disabled t
   :commands visual-fill-column-mode
   :hook (emacs-startup . global-visual-fill-column-mode)
 
