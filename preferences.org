@@ -1615,11 +1615,15 @@ Use =TabNine= for general text completion. Please remember to run
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]deps\\'")
 
   (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
+  (add-hook 'lsp-mode-hook 'lsp-headerline--disable-breadcrumb)
+  (add-hook 'lsp-mode-hook 'lsp-lens-mode)
 
   ;; conflict with projectile prefix
   (unbind-key "M-p" lsp-signature-mode-map)
   ;; unbind it as well as I never bother using it.
   (unbind-key "M-n" lsp-signature-mode-map)
+
+  (use-package lsp-ui)
 
   :custom
   ;; performance tuning
