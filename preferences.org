@@ -832,6 +832,7 @@ Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configur
           counsel-yank-pop
           flyspell-correct-ivy
           flyspell-correct-wrapper
+          lsp-ivy-workspace-symbol
           ))
 
   ;; try to retain highlighting
