@@ -312,6 +312,10 @@ Here I unbind keyboard shortcuts that I frequently mistype.
 ;; It was bound to kill-region or something.
 ;; I often accidentally deleted whole buffer with this key which is frastrating.
 (unbind-key "s-x")
+
+;; I use these two keys to jump to definitions
+(unbind-key "M-." global-map)
+(unbind-key "M-," global-map)
 #+end_src
 
 ** Confirm before quitting
