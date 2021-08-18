@@ -1605,7 +1605,8 @@ Use =TabNine= for general text completion. Please remember to run
   (add-to-list 'load-path (concat (straight--repos-dir) "lsp-mode/" "clients"))
   :commands (lsp lsp-mode lsp-deferred)
   :bind (:map lsp-mode-map
-              ("C-c C-f" . lsp-format-buffer))
+              ("C-c C-f" . lsp-format-buffer)
+              ("M-," . lsp-find-definition))
 
   ;; so it can be registered
   :config
