@@ -1907,6 +1907,9 @@ Reformatting JSON.
   ;; set default indent size to 2. Actual indent size will be auto-detected
   (rust-indent-offset 2)
 
+  ;; enable proc macro expansion for rust-analyzer (used by lsp mode)
+  (lsp-rust-analyzer-proc-macro-enable t)
+
   :config
   ;; Rusty Object Notation
   (use-package ron-mode
