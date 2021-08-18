@@ -1630,6 +1630,10 @@ Use =TabNine= for general text completion. Please remember to run
     :custom
     (lsp-ui-doc-enable nil))
 
+  (use-package lsp-ivy
+    :bind (:map lsp-mode-map
+                ("C-c C-j" . lsp-ivy-workspace-symbol)))
+
   :custom
   ;; performance tuning
   (read-process-output-max (* 1 1024 1024)) ;; 20mb
