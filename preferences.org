@@ -2103,6 +2103,16 @@ project related functionalities.
   )
 #+end_src
 
+*** TypeScript
+
+#+begin_src emacs-lisp
+(use-package typescript-mode
+  :mode "\\.ts\'"
+  :hook (typescript-mode . lsp)
+  )
+#+end_src
+
+
 *** PHP
 
 #+begin_src emacs-lisp
