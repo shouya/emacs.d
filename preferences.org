@@ -244,6 +244,7 @@ I switched to readable mode after a web page is rendered.
   (add-to-list 'recentf-exclude (rx "bookmarks" eol))
   (add-to-list 'recentf-exclude (rx "*.org" eol))
 #+end_src
+
 ** Remove trailing whitespaces on save
 
 #+BEGIN_SRC emacs-lisp
@@ -323,7 +324,6 @@ Here I unbind keyboard shortcuts that I frequently mistype.
 (unbind-key "s-x")
 
 ;; I use these two keys to jump to definitions
-(unbind-key "M-." global-map)
 (add-hook 'emacs-startup-hook
           (lambda ()
             (unbind-key "M-." global-map)
@@ -1132,6 +1132,18 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
   )
 #+end_src
 
+** Quail
+
+Add extra shortcuts for symbols I frequently use to the TeX input method.
+
+#+begin_src emacs-lisp
+(eval-after-load 'quail
+  (let ((quail-current-package (assoc "TeX" quail-package-alist)))
+    (quail-define-rules ((append . t))
+                        ("|-" ?⊢)
+                        ("|=" ?⊨)
+                        )))
+#+end_src
 
 * Programming
 ** Show column number
@@ -1658,6 +1670,7 @@ Use =TabNine= for general text completion. Please remember to run
       (if (seq-empty-p loc)
           (dumb-jump-go)
         (lsp-show-xrefs (lsp--locations-to-xref-items loc) nil nil))))
+
   :custom
   ;; performance tuning
   (read-process-output-max (* 1 1024 1024)) ;; 20mb
@@ -2235,6 +2248,7 @@ project related functionalities.
 #+BEGIN_SRC emacs-lisp
 (use-package org)
 #+END_SRC
+
 ** Set org directory
 
 #+BEGIN_SRC emacs-lisp
