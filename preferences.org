@@ -2223,6 +2223,13 @@ project related functionalities.
   )
 #+end_src
 
+*** GLSL
+
+#+begin_src emacs-lisp
+(use-package glsl-mode
+  :mode ("\\.glsl\\'" "\\.vert\\'" "\\.frag\\'"))
+#+end_src
+
 * org mode
 
 #+BEGIN_SRC emacs-lisp
