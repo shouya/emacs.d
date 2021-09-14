@@ -324,7 +324,10 @@ Here I unbind keyboard shortcuts that I frequently mistype.
 
 ;; I use these two keys to jump to definitions
 (unbind-key "M-." global-map)
-(unbind-key "M-," global-map)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (unbind-key "M-." global-map)
+            (unbind-key "M-," global-map)))
 #+end_src
 
 ** Confirm before quitting
