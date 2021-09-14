@@ -1082,7 +1082,7 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
   :bind (("C-x m" . mc/mark-all-dwim)
          ("C-M-SPC" . mc/mark-next-lines)
          ("C->" . mc/mark-next-like-this-symbol)
-         ("C-<" . mc/unmark-next-like-this-symbol)
+         ("C-<" . mc/unmark-next-like-this)
          ("C-M->" . mc/mark-next-like-this)
          ("C-M-<" . mc/unmark-next-like-this)
    ("M-<mouse-1>" . mc/add-cursor-on-click))
