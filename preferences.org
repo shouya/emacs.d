@@ -237,6 +237,13 @@ I switched to readable mode after a web page is rendered.
         auto-save-file-name-transforms `((".*" ,backup-dir t))))
 #+END_SRC
 
+** Recent file
+
+#+begin_src emacs-lisp
+(require 'recentf)
+  (add-to-list 'recentf-exclude (rx "bookmarks" eol))
+  (add-to-list 'recentf-exclude (rx "*.org" eol))
+#+end_src
 ** Remove trailing whitespaces on save
 
 #+BEGIN_SRC emacs-lisp
