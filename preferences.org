@@ -1183,6 +1183,7 @@ We use =dumb-jump=, which works out of the box for many languages.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dumb-jump
+  :commands dumb-jump-go
   :bind (("M-." . dumb-jump-go-other-window)
          ("M-," . dumb-jump-go))
   :custom
@@ -1619,7 +1620,7 @@ Use =TabNine= for general text completion. Please remember to run
   :commands (lsp lsp-mode lsp-deferred)
   :bind (:map lsp-mode-map
               ("C-c C-f" . lsp-format-buffer)
-              ("M-," . lsp-find-definition))
+              ("M-," . lsp-find-definition-or-dumb-jump))
 
   ;; so it can be registered
   :config
@@ -1647,6 +1648,16 @@ Use =TabNine= for general text completion. Please remember to run
     :bind (:map lsp-mode-map
                 ("C-c C-j" . lsp-ivy-workspace-symbol)))
 
+
+  ;; fallback to dumb-jump if lsp can't find defn
+  ;; copied from https://github.com/hlissner/doom-emacs/issues/4662#issuecomment-780911875
+  (defun lsp-find-definition-or-dumb-jump ()
+    (interactive)
+    (let ((loc (lsp-request "textDocument/definition"
+                            (lsp--text-document-position-params))))
+      (if (seq-empty-p loc)
+          (dumb-jump-go)
+        (lsp-show-xrefs (lsp--locations-to-xref-items loc) nil nil))))
   :custom
   ;; performance tuning
   (read-process-output-max (* 1 1024 1024)) ;; 20mb
