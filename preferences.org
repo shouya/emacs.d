@@ -2,14 +2,6 @@
 #+latex_compiler: xelatex
 #+latex_header: \usemintedstyle{emacs}
 
-* Setup personal information
-
-#+BEGIN_SRC emacs-lisp
-;;; -*- lexical-binding: t; -*-
-(setq-default user-full-name "Shou Ya"
-              user-email-address "shou@lain.li")
-#+END_SRC
-
 * Boot up
 ** Enable packages are loadable
 
@@ -1137,12 +1129,14 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 Add extra shortcuts for symbols I frequently use to the TeX input method.
 
 #+begin_src emacs-lisp
-(eval-after-load 'quail
-  (let ((quail-current-package (assoc "TeX" quail-package-alist)))
-    (quail-define-rules ((append . t))
-                        ("|-" ?⊢)
-                        ("|=" ?⊨)
-                        )))
+  (eval-after-load 'quail
+    (with-temp-buffer
+      (activate-input-method "TeX")
+      (let ((quail-current-package (assoc "TeX" quail-package-alist)))
+        (quail-define-rules ((append . t))
+                            ("|-" ?⊢)
+                            ("|=" ?⊨)
+                            ))))
 #+end_src
 
 * Programming
