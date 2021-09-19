@@ -1129,14 +1129,16 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 Add extra shortcuts for symbols I frequently use to the TeX input method.
 
 #+begin_src emacs-lisp
-  (eval-after-load 'quail
-    (with-temp-buffer
-      (activate-input-method "TeX")
-      (let ((quail-current-package (assoc "TeX" quail-package-alist)))
-        (quail-define-rules ((append . t))
-                            ("|-" ?⊢)
-                            ("|=" ?⊨)
-                            ))))
+(eval-after-load 'quail
+  (with-temp-buffer
+    (activate-input-method "TeX")
+    (let ((quail-current-package (assoc "TeX" quail-package-alist)))
+      (quail-define-rules ((append . t))
+                          ("|-" ?⊢)
+                          ("|=" ?⊨)
+                          ("\\lam" ?λ)
+                          ("|->" ?↦)
+                          ))))
 #+end_src
 
 * Programming
