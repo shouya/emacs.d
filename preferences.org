@@ -569,8 +569,7 @@ Use =C-c <left>= and =C-c <right>= to undo layout.
 
 #+BEGIN_SRC emacs-lisp
 (use-package popwin
-  :defer t
-
+  :hook (emacs-startup . popwin-mode)
   :config
   (push '("*elixir-format-errors*" :noselect t) popwin:special-display-config)
   (push "*idris-repl*" popwin:special-display-config)
