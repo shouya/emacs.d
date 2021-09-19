@@ -1960,8 +1960,8 @@ Reformatting JSON.
 
 *** Rust
 #+BEGIN_SRC emacs-lisp
-(use-package rustic
-  :mode ("\\.rs\\'" . rustic-mode)
+(use-package rust-mode
+  :mode ("\\.rs\\'" . rust-mode)
   :custom
   ;; do not show a buffer for format errors
   (rust-format-show-buffer nil)
@@ -1973,12 +1973,28 @@ Reformatting JSON.
   (lsp-rust-analyzer-proc-macro-enable t)
 
   :config
+  (use-package cargo
+    :bind
+    (:map rust-mode-map
+          ("C-c C-c r" . cargo-process-run-release)
+          ("C-c C-c C-r" . cargo-process-run)
+          ("C-c C-c C-c" . cargo-process-check)
+          ("C-c C-c C-a" . cargo-process-add)
+          ("C-c C-c C-f" . cargo-process-fmt)
+          )
+    :config
+    (defun cargo-process-run-release ()
+      (interactive)
+      (let ((cargo-process--command-run "run --release"))
+        (cargo-process-run)))
+    )
+
   ;; Rusty Object Notation
   (use-package ron-mode
     :mode "\\.ron\\'")
 
   ;; enable LSP for type info and more
-  (add-hook 'rustic-mode-hook #'lsp)
+  (add-hook 'rust-mode-hook #'lsp)
   )
 #+END_SRC
 
