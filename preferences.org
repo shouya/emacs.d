@@ -1191,9 +1191,7 @@ We use =dumb-jump=, which works out of the box for many languages.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dumb-jump
-  :commands dumb-jump-go
-  :bind (("M-." . dumb-jump-go-other-window)
-         ("M-," . dumb-jump-go))
+  :commands (dumb-jump-xref-activate)
   :custom
   (dumb-jump-selector 'ivy)
   (dumb-jump-force-searcher 'rg))
