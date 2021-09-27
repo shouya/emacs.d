@@ -80,6 +80,7 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'exec-path "/usr/local/bin")
+(add-to-list 'exec-path (f-expand "~/.nix-profile/bin"))
 (add-to-list 'exec-path (f-expand "~/.local/bin"))
 (add-to-list 'exec-path (f-expand "~/.asdf/shims"))
 (add-to-list 'exec-path (f-expand "~/.asdf/bin"))
