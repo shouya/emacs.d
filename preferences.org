@@ -875,41 +875,42 @@ entered.
 (use-package expand-region
   :bind (("C-=" . er/expand-region)
          ("C--" . er/contract-region))
-  :custom
-  (expand-region-subword-enabled t)
-  (expand-region-skip-whitespace t)
-  (expand-region-smart-cursor nil)
-
-  :config
-  (defun shou/er/mark-org-heading ()
-    (when (org-at-heading-p)
-      (end-of-line)
-      (push-mark nil t t)
-      (beginning-of-line)))
-
-  (require 'the-org-mode-expansions)
-  (defun shou/er/add-org-mode-expansions ()
-    (set (make-local-variable 'er/try-expand-list)
-         (append
-          (remove #'er/mark-defun er/try-expand-list)
-          '(org-mark-subtree
-            er/mark-org-element
-            er/mark-org-element-parent
-            er/mark-org-code-block
-            er/mark-sentence
-            er/mark-org-parent
-            er/mark-paragraph
-            shou/er/mark-org-heading
-            )))
-    (set (make-local-variable 'er/save-mode-excursion)
-         #'er/save-org-mode-excursion))
-
-  (er/enable-mode-expansions 'org-mode 'shou/er/add-org-mode-expansions)
-
-  ;; mainly for qualified names like "Struct::method".
-  (require 'cc-mode-expansions)
-  (er/enable-mode-expansions 'rust-mode 'er/add-cc-mode-expansions)
   )
+  ;; :custom
+  ;; (expand-region-subword-enabled t)
+  ;; (expand-region-skip-whitespace t)
+  ;; (expand-region-smart-cursor nil)
+
+  ;; :config
+  ;; (defun shou/er/mark-org-heading ()
+  ;;   (when (org-at-heading-p)
+  ;;     (end-of-line)
+  ;;     (push-mark nil t t)
+  ;;     (beginning-of-line)))
+
+  ;; (require 'the-org-mode-expansions)
+  ;; (defun shou/er/add-org-mode-expansions ()
+  ;;   (set (make-local-variable 'er/try-expand-list)
+  ;;        (append
+  ;;         (remove #'er/mark-defun er/try-expand-list)
+  ;;         '(org-mark-subtree
+  ;;           er/mark-org-element
+  ;;           er/mark-org-element-parent
+  ;;           er/mark-org-code-block
+  ;;           er/mark-sentence
+  ;;           er/mark-org-parent
+  ;;           er/mark-paragraph
+  ;;           shou/er/mark-org-heading
+  ;;           )))
+  ;;   (set (make-local-variable 'er/save-mode-excursion)
+  ;;        #'er/save-org-mode-excursion))
+
+  ;; (er/enable-mode-expansions 'org-mode 'shou/er/add-org-mode-expansions)
+
+  ;; ;; mainly for qualified names like "Struct::method".
+  ;; (require 'cc-mode-expansions)
+  ;; (er/enable-mode-expansions 'rust-mode 'er/add-cc-mode-expansions)
+  ;; )
 #+END_SRC
 
 ** Writing prose
@@ -2592,7 +2593,7 @@ title."
                           (org-file-path "mencti.org"))))
 #+END_SRC
 
-*** Extend toady to 6:00am into next morning
+*** Extend toady to 3am into next morning
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
@@ -3231,7 +3232,7 @@ text and copying to the killring."
 
 ** Automatic backup
 
-I automatically backup my org files using git after idle for a while.
+I automatically backup my org files using git after idle for a while. The mode is activated for specific folder only using =.dir-locals.el=.
 
 #+begin_src emacs-lisp
 (use-package git-auto-commit-mode
