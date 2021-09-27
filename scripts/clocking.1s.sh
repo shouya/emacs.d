@@ -7,7 +7,7 @@
 # done.
 
 # for jq
-PATH="/usr/local/bin:$PATH"
+PATH="$HOME/.nix-profile/bin:/usr/local/bin:$PATH"
 
 emacs_exec() {
   /usr/local/bin/emacsclient \
