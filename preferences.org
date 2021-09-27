@@ -1618,6 +1618,7 @@ Use =TabNine= for general text completion. Please remember to run
 **** LSP mode
 
 #+begin_src emacs-lisp
+
 (use-package lsp-mode
   :straight (:host github :repo "emacs-lsp/lsp-mode")
   :init
@@ -1646,6 +1647,7 @@ Use =TabNine= for general text completion. Please remember to run
     (setq-local xref-backend-functions '(shou/xref t)))
 
   (add-hook 'lsp-mode-hook 'insert-dumb-jump-to-xref)
+
   ;; conflict with projectile prefix
   (unbind-key "M-p" lsp-signature-mode-map)
   ;; unbind it as well as I never bother using it.
@@ -2217,6 +2219,7 @@ project related functionalities.
   :custom
   ;; do not stuck on comments.
   (proof-script-fly-past-comments t)
+  (proof-three-window-mode-policy 'hybrid)
   )
 
 (use-package company-coq
