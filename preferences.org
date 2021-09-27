@@ -1626,7 +1626,8 @@ Use =TabNine= for general text completion. Please remember to run
   :commands (lsp lsp-mode lsp-deferred)
   :bind (:map lsp-mode-map
               ("C-c C-f" . lsp-format-buffer)
-              ("M-," . lsp-find-definition-or-dumb-jump))
+              ("M-," . xref-find-definitions)
+              ("M-." . xref-find-definitions-other-window))
 
   ;; so it can be registered
   :config
@@ -1641,6 +1642,10 @@ Use =TabNine= for general text completion. Please remember to run
   (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
   (add-hook 'lsp-mode-hook 'lsp-lens-mode)
 
+  (defun insert-dumb-jump-to-xref ()
+    (setq-local xref-backend-functions '(shou/xref t)))
+
+  (add-hook 'lsp-mode-hook 'insert-dumb-jump-to-xref)
   ;; conflict with projectile prefix
   (unbind-key "M-p" lsp-signature-mode-map)
   ;; unbind it as well as I never bother using it.
@@ -1655,6 +1660,13 @@ Use =TabNine= for general text completion. Please remember to run
                 ("C-c C-j" . lsp-ivy-workspace-symbol)))
 
 
+  (defun shou/xref ()
+    (let ((loc (lsp-request "textDocument/definition"
+                            (lsp--text-document-position-params))))
+      (if (seq-empty-p loc)
+          (dumb-jump-xref-activate)
+        (lsp--xref-backend))))
+
   ;; fallback to dumb-jump if lsp can't find defn
   ;; copied from https://github.com/hlissner/doom-emacs/issues/4662#issuecomment-780911875
   (defun lsp-find-definition-or-dumb-jump ()
@@ -1662,8 +1674,8 @@ Use =TabNine= for general text completion. Please remember to run
     (let ((loc (lsp-request "textDocument/definition"
                             (lsp--text-document-position-params))))
       (if (seq-empty-p loc)
-          (dumb-jump-go)
-        (lsp-show-xrefs (lsp--locations-to-xref-items loc) nil nil))))
+          (lsp-show-xrefs (lsp--locations-to-xref-items loc) nil nil)
+        (dumb-jump-go))))
 
   :custom
   ;; performance tuning
@@ -1675,7 +1687,7 @@ Use =TabNine= for general text completion. Please remember to run
 
   ;; do not show breadcrumb
   (lsp-headerline-breadcrumb-enable nil)
-)
+  )
 #+end_src
 
 #+RESULTS:
