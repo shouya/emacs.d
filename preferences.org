@@ -1413,8 +1413,6 @@ I use =magit= to show git status.
   ("C-x g" . magit)
   ("C-x C-g" . magit-file-dispatch)
 
-  :after projectile
-
   :custom
   ;; https://twitter.com/iLemming/status/1243322552828571649
   (magit-save-repository-buffers 'save-all-and-dont-ask)
