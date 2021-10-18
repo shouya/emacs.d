@@ -1189,7 +1189,7 @@ Also show a ruler at column 80.
 
 ** Jump to definition (=M-.=)
 
-We use =dumb-jump=, which works out of the box for many languages.
+I use =dumb-jump=, which works out of the box for many languages. I prioritize lsp-mode's find-definition function if it works, otherwise fallback to dumb-jump.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dumb-jump
@@ -1197,7 +1197,23 @@ We use =dumb-jump=, which works out of the box for many languages.
   :custom
   (dumb-jump-selector 'ivy)
   (dumb-jump-force-searcher 'rg))
+
+
+(defun shou/xref ()
+  (let ((loc (and lsp-mode
+                  (lsp-request "textDocument/definition"
+                               (lsp--text-document-position-params)))))
+    (if (seq-empty-p loc)
+        (dumb-jump-xref-activate)
+      (lsp--xref-backend))))
+
+(defun insert-dumb-jump-to-xref ()
+  (setq-local xref-backend-functions '(shou/xref t)))
+
+(add-hook 'prog-mode-hook 'insert-dumb-jump-to-xref)
 #+END_SRC
+
+
 
 ** Enable flycheck
 
@@ -1618,7 +1634,6 @@ Use =TabNine= for general text completion. Please remember to run
 **** LSP mode
 
 #+begin_src emacs-lisp
-
 (use-package lsp-mode
   :straight (:host github :repo "emacs-lsp/lsp-mode")
   :init
@@ -1643,11 +1658,6 @@ Use =TabNine= for general text completion. Please remember to run
   (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
   (add-hook 'lsp-mode-hook 'lsp-lens-mode)
 
-  (defun insert-dumb-jump-to-xref ()
-    (setq-local xref-backend-functions '(shou/xref t)))
-
-  (add-hook 'lsp-mode-hook 'insert-dumb-jump-to-xref)
-
   ;; conflict with projectile prefix
   (unbind-key "M-p" lsp-signature-mode-map)
   ;; unbind it as well as I never bother using it.
@@ -1661,13 +1671,6 @@ Use =TabNine= for general text completion. Please remember to run
     :bind (:map lsp-mode-map
                 ("C-c C-j" . lsp-ivy-workspace-symbol)))
 
-
-  (defun shou/xref ()
-    (let ((loc (lsp-request "textDocument/definition"
-                            (lsp--text-document-position-params))))
-      (if (seq-empty-p loc)
-          (dumb-jump-xref-activate)
-        (lsp--xref-backend))))
 
   ;; fallback to dumb-jump if lsp can't find defn
   ;; copied from https://github.com/hlissner/doom-emacs/issues/4662#issuecomment-780911875
