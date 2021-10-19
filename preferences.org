@@ -1661,6 +1661,11 @@ Use =TabNine= for general text completion. Please remember to run
 
   (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
   (add-hook 'lsp-mode-hook 'lsp-lens-mode)
+  ;; override default lsp-xref backend
+  (add-hook 'lsp-mode-hook 'insert-dumb-jump-to-xref)
+
+  (defun insert-dumb-jump-to-xref ()
+    (setq-local xref-backend-functions '(shou/xref t)))
 
   ;; conflict with projectile prefix
   (unbind-key "M-p" lsp-signature-mode-map)
