@@ -646,19 +646,6 @@ Load Dired X that comes with Emacs.
 (use-package dired
   :defer t
   :straight (:type built-in)
-  :bind (:map dired-mode-map
-              ;; Open directory in the same window
-              ("RET" . dired-find-alternate-file)
-              ;; Open directory in alternative window
-              ("C-RET" . dired-find-file)
-              ;; Go up
-              ("^" . shou/dired-go-up))
-  :config
-  (defun shou/dired-go-up ()
-    (interactive)
-    (find-alternate-file ".."))
-  ;; do not show warning
-  (put 'dired-find-alternate-file 'disabled nil)
   :custom
   ;; Copy file to split window
   (dired-dwim-target t)
@@ -1664,9 +1651,6 @@ Use =TabNine= for general text completion. Please remember to run
   ;; override default lsp-xref backend
   (add-hook 'lsp-mode-hook 'insert-dumb-jump-to-xref)
 
-  (defun insert-dumb-jump-to-xref ()
-    (setq-local xref-backend-functions '(shou/xref t)))
-
   ;; conflict with projectile prefix
   (unbind-key "M-p" lsp-signature-mode-map)
   ;; unbind it as well as I never bother using it.
@@ -1958,7 +1942,9 @@ Simply install protobuf mode. Default settings should work.
 (use-package protobuf-mode
   :commands protobuf-mode
   :mode "\\.proto\\'"
-  :mode "\\.proto3\\'")
+  :mode "\\.proto3\\'"
+  :hook (protobuf-mode . insert-dumb-jump-to-xref)
+  )
 #+END_SRC
 
 *** JSON
