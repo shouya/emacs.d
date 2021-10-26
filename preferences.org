@@ -2418,15 +2418,14 @@ I'd like to hide ===, =+=, =*= symbols when not necessary.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :custom (org-hide-emphasis-markers t))
+  :custom (org-hide-emphasis-markers nil))
 #+END_SRC
 
 *** Customize wrap around symbol
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :custom (org-hide-emphasis-markers t))
-(setq-default org-ellipsis " ⤵")
+  :custom (org-ellipsis " ⤵"))
 #+END_SRC
 
 ** Source editing
