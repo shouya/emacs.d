@@ -630,22 +630,13 @@ It render =^L= as a page break line, which is nicer to look at.
 #+end_src
 
 * Dired
-** Load =dired-x= by default
-
-Load Dired X that comes with Emacs.
-
-#+BEGIN_SRC emacs-lisp
-(use-package dired-x
-  :defer t
-  :straight (:type built-in))
-#+END_SRC
-
-** Retain the same window when browsing
+** Basic config
 
 #+BEGIN_SRC emacs-lisp
 (use-package dired
   :defer t
   :straight (:type built-in)
+  :commands (dired dired-jump)
   :custom
   ;; Copy file to split window
   (dired-dwim-target t)
@@ -653,6 +644,10 @@ Load Dired X that comes with Emacs.
   (dired-recursive-copies 'always)
   ;; Ask once before deleting
   (dired-recursive-deletes 'top)
+
+  :config
+  (use-package dired-x
+    :straight (:type built-in))
   )
 #+END_SRC
 
