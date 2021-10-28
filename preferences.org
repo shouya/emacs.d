@@ -371,7 +371,7 @@ I use "Input" as my default font face.
 ;; (add-to-list 'default-frame-alist '(font . "Input-14"))
 
 ;; Experiment with different fonts here:
-(set-frame-font "Fira Code-14")
+;; (set-frame-font "Fira Code-14")
 #+END_SRC
 
 ** Ligature
@@ -2715,8 +2715,7 @@ Basically restoring the default face.
    '(org-tag-faces)
    '(org-agenda-done)
    '(org-agenda-date)
-   '(org-agenda-date-weekend)
-   ))
+   '(org-agenda-date-weekend)))
 #+END_SRC
 
 *** Mixed pitch
