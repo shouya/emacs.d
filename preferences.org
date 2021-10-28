@@ -1509,7 +1509,7 @@ Use =company-mode= for auto completion.
 #+BEGIN_SRC emacs-lisp
 (use-package company
   :bind ("M-/" . company-complete)
-  :hook (emacs-startup . global-company-mode)
+  :hook (prog-mode . company-mode)
 
   :custom
   (company-idle-delay 0.3 "Show completion with a small delay")
