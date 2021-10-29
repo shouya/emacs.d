@@ -497,7 +497,20 @@ Doom modeline
 (blink-cursor-mode 1)
 #+END_SRC
 
-** Window split
+** Window manipulation
+
+| Key     | Function                              |
+|---------+---------------------------------------|
+| =C-x -= | split-window-below                    |
+| =C-x ¦= | split-window-height                   |
+| =C-x += | balance-windows                       |
+| =C-x ^= | enlarge-window (height++)             |
+| =C-x }= | enlarge-window-horizontally (width++) |
+| =C-x }= | shrink-window-horizontally (width--)  |
+
+Note: Enlarge another window with =C-x ^= to reduce the size of current window.
+
+Note: Press =C-x z= and keep pressing =z= to repeat the last command.
 
 #+BEGIN_SRC emacs-lisp
 (define-key global-map (kbd "C-x -") 'split-window-below)
@@ -555,7 +568,9 @@ Use =C-c <left>= and =C-c <right>= to undo layout.
 
 #+begin_src emacs-lisp
 (use-package winner
-  :defer t)
+  :config
+  ;; enable winner mode globally
+  (winner-mode 1))
 #+end_src
 
 ** Alert library
