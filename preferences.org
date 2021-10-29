@@ -2741,12 +2741,15 @@ Show variable pitch for normal text, and monospace font for codes.
 
   :custom
   ;; use the default box cursor instead of the I cursor
-  (mixed-pitched-variable-pitch-cursor 'box)
+  (mixed-pitch-variable-pitch-cursor 'box)
+  (mixed-pitch-set-height t)
 
   :config
-  (set-face-attribute 'default nil :family "Fira Code" :height 160)
-  (set-face-attribute 'fixed-pitch nil :family "Fira Code")
-  (set-face-attribute 'variable-pitch nil :family "Avenir Next"))
+  ;; 'default face dictates the monospace font
+  ;; 'variable-picth face is based on default with changed 'family and 'height
+  (set-face-attribute 'default nil :family "Fira Code" :height 150)
+  (set-face-attribute 'variable-pitch nil :family "Charter" :height 150)
+  )
 #+end_src
 
 ** Archiving
