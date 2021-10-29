@@ -1522,6 +1522,16 @@ Use =company-mode= for auto completion.
   (company-dabbrev-code-everywhere t)
 
   :config
+  (use-package company-posframe
+    :config
+    (company-posframe-mode 1)
+
+    ;; The below code let desktop.el not record the company-posframe-mode
+    (require 'desktop)
+    (push '(company-posframe-mode . nil)
+          desktop-minor-mode-table)
+    )
+
   ;; only enable these options
   (setq company-backends
         '(company-capf company-dabbrev-code company-files))
