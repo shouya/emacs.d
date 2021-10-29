@@ -1211,8 +1211,8 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
   :commands (flycheck-mode)
   :config
   ;; display pos-tip for flycheck errors
-  (use-package flycheck-pos-tip)
-  (flycheck-pos-tip-mode)
+  (use-package flycheck-posframe)
+  (add-hook 'flycheck-mode-hook 'flycheck-posframe-mode)
   )
 #+END_SRC
 
