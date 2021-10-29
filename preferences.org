@@ -1123,7 +1123,9 @@ Add extra shortcuts for symbols I frequently use to the TeX input method.
       (quail-define-rules ((append . t))
                           ("|-" ?⊢) ;; \vdash
                           ("|=" ?⊨)
+                          ("=>" ?⇒)
                           ("\\lam" ?λ)
+                          (":=" ?≔)
                           ("|->" ?↦) ;; \mapsto
                           ("-->" ?⟶) ;; \longrightarrow
                           ))))
