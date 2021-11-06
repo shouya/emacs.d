@@ -573,6 +573,15 @@ Use =C-c <left>= and =C-c <right>= to undo layout.
   (winner-mode 1))
 #+end_src
 
+** Allow transposing window (swap between horizontal/vertical arrangement)
+
+#+begin_src emacs-lisp
+(use-package transpose-frame
+  :commands (transpose-frame flip-frame)
+  :bind ("C-x C-t" . transpose-frame)
+  )
+#+end_src
+
 ** Alert library
 
 #+BEGIN_SRC emacs-lisp
