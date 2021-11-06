@@ -2156,7 +2156,7 @@ project related functionalities.
   :after popwin
   :mode (("\\.idr\\'" . idris-mode))
   :config
-  (add-to-list 'popwin:special-display-config 'idris-compiler-notes-mode)
+  ;; (add-to-list 'popwin:special-display-config 'idris-compiler-notes-mode)
   (add-to-list 'popwin:special-display-config
                '(idris-info-mode :stick t))
   (add-to-list 'popwin:special-display-config
