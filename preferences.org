@@ -1135,6 +1135,16 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
   )
 #+end_src
 
+** CSV file
+
+#+begin_src emacs-lisp
+(use-package csv-mode
+  :commands csv-mode
+  :mode (("\\.csv\\'" . csv-mode))
+  :config
+  (add-hook 'csv-mode-hook 'csv-align-mode))
+#+end_src
+
 ** Quail
 
 Add extra shortcuts for symbols I frequently use to the TeX input method.
