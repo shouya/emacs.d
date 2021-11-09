@@ -2044,6 +2044,9 @@ Reformatting JSON.
   ;; enable proc macro expansion for rust-analyzer (used by lsp mode)
   (lsp-rust-analyzer-proc-macro-enable t)
 
+  ;; default: "check".
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+
   :config
   (use-package cargo
     :bind
