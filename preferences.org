@@ -2055,9 +2055,14 @@ Reformatting JSON.
           ("C-c C-c r" . cargo-process-run-release)
           ("C-c C-c C-r" . cargo-process-run)
           ("C-c C-c C-c" . cargo-process-check)
+          ("C-c C-c C-k" . cargo-process-clippy)
           ("C-c C-c C-a" . cargo-process-add)
           ("C-c C-c C-f" . cargo-process-fmt)
           )
+    :custom
+    ;; default: "clippy -Zunstable-options" which doesn't work for
+    ;; stable rust
+    (cargo-process--command-clippy "clippy")
     :config
     (defun cargo-process-run-release ()
       (interactive)
