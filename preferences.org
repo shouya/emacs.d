@@ -1706,10 +1706,11 @@ Use =TabNine= for general text completion. Please remember to run
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]_build\\'")
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]deps\\'")
 
-  (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
-  (add-hook 'lsp-mode-hook 'lsp-lens-mode)
   ;; override default lsp-xref backend
   (add-hook 'lsp-mode-hook 'insert-dumb-jump-to-xref)
+
+  (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
+  (add-hook 'lsp-mode-hook 'lsp-lens-mode)
 
   ;; conflict with projectile prefix
   (unbind-key "M-p" lsp-signature-mode-map)
