@@ -1244,9 +1244,27 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
   :demand t
   :commands (flycheck-mode)
   :config
+
   ;; display pos-tip for flycheck errors
-  (use-package flycheck-posframe)
-  (add-hook 'flycheck-mode-hook 'flycheck-posframe-mode)
+  (use-package flycheck-pos-tip
+    :disabled t
+    :custom
+    ;; do not timeout when I'm reading the text. (default: 5)
+    (flycheck-pos-tip-timeout 30)
+
+    :config
+    (add-hook 'flycheck-mode-hook 'flycheck-pos-tip-mode)
+    )
+
+  (use-package flycheck-posframe
+    :custom
+    (flycheck-posframe-border-width 1)
+
+    :config
+    (flycheck-posframe-configure-pretty-defaults)
+
+    (add-hook 'flycheck-mode-hook 'flycheck-posframe-mode)
+    )
   )
 #+END_SRC
 
@@ -1671,6 +1689,7 @@ Use =TabNine= for general text completion. Please remember to run
   :init
   ;; to fix a weird bug
   (add-to-list 'load-path (concat (straight--repos-dir) "lsp-mode/" "clients"))
+
   :commands (lsp lsp-mode lsp-deferred)
   :bind (:map lsp-mode-map
               ("C-c C-f" . lsp-format-buffer)
