@@ -1755,6 +1755,7 @@ Use =TabNine= for general text completion. Please remember to run
 
 #+begin_src emacs-lisp
 (use-package dap-mode
+  :disabled t
   :commands (dap-debug dap-hydra)
   :config
   (dap-ui-mode)
