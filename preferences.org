@@ -1716,9 +1716,9 @@ Use =TabNine= for general text completion. Please remember to run
   ;; unbind it as well as I never bother using it.
   (unbind-key "M-n" lsp-signature-mode-map)
 
-  (use-package lsp-ui
-    :custom
-    (lsp-ui-doc-enable nil))
+  ;; (use-package lsp-ui
+  ;;   :custom
+  ;;   (lsp-ui-doc-enable nil))
 
   (use-package lsp-ivy
     :bind (:map lsp-mode-map
