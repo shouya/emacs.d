@@ -379,6 +379,7 @@ I use "Input" as my default font face.
 #+begin_src emacs-lisp
 (use-package ligature
   :straight (:host github :repo "mickeynp/ligature.el")
+  :hook (prog-mode . ligature-mode)
   :when (eq system-type 'darwin)
   :config
   ;; Fira code ligatures that I use
@@ -399,7 +400,6 @@ I use "Input" as my default font face.
                             ".." "..." "<=>" "=>" "->" "<-" "<->" "::"
                             "<<" "<<<" ">>" ">>>" "//" "///"
                             "||" "&&" "->>" "<<-" "<<->>" "-->" "!->" ))
-  (global-ligature-mode t)
   )
 #+end_src
 
