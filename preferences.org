@@ -1698,7 +1698,7 @@ Use =TabNine= for general text completion. Please remember to run
 
   ;; so it can be registered
   :config
-  ;; (use-package lsp-treemacs :defer t)
+  ;; (use-package lsp-treemacs)
 
   ;; exclude watch files for elixir projects
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.elixir_ls")
@@ -2800,7 +2800,8 @@ Show variable pitch for normal text, and monospace font for codes.
 #+begin_src emacs-lisp
 (use-package mixed-pitch
   :hook
-  (text-mode . mixed-pitch-mode)
+  (org-mode . mixed-pitch-mode)
+  (git-commit-mode . mixed-pitch-mode)
 
   :custom
   ;; use the default box cursor instead of the I cursor
