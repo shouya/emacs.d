@@ -1440,7 +1440,7 @@ I use =smartparens= package for the purpose.
 
 #+BEGIN_SRC emacs-lisp
 (use-package smartparens
-  :hook (prog-mode . smartparens-mode)
+  :hook (lisp-data-mode . smartparens-mode)
   :bind (("M-r" . sp-rewrap-sexp)
          :map smartparens-mode-map
               ;; ((a|) b) => ((a| b))
