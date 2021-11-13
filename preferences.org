@@ -372,6 +372,8 @@ I use "Input" as my default font face.
 
 ;; Experiment with different fonts here:
 ;; (set-frame-font "Fira Code-14")
+(set-face-attribute 'default nil :family "Fira Code" :height 150)
+(set-face-attribute 'variable-pitch nil :family "Charter" :height 150)
 #+END_SRC
 
 ** Ligature
