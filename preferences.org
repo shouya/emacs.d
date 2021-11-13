@@ -1258,7 +1258,8 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
 
   (use-package flycheck-posframe
     :custom
-    (flycheck-posframe-border-width 1)
+    (flycheck-posframe-position 'window-bottom-left-corner)
+    (flycheck-posframe-border-width 0)
 
     :config
     (flycheck-posframe-configure-pretty-defaults)
