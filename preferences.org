@@ -2887,7 +2887,7 @@ Show variable pitch for normal text, and monospace font for codes.
       ,(concat ":PROPERTIES:\n:ADDED: %U\n:END:\n"
                "gunka:\n- [ ]%?\n- [ ]\n"
                "cilre:\n- [ ]\n- [ ]\n"
-               "chore:\n- [ ] vocab\n- [ ] diary\n- [ ] email\n- [ ] mencti\n"
+               "chore:\n- [ ] vocab\n- [ ] diary\n- [ ] email\n"
                "sevzi:\n- [ ]\n"
                )
       :time-prompt t
