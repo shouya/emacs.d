@@ -46,7 +46,11 @@ Allow installing required system packages automatically.
 #+BEGIN_SRC emacs-lisp
 (use-package server
   :straight (:type built-in)
-  :hook (after-init . server-start))
+  :config
+  (defun shou/server-start ()
+    (when (not (server-running-p))
+      (server-start)))
+  (add-hook 'after-init-hook 'shou/server-start))
 #+END_SRC
 
 ** Start edit server (for browser extensions)
