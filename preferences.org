@@ -376,8 +376,13 @@ I use "Input" as my default font face.
 
 ;; Experiment with different fonts here:
 ;; (set-frame-font "Fira Code-14")
-(set-face-attribute 'default nil :family "Fira Code" :height 150)
-(set-face-attribute 'variable-pitch nil :family "Charter" :height 150)
+(setq shou/font-height
+      (cond
+       ((eq system-type 'gnu/linux) 130)
+       ((eq system-type 'darwin) 150)))
+
+(set-face-attribute 'default nil :family "Fira Code" :height shou/font-height)
+(set-face-attribute 'variable-pitch nil :family "Charter" :height shou/font-height)
 #+END_SRC
 
 ** Ligature
