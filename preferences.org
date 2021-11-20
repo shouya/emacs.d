@@ -2833,8 +2833,8 @@ Show variable pitch for normal text, and monospace font for codes.
   :config
   ;; 'default face dictates the monospace font
   ;; 'variable-picth face is based on default with changed 'family and 'height
-  (set-face-attribute 'default nil :family "Fira Code" :height 150)
-  (set-face-attribute 'variable-pitch nil :family "Charter" :height 150)
+  (set-face-attribute 'default nil :family "Fira Code" :height shou/font-height)
+  (set-face-attribute 'variable-pitch nil :family "Charter" :height shou/font-height)
   )
 #+end_src
 
