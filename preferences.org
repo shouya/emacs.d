@@ -2369,9 +2369,7 @@ project related functionalities.
 ** Set org directory
 
 #+BEGIN_SRC emacs-lisp
-(if (eq system-type 'darwin)
-  (setq-default org-directory "~/Documents/org")
-  (setq-default org-directory "~/org"))
+(setq-default org-directory "~/Documents/org")
 
 (defun org-file-path (filename)
   "Return the path of file inside org-directory"
