@@ -991,7 +991,7 @@ Correct word with =C-;= key.
   (ispell-silently-savep t)
 
   ;; use aspell rather than ispell
-  (ispell-program-name "/usr/local/bin/aspell")
+  (ispell-program-name (executable-find "aspell"))
 
   ;; automatically save to abbrev
   (flyspell-abbrev-p t)
