@@ -74,6 +74,7 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 #+END_SRC
 
 ** Load some basic libraries
+
 #+BEGIN_SRC emacs-lisp
 (use-package dash :demand t)
 (use-package f :demand t)
@@ -1177,6 +1178,43 @@ Add extra shortcuts for symbols I frequently use to the TeX input method.
                           ("|->" ?↦) ;; \mapsto
                           ("-->" ?⟶) ;; \longrightarrow
                           ))))
+#+end_src
+
+** Jump to char quickly with Avy
+#+begin_src emacs-lisp
+(use-package avy
+  :bind ("M-j" . avy-goto-char-timer)
+
+  :custom
+  (avy-style 'at-full)
+
+  :config
+  (use-package embark)
+
+  ;; https://karthinks.com/software/avy-can-do-anything/#avy-plus-embark-any-action-anywhere
+  (defun shou/def/avy-action-at-point (:key key :action f)
+    "define custom avy action"
+    (let ((avy-action-name
+           (intern (concat "avy-action-" (symbol-name f)))))
+      (progn
+        (eval `(defun ,avy-action-name (pt)
+                 (unwind-protect
+                     (save-excursion (goto-char pt) (funcall ',f))
+                   (select-window (cdr (ring-ref avy-ring 0))))
+                 t))
+        (eval `(setf (alist-get ,key avy-dispatch-alist) ',avy-action-name)))
+    ))
+
+  (shou/def/avy-action-at-point
+   :key ?L
+   :action 'shou/copy-idlink-to-clipboard)
+  (shou/def/avy-action-at-point
+   :key ?m
+   :action 'embark-act)
+  (shou/def/avy-action-at-point
+   :key ?K
+   :action 'kill-whole-line)
+  )
 #+end_src
 
 * Programming
