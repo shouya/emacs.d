@@ -434,23 +434,13 @@ directory. You can also install the latest fonts for this package in the
 
 ** Theme
 
-I use =sanityinc-tomorrow= theme because it's high contrast and colorful.
+I use =dichromacy= theme because it's high contrast, colorful, and looks pristine.
 
 #+BEGIN_SRC emacs-lisp
-(setq shou/current-theme 'doom-tomorrow-night)
+(setq shou/current-theme 'dichromacy)
 (setq custom--inhibit-theme-enable nil)
 
-(use-package doom-themes
-  :custom
-  (doom-themes-enable-bold t)
-  (doom-themes-enable-italic t)
-  :config
-  (load-theme shou/current-theme t)
-  (setq ansi-color-names-vector
-        ["#c5c8c6" ; customized
-         "#cc6666" "#b5bd68" "#f0c674" "#81a2be" "#c9b4cf" "#8abeb7" "#c4c8c6"])
-  (setq ansi-color-map (ansi-color-make-color-map))
-)
+(load-theme shou/current-theme t)
 #+END_SRC
 
 ** Modeline customization
@@ -470,9 +460,6 @@ Doom modeline
   (doom-modeline-persp-name t)
 
   :config
-  (set-face-attribute 'mode-line nil :height 120 :background "#330033")
-  (set-face-attribute 'mode-line-inactive nil :height 120 :background "#0d0d0d")
-
   (doom-modeline-mode 1))
 #+END_SRC
 
@@ -495,11 +482,6 @@ Doom modeline
 (defun shou/visualize-matching-parens ()
   (show-paren-mode +1)
   (setq show-paren-style 'expression)
-
-  (custom-theme-set-faces
-   'user
-   '(show-paren-match ((t (:foreground nil :bold nil :background "#304020"))))
-  )
   (use-package highlight-parentheses)
 )
 
@@ -2768,20 +2750,7 @@ title."
   :custom
   (org-habit-graph-column 60)
   (org-habit-preceding-days 14)
-  (org-habit-following-days 3)
-
-  :config
-  ;; clear out the face set by current theme, the default is good enough.
-  (custom-theme-set-faces
-   shou/current-theme
-   '(org-habit-alert-face)
-   '(org-habit-ready-face)
-   '(org-habit-clear-face)
-   '(org-habit-overdue-face)
-   '(org-habit-alert-future-face)
-   '(org-habit-clear-future-face)
-   '(org-habit-ready-future-face)
-   '(org-habit-overdue-future-face)))
+  (org-habit-following-days 3))
 #+END_SRC
 *** Auto save
 
@@ -2796,28 +2765,6 @@ title."
 #+END_SRC
 
 
-#+END_SRC
-
-*** Customize face
-
-Basically restoring the default face.
-
-#+BEGIN_SRC emacs-lisp
-(use-package org
-  :config
-  (custom-theme-set-faces
-   shou/current-theme
-   '(org-scheduled-previously)
-   '(org-upcoming-deadline)
-   '(org-agenda-dimmed-todo-face)
-   '(org-scheduled-today)
-   '(org-scheduled)
-   '(org-agenda-clocking)
-   '(org-agenda-date-today)
-   '(org-tag-faces)
-   '(org-agenda-done)
-   '(org-agenda-date)
-   '(org-agenda-date-weekend)))
 #+END_SRC
 
 *** Mixed pitch
@@ -2838,8 +2785,8 @@ Show variable pitch for normal text, and monospace font for codes.
   :config
   ;; 'default face dictates the monospace font
   ;; 'variable-picth face is based on default with changed 'family and 'height
-  (set-face-attribute 'default nil :family "Fira Code" :height shou/font-height)
-  (set-face-attribute 'variable-pitch nil :family "Charter" :height shou/font-height)
+  (set-face-attribute 'default nil :family shou/mono-font :height shou/font-height)
+  (set-face-attribute 'variable-pitch nil :family shou/var-font :height shou/font-height)
   )
 #+end_src
 
