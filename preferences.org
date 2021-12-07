@@ -1325,9 +1325,9 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
 
 #+BEGIN_SRC emacs-lisp
 (use-package idle-highlight-mode
-  :config
-  (setq-default idle-highlight-idle-time 0.3)
-  (add-hook 'prog-mode-hook 'idle-highlight-mode))
+  :hook (fundamental-mode . idle-highlight-mode)
+  :custom
+  (idle-highlight-idle-time 0.5))
 #+END_SRC
 
 ** Project management
