@@ -765,7 +765,11 @@ Some modes set this variable automatically, so we need to override them.
 
 #+BEGIN_SRC emacs-lisp
 (use-package undo-tree
-  :hook (emacs-startup . global-undo-tree-mode))
+  :hook (emacs-startup . global-undo-tree-mode)
+  :custom
+  ;; allow undo in active region only
+  (undo-tree-enable-undo-in-region t)
+  )
 #+END_SRC
 
 ** Minibuffer Completion
