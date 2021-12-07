@@ -1742,13 +1742,14 @@ Use =TabNine= for general text completion. Please remember to run
   :init
   ;; to fix a weird bug
   (add-to-list 'load-path (concat (straight--repos-dir) "lsp-mode/" "clients"))
+  (setq lsp-keymap-prefix "M-l")
 
   :commands (lsp lsp-mode lsp-deferred)
   :bind (:map lsp-mode-map
               ("C-c C-f" . lsp-format-buffer)
               ("M-," . xref-find-definitions)
-              ("M-." . xref-find-definitions-other-window))
-
+              ("M-." . xref-find-definitions-other-window)
+              )
   ;; so it can be registered
   :config
   ;; (use-package lsp-treemacs)
