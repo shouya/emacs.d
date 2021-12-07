@@ -377,7 +377,7 @@ I use "Input" as my default font face.
 ;; Experiment with different fonts here:
 ;; (set-frame-font "Fira Code-14")
 (when (eq system-type 'gnu/linux)
-  (setq shou/font-height 140)
+  (setq shou/font-height 130)
   (setq shou/mono-font "Fira Code")
   (setq shou/var-font "Spectral"))
 
