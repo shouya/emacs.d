@@ -1959,6 +1959,14 @@ Colorize function names/arguments in info documentations.
   :config (add-hook 'Info-selection-hook 'info-colors-fontify-node))
 #+END_SRC
 
+**** Parinfer
+
+#+begin_src emacs-lisp
+(use-package parinfer-rust-mode
+  :straight (:host github :repo "justinbarclay/parinfer-rust-mode" :branch "main")
+  :hook lisp-mode)
+#+end_src
+
 *** Elixir
 **** Use =elixir-mode= for highlighting
 
