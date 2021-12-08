@@ -2398,6 +2398,19 @@ project related functionalities.
   :mode ("\\.glsl\\'" "\\.vert\\'" "\\.frag\\'"))
 #+end_src
 
+*** Clojure
+
+#+begin_src emacs-lisp
+(use-package clojure-mode
+  :mode ("\\.clj\\'" "\\.cljs\\'")
+  ;; clojure-mode doesn't derive from lisp mode so we have to enable
+  ;; parinfer manually
+  :hook (clojure-mode-hook . parinfer-rust-mode)
+  :config
+  (use-package cider)
+  )
+#+end_src
+
 * org mode
 
 #+BEGIN_SRC emacs-lisp
