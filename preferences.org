@@ -3326,6 +3326,7 @@ text and copying to the killring."
                               (haskell . t)
                               (scheme . t)
                               (js . t)
+                              (restclient . t)
                               ))
 
   (python-shell-completion-native-enable nil)
@@ -3335,6 +3336,7 @@ text and copying to the killring."
 
   :config
   (use-package gnuplot :commands gnuplot-mode)
+  (use-package ob-restclient)
   )
 #+end_src
 
