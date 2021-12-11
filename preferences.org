@@ -239,8 +239,10 @@ I switched to readable mode after a web page is rendered.
 
 #+begin_src emacs-lisp
 (require 'recentf)
-  (add-to-list 'recentf-exclude (rx "bookmarks" eol))
-  (add-to-list 'recentf-exclude (rx "*.org" eol))
+(add-to-list 'recentf-exclude (rx "bookmarks" eol))
+(add-to-list 'recentf-exclude (rx (* any) ".org" eol))
+;; save 100 files instead of default 20 files in history
+(setq recentf-max-saved-items 100)
 #+end_src
 
 ** Remove trailing whitespaces on save
@@ -660,6 +662,9 @@ It render =^L= as a page break line, which is nicer to look at.
   :defer t
   :straight (:type built-in)
   :commands (dired dired-jump)
+  :bind (:map dired-mode-map
+              ("." . dired-hide-dotfiles-mode)
+              )
   :custom
   ;; Copy file to split window
   (dired-dwim-target t)
@@ -2821,7 +2826,8 @@ title."
 #+BEGIN_SRC emacs-lisp
 (use-package org
   :config
-  (add-hook 'org-mode-hook 'auto-save-mode)
+  ;; save to the file directly, not to a temporary file
+  (add-hook 'org-mode-hook 'auto-save-visited-mode)
 
   ; save but don't leave a message.
   (setq auto-save-no-message t)
@@ -3331,6 +3337,9 @@ text and copying to the killring."
 ** Org babel
 
 #+begin_src emacs-lisp
+(use-package ob-restclient
+  :defer t)
+
 (use-package org
   :custom
   (org-babel-load-languages '((ditaa . t)
@@ -3349,7 +3358,6 @@ text and copying to the killring."
 
   :config
   (use-package gnuplot :commands gnuplot-mode)
-  (use-package ob-restclient)
   )
 #+end_src
 
