@@ -1,0 +1,3 @@
+secrets.el filter=git-crypt diff=git-crypt
+scripts/secrets.sh filter=git-crypt diff=git-crypt
+user-dict filter=git-crypt diff=git-crypt
