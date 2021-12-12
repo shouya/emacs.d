@@ -389,8 +389,11 @@ I use "Input" as my default font face.
   (setq shou/mono-font "Fira Code")
   (setq shou/var-font "Charter"))
 
-(set-face-attribute 'default nil :family shou/mono-font :height shou/font-height)
-(set-face-attribute 'variable-pitch nil :family shou/var-font :height shou/font-height)
+(set-face-attribute 'default nil
+                    :family shou/mono-font :height shou/font-height)
+(set-face-attribute 'variable-pitch nil
+                    ;; variable pitch font needs to be higher to match the height of mono font
+                    :family shou/var-font :height (+ 10 shou/font-height))
 #+END_SRC
 
 ** Ligature
@@ -2850,14 +2853,7 @@ Show variable pitch for normal text, and monospace font for codes.
   :custom
   ;; use the default box cursor instead of the I cursor
   (mixed-pitch-variable-pitch-cursor 'box)
-  (mixed-pitch-set-height t)
-
-  :config
-  ;; 'default face dictates the monospace font
-  ;; 'variable-picth face is based on default with changed 'family and 'height
-  (set-face-attribute 'default nil :family shou/mono-font :height shou/font-height)
-  (set-face-attribute 'variable-pitch nil :family shou/var-font :height shou/font-height)
-  )
+  (mixed-pitch-set-height t))
 #+end_src
 
 ** Archiving
