@@ -2853,7 +2853,16 @@ Show variable pitch for normal text, and monospace font for codes.
   :custom
   ;; use the default box cursor instead of the I cursor
   (mixed-pitch-variable-pitch-cursor 'box)
-  (mixed-pitch-set-height t))
+  (mixed-pitch-set-height t)
+
+  :config
+  ;; somehow the variable-pitch font needs to be reset in
+  ;; mixed-pitch mode.
+  (set-face-attribute
+   'variable-pitch nil
+   ;; variable pitch font needs to be higher to match the height of mono font
+   :family shou/var-font :height (+ 10 shou/font-height))
+  )
 #+end_src
 
 ** Archiving
