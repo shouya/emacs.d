@@ -1374,7 +1374,7 @@ Few shortcuts:
 (use-package projectile
   :custom
   (projectile-completion-system 'ivy)
-  (projectile-enable-caching t)
+  (projectile-enable-caching nil)
   (projectile-indexing-method 'alien)
   (projectile-globally-ignored-file-suffixes '("beam"))
   (projectile-create-missing-test-files t)
