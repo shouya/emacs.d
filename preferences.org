@@ -1688,6 +1688,7 @@ Use =TabNine= for general text completion. Please remember to run
 
 #+BEGIN_SRC emacs-lisp
 (use-package company-quickhelp
+  :disabled
   :hook (company-mode-hook . company-quickhelp-mode)
   :after company
   :custom (company-quickhelp-delay 0.2)
