@@ -3289,6 +3289,17 @@ text and copying to the killring."
   :bind (:map org-src-mode-map ("C-c C-c" . org-edit-src-exit)))
 #+END_SRC
 
+*** Quickly insert timestamp anywhere
+
+#+begin_src emacs-lisp
+(use-package org
+  :bind (:map org-mode-map ("<f5>" . shou/insert-timestamp))
+  :config
+  (defun shou/insert-timestamp ()
+    (interactive)
+    (insert (org-format-time-string "[%H:%M]: " (org-current-time)))))
+#+end_src
+
 *** Disable unused export options
 
 #+BEGIN_SRC emacs-lisp
