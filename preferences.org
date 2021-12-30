@@ -3395,6 +3395,14 @@ I automatically backup my org files using git after idle for a while. The mode i
   (gac-commit-additional-flag "--no-gpg-sign"))
 #+end_src
 
+** Open file with apps
+
+#+begin_src emacs-lisp
+(setf
+ (alist-get "\\.pdf\\'" org-file-apps) "mupdf %s"
+ )
+#+end_src
+
 * Playground
 
 Try out stuff here and execute manually.
