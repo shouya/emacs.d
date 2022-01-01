@@ -1732,7 +1732,9 @@ Use =TabNine= for general text completion. Please remember to run
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
   :commands (yas-global-mode yas-minor-mode)
-  :hook (prog-mode . yas-minor-mode)
+  :hook
+  (prog-mode . yas-minor-mode)
+  (k8s-mode . yas-minor-mode)
 
   :config
   (setq-default yas-snippet-dirs
