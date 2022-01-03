@@ -1,0 +1,18 @@
+# -*- mode: snippet -*-
+# name: service
+# key: service
+# --
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${1}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: true
+spec:
+  type: LoadBalancer
+  selector:
+    app: ${1}
+    component: main
+  ports:
+    - port: 1080
+      name: ${2:web-ui}
