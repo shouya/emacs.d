@@ -41,7 +41,9 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+;; must load org before calling org-babel. Otherwise it tries to use system org
 (straight-use-package 'org)
+(straight-use-package 'org-contrib)
 
 ;; ----------- load custom config --------------
 (setq vc-follow-symlinks t)
@@ -49,6 +51,13 @@
                               "~/.emacs.d/preferences.el")
   (delete-file "~/.emacs.d/preferences.el"))
 (load-file (expand-file-name "secrets.el" "~/.emacs.d"))
-(org-babel-load-file "~/.emacs.d/preferences.org")
+
+;; this avoid jit emacs from compiling the file using system org mode
+(with-eval-after-load 'org
+  (org-babel-load-file "~/.emacs.d/preferences.org")
+  )
+(require 'org)
+
+;; ---------- config managed by emacs ----------
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
