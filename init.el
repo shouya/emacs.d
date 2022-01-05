@@ -43,7 +43,6 @@
 
 ;; must load org before calling org-babel. Otherwise it tries to use system org
 (straight-use-package 'org)
-(straight-use-package 'org-contrib)
 
 ;; ----------- load custom config --------------
 (setq vc-follow-symlinks t)
