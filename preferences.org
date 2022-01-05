@@ -377,18 +377,37 @@ I use "Input" as my default font face.
 #+BEGIN_SRC emacs-lisp
 ;; (add-to-list 'default-frame-alist '(font . "Input-14"))
 
+;; https://old.reddit.com/r/emacs/comments/1xe7vr/check_if_font_is_available_before_setting/
+(defun font-exists-p (font)
+  "check if font exists"
+  (if (null (x-list-fonts font)) nil t))
+
 ;; Experiment with different fonts here:
-;; (set-frame-font "Fira Code-14")
-(when (eq system-type 'gnu/linux)
-  (setq shou/font-height 130)
-  (setq shou/mono-font "Fira Code")
+;; (set-frame-font shou/mono-font)
+
+;; Conditionally set variable and monospace fonts
+(cond
+ ((font-exists-p "Spectral")
   (setq shou/var-font "Spectral"))
+ ((font-exists-p "Charter")
+  (setq shou/var-font "Charter"))
+ )
+
+(cond
+ ((font-exists-p "Fira Code")
+  (setq shou/mono-font "Fira Code"))
+ ((font-exists-p "Dejavu Sans Mono")
+  (setq shou/mono-font "Dejavu Sans Mono"))
+ )
+
+(when (eq system-type 'gnu/linux)
+  (setq shou/font-height 130))
 
 (when (eq system-type 'darwin)
-  (setq shou/font-height 150)
-  (setq shou/mono-font "Fira Code")
-  (setq shou/var-font "Charter"))
+  (setq shou/font-height 150))
 
+;; Use the chosen font
+(set-frame-font shou/mono-font)
 (set-face-attribute 'default nil
                     :family shou/mono-font :height shou/font-height)
 (set-face-attribute 'variable-pitch nil
@@ -427,10 +446,7 @@ I use "Input" as my default font face.
 
 ** Install all-the-icon
 
-In order for the icons to work it is very important that you install the
-Resource Fonts included in this package, they are available in the fonts
-directory. You can also install the latest fonts for this package in the
-(guessed?) based on the OS by calling the following function;
+In order for the icons to work it is very important that you install the Resource Fonts included in this package, they are available in the fonts directory. You can also install the latest fonts for this package in the (guessed?) based on the OS by calling the following function;
 
 =M-x all-the-icons-install-fonts=
 
