@@ -400,19 +400,25 @@ I use "Input" as my default font face.
   (setq shou/mono-font "Dejavu Sans Mono"))
  )
 
-(when (eq system-type 'gnu/linux)
-  (setq shou/font-height 130))
+(cond
+ ((eq system-type 'gnu/linux)
+  (setq shou/mono-font-height 130)
+  (setq shou/var-font-height 140))
 
-(when (eq system-type 'darwin)
-  (setq shou/font-height 150))
+ ((eq system-type 'darwin)
+  (setq shou/mono-font-height 150)
+  (setq shou/var-font-height 160)
+  ))
+
 
 ;; Use the chosen font
 (set-frame-font shou/mono-font)
 (set-face-attribute 'default nil
-                    :family shou/mono-font :height shou/font-height)
+                    :family shou/mono-font :height shou/mono-font-height)
+(set-face-attribute 'fixed-pitch nil
+                    :family shou/mono-font :height shou/mono-font-height)
 (set-face-attribute 'variable-pitch nil
-                    ;; variable pitch font needs to be higher to match the height of mono font
-                    :family shou/var-font :height (+ 10 shou/font-height))
+                    :family shou/var-font :height shou/var-font-height)
 #+END_SRC
 
 ** Ligature
@@ -2870,15 +2876,12 @@ Show variable pitch for normal text, and monospace font for codes.
   :custom
   ;; use the default box cursor instead of the I cursor
   (mixed-pitch-variable-pitch-cursor 'box)
-  (mixed-pitch-set-height t)
+  (mixed-pitch-set-height nil)
 
   :config
   ;; somehow the variable-pitch font needs to be reset in
   ;; mixed-pitch mode.
-  (set-face-attribute
-   'variable-pitch nil
-   ;; variable pitch font needs to be higher to match the height of mono font
-   :family shou/var-font :height (+ 10 shou/font-height))
+  (set-face-attribute 'variable-pitch nil :family shou/var-font)
   )
 #+end_src
 
