@@ -2442,7 +2442,7 @@ project related functionalities.
   )
 #+end_src
 
-* org mode
+* Org mode
 
 #+BEGIN_SRC emacs-lisp
 (use-package org)
@@ -3420,7 +3420,7 @@ I automatically backup my org files using git after idle for a while. The mode i
 
 #+begin_src emacs-lisp
 (setf
- (alist-get "\\.pdf\\'" org-file-apps) "mupdf %s"
+ (alist-get "\\.pdf\\'" org-file-apps) "evince %s"
  )
 #+end_src
 
