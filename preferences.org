@@ -1884,7 +1884,7 @@ Use =TabNine= for general text completion. Please remember to run
   (defun shou/fix-apheleia-project-dir (orig-fn &rest args)
     (let ((project (project-current)))
       (if (not (null project))
-          (let ((default-directory (project-root project))) (apply orig-fn args))
+          (let ((default-directory (projectile-project-root))) (apply orig-fn args))
         (apply orig-fn args))))
 
   (advice-add 'apheleia-format-buffer :around #'shou/fix-apheleia-project-dir)
@@ -1901,7 +1901,8 @@ Use =TabNine= for general text completion. Please remember to run
 
   (advice-add 'apheleia--create-rcs-patch :around #'shou/fix-apheleia-accidental-deletion)
 
-  (apheleia-global-mode 1))
+  (apheleia-global-mode 1)
+  )
 #+END_SRC
 
 ** Compile mode configurations
