@@ -3386,6 +3386,7 @@ text and copying to the killring."
                               (scheme . t)
                               (js . t)
                               (restclient . t)
+                              (shell . t)
                               ))
 
   (python-shell-completion-native-enable nil)
