@@ -300,11 +300,11 @@ most GUI editors.
 #+BEGIN_SRC emacs-lisp
 (use-package explain-pause-mode
   :straight (:host github :repo "lastquestion/explain-pause-mode")
-  :disabled
+  ;; :disabled
   :hook (emacs-startup . explain-pause-mode)
 
   ;; only report if the pauses exceed 100ms
-  :custom (explain-pause-blocking-too-long-ms 30)
+  :custom (explain-pause-blocking-too-long-ms 15)
 )
 #+END_SRC
 
@@ -1687,6 +1687,7 @@ Use =TabNine= for general text completion. Please remember to run
   :straight (:host github :repo "shouya/company-tabnine")
   :if (eq system-type 'darwin)
   :after company
+  :disabled
   :custom
   (company-tabnine-log-file-path "~/tmp/tabnine.log")
   (company-tabnine-executable-args '("--log-level" "Trace"))
@@ -1797,6 +1798,9 @@ Use =TabNine= for general text completion. Please remember to run
 
   (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
   (add-hook 'lsp-mode-hook 'lsp-lens-mode)
+
+  ;; the following line disable lsp-modeline-diagnostics-mode
+  (add-hook 'lsp-mode-hook (lambda () (lsp-modeline-diagnostics-mode -1)))
 
   ;; conflict with projectile prefix
   (unbind-key "M-p" lsp-signature-mode-map)
