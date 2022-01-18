@@ -300,7 +300,7 @@ most GUI editors.
 #+BEGIN_SRC emacs-lisp
 (use-package explain-pause-mode
   :straight (:host github :repo "lastquestion/explain-pause-mode")
-  ;; :disabled
+  :disabled
   :hook (emacs-startup . explain-pause-mode)
 
   ;; only report if the pauses exceed 100ms
