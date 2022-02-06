@@ -240,7 +240,6 @@ I switched to readable mode after a web page is rendered.
 #+begin_src emacs-lisp
 (require 'recentf)
 (add-to-list 'recentf-exclude (rx "bookmarks" eol))
-(add-to-list 'recentf-exclude (rx (* any) ".org" eol))
 ;; save 100 files instead of default 20 files in history
 (setq recentf-max-saved-items 100)
 #+end_src
@@ -1329,7 +1328,6 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
 
   ;; display pos-tip for flycheck errors
   (use-package flycheck-pos-tip
-    :disabled t
     :custom
     ;; do not timeout when I'm reading the text. (default: 5)
     (flycheck-pos-tip-timeout 30)
@@ -1338,16 +1336,16 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
     (add-hook 'flycheck-mode-hook 'flycheck-pos-tip-mode)
     )
 
-  (use-package flycheck-posframe
-    :custom
-    (flycheck-posframe-position 'window-bottom-left-corner)
-    (flycheck-posframe-border-width 0)
+  ;; (use-package flycheck-posframe
+  ;;   :custom
+  ;;   (flycheck-posframe-position 'window-bottom-left-corner)
+  ;;   (flycheck-posframe-border-width 0)
 
-    :config
-    (flycheck-posframe-configure-pretty-defaults)
+  ;;   :config
+  ;;   (flycheck-posframe-configure-pretty-defaults)
 
-    (add-hook 'flycheck-mode-hook 'flycheck-posframe-mode)
-    )
+  ;;   (add-hook 'flycheck-mode-hook 'flycheck-posframe-mode)
+  ;;   )
   )
 #+END_SRC
 
@@ -1656,15 +1654,15 @@ Use =company-mode= for auto completion.
   (company-dabbrev-code-everywhere t)
 
   :config
-  (use-package company-posframe
-    :config
-    (company-posframe-mode 1)
+  ;; (use-package company-posframe
+  ;;   :config
+  ;;   (company-posframe-mode 1)
 
-    ;; The below code let desktop.el not record the company-posframe-mode
-    (require 'desktop)
-    (push '(company-posframe-mode . nil)
-          desktop-minor-mode-table)
-    )
+  ;;   ;; The below code let desktop.el not record the company-posframe-mode
+  ;;   (require 'desktop)
+  ;;   (push '(company-posframe-mode . nil)
+  ;;         desktop-minor-mode-table)
+  ;;   )
 
   ;; only enable these options
   (setq company-backends
@@ -1881,6 +1879,7 @@ Use =TabNine= for general text completion. Please remember to run
   :config
   (add-to-list 'apheleia-formatters '(mix . ("mix" "format" "-")))
   (add-to-list 'apheleia-formatters '(prettier . (npx "prettier" "--stdin-filepath" filepath)))
+  (add-to-list 'apheleia-formatters '(rustfmt . ("rustfmt" "--quiet" "--emit" "stdout")))
 
   (add-to-list 'apheleia-mode-alist '(elixir-mode . mix))
 
