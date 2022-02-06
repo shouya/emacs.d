@@ -2160,6 +2160,8 @@ Reformatting JSON.
     ;; default: "clippy -Zunstable-options" which doesn't work for
     ;; stable rust
     (cargo-process--command-clippy "clippy")
+    ;; show backtrace in cargo-run
+    (cargo-process--enable-rust-backtrace t)
     :config
     (defun cargo-process-run-release ()
       (interactive)
