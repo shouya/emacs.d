@@ -1257,6 +1257,9 @@ Also show a ruler at column 80.
 
 #+BEGIN_SRC emacs-lisp
 (use-package fill-column-indicator
+  :hook (prog-mode . fci-mode)
+  ;; it conflicts with company-mode, see https://github.com/company-mode/company-mode/issues/180
+  :disabled
   :custom
   (fci-rule-column 80)
 
@@ -1266,10 +1269,13 @@ Also show a ruler at column 80.
   (fci-dash-pattern 0.3)
 
   ;; fci is incompatible with show-trailing-whitespace
-  (show-trailing-whitespace nil)
+  (show-trailing-whitespace nil))
 
-  :hook (prog-mode . fci-mode))
-
+(use-package display-fill-column-indicator
+  :hook (prog-mode . display-fill-column-indicator-mode)
+  :custom
+  (display-fill-column-indicator-column 80)
+  )
 #+END_SRC
 
 ** Show line number
@@ -1327,14 +1333,14 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
   :config
 
   ;; display pos-tip for flycheck errors
-  (use-package flycheck-pos-tip
-    :custom
-    ;; do not timeout when I'm reading the text. (default: 5)
-    (flycheck-pos-tip-timeout 30)
+  ;; (use-package flycheck-pos-tip
+  ;;   :custom
+  ;;   ;; do not timeout when I'm reading the text. (default: 5)
+  ;;   (flycheck-pos-tip-timeout 30)
 
-    :config
-    (add-hook 'flycheck-mode-hook 'flycheck-pos-tip-mode)
-    )
+  ;;   :config
+  ;;   (add-hook 'flycheck-mode-hook 'flycheck-pos-tip-mode)
+  ;;   )
 
   ;; (use-package flycheck-posframe
   ;;   :custom
@@ -1621,6 +1627,7 @@ Install delta with the instruction here: https://github.com/dandavison/delta
 
 #+begin_src emacs-lisp
 (use-package magit-delta
+  :if (executable-find "delta")
   :hook (magit-mode . magit-delta-mode))
 #+end_src
 
@@ -1649,8 +1656,7 @@ Use =company-mode= for auto completion.
   (company-idle-delay 0.3 "Show completion with a small delay")
   (company-minimum-prefix-length 2 "Show completion after typing n characters")
 
-  (company-show-numbers t "Number the candidates (use M-1, M-2 etc to select completions)")
-  (company-tooltip-align-annotations t)
+  ;; (company-tooltip-align-annotations t)
   (company-dabbrev-code-everywhere t)
 
   :config
@@ -1709,9 +1715,9 @@ Use =TabNine= for general text completion. Please remember to run
 
 #+BEGIN_SRC emacs-lisp
 (use-package company-quickhelp
-  :disabled
   :hook (company-mode-hook . company-quickhelp-mode)
   :after company
+  :disabled
   :custom (company-quickhelp-delay 0.2)
 )
 #+END_SRC
@@ -1720,10 +1726,9 @@ Use =TabNine= for general text completion. Please remember to run
 
 #+BEGIN_SRC emacs-lisp
 (use-package company-box
-  :disabled
   :init (require 'icons-in-terminal)
+  :disabled
   :if (display-graphic-p)
-  ;:disabled
   :hook (company-mode . company-box-mode)
   :config
 
@@ -1737,15 +1742,6 @@ Use =TabNine= for general text completion. Please remember to run
                   (md_color_lens :face font-lock-doc-face)))  ;; Face
 
   (setq-default company-box-icons-yasnippet 'fa_bookmark))
-#+END_SRC
-
-*** Company completion pop up on CLI
-
-#+BEGIN_SRC emacs-lisp
-(use-package company-quickhelp
-  :if (not (display-graphic-p))
-  :after company
-  :hook (company-mode . company-quickhelp-mode))
 #+END_SRC
 
 *** Yasnippet
