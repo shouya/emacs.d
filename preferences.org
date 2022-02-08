@@ -1333,14 +1333,14 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
   :config
 
   ;; display pos-tip for flycheck errors
-  ;; (use-package flycheck-pos-tip
-  ;;   :custom
-  ;;   ;; do not timeout when I'm reading the text. (default: 5)
-  ;;   (flycheck-pos-tip-timeout 30)
+  (use-package flycheck-pos-tip
+    :custom
+    ;; do not timeout when I'm reading the text. (default: 5)
+    (flycheck-pos-tip-timeout 30)
 
-  ;;   :config
-  ;;   (add-hook 'flycheck-mode-hook 'flycheck-pos-tip-mode)
-  ;;   )
+    :config
+    (add-hook 'flycheck-mode-hook 'flycheck-pos-tip-mode)
+    )
 
   ;; (use-package flycheck-posframe
   ;;   :custom
