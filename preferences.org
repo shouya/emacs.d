@@ -634,6 +634,7 @@ Use =C-c <left>= and =C-c <right>= to undo layout.
   (push "*explain-pause-log*" popwin:special-display-config)
   (push "*explain-pause-profiles*" popwin:special-display-config)
   (push '("*Flycheck errors*" :position bottom :stick t) popwin:special-display-config)
+  (push '(cargo-process-mode :position bottom :stick t :height 10) popwin:special-display-config)
 )
 #+END_SRC
 
@@ -1593,6 +1594,16 @@ Hotkey to remember:
   )
 #+END_SRC
 
+*** Ediff
+
+#+begin_src emacs-lisp
+(use-package ediff
+  :custom
+  (ediff-window-setup-function 'ediff-setup-windows-plain)
+  (ediff-split-window-function 'split-window-horizontally)
+)
+
+#+end_src
 
 *** Browse current file on GitHub
 
