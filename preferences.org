@@ -2020,10 +2020,8 @@ Colorize function names/arguments in info documentations.
 
   ;; Format with C-c C-f
   :bind (:map elixir-mode-map
-              ("C-c C-f" . elixir-format)
               ("M-q" . python-fill-paragraph))
   :hook (elixir-mode . lsp)
-  :hook (elixir-mode . parinfer-rust-mode)
 
   :config
   ;; we don't enable eglot's auto completion functionality
