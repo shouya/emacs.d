@@ -2068,7 +2068,14 @@ Colorize function names/arguments in info documentations.
               ("C-c C-t C-t" . exunit-verify-single)
               ("C-c C-t C-v" . exunit-verify)
               ("C-c C-t C-a" . exunit-verify-all))
-  :custom (exunit-environment '("MIX_ENV=test")))
+  :custom (exunit-environment '("MIX_ENV=test"))
+  :config
+  (defun shou/elixir-project-root ()
+    (condition-case nil
+        (exunit-umbrella-project-root)
+      (exunit-project-root)))
+  (advice-add 'exunit-project-root :override 'shou/elixir-project-root)
+  )
 #+END_SRC
 
 **** Alchemist
