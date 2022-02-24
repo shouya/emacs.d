@@ -2103,6 +2103,13 @@ Press 'g' in compile mode to rerun last command (original 'r').
   ;; conflicts with dumb-jump-go
   (unbind-key "M-." alchemist-mode-map)
   (unbind-key "M-," alchemist-mode-map)
+
+  ;; respect alchemist-mix-env in iex-project
+  (advice-add 'alchemist-iex-command
+              :filter-return
+              (lambda (ret) (append
+                             (list "env" (concat "MIX_ENV=" alchemist-mix-env))
+                             ret)))
   )
 #+end_src
 
