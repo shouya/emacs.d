@@ -3467,11 +3467,28 @@ Try out stuff here and execute manually.
 
 (defun scroll-up-benchmark ()
   (interactive)
+  (end-of-buffer)
+  (redisplay)
   (let ((oldgc gcs-done)
         (oldtime (float-time)))
-    (condition-case nil (while t (scroll-up) (redisplay))
+    (condition-case nil (while t (previous-line) (redisplay))
       (error (message "GCs: %d Elapsed time: %f seconds"
                       (- gcs-done oldgc) (- (float-time) oldtime))))))
+
+(defun scroll-up-profile ()
+  (interactive)
+  (end-of-buffer)
+  (redisplay)
+  (profiler-stop)
+  (profiler-start 'cpu)
+  (let ((oldgc gcs-done)
+        (oldtime (float-time)))
+    (condition-case nil (while t (previous-line) (redisplay))
+      (error (message "GCs: %d Elapsed time: %f seconds"
+                        (- gcs-done oldgc) (- (float-time) oldtime))))
+    (profiler-report)
+    (profiler-stop)
+))
 #+end_src
 
 
