@@ -2334,6 +2334,8 @@ project related functionalities.
 
 *** Kubernetes
 
+K8s mode for editing yaml files.
+
 #+begin_src emacs-lisp
 (use-package k8s-mode
   :defer t
@@ -2342,6 +2344,13 @@ project related functionalities.
   ;; match all yaml files beneath a folder named "kustom*"
   :mode "/kustom.*ya?ml\\'"
   )
+#+end_src
+
+Kubernetes.el for managing k8s cluster.
+
+#+begin_src emacs-lisp
+(use-package kubernetes
+  :commands (kubernetes-overview))
 #+end_src
 
 *** JavaScript
