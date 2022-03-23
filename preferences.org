@@ -800,6 +800,8 @@ Some modes set this variable automatically, so we need to override them.
   :custom
   ;; allow undo in active region only
   (undo-tree-enable-undo-in-region t)
+  ;; do not create undo-tree history files =.file.~undo-tree~= under file directories
+  (undo-tree-history-directory-alist '((".*" . "~/.cache/undo-tree")))
   )
 #+END_SRC
 
