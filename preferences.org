@@ -2651,6 +2651,19 @@ I'd like to hide ===, =+=, =*= symbols when not necessary.
   :custom (org-ellipsis " ⤵"))
 #+END_SRC
 
+*** "Modern org"
+
+#+begin_src emacs-lisp
+(use-package org-modern
+  :disabled
+  :after org
+  :hook (org-mode . org-modern-mode)
+  :hook (org-agenda-finalize . org-modern-mode)
+  )
+#+end_src
+
+I disabled it because I experienced some glitches with it.
+
 ** Source editing
 *** Do not add indentation from org-src-edit
 
