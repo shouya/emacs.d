@@ -369,6 +369,27 @@ Show file name in window title.
 (setq frame-title-format '("%b - %m @ Emacs"))
 #+END_SRC
 
+** Install all-the-icon
+
+In order for the icons to work it is very important that you install the Resource Fonts included in this package, they are available in the fonts directory. You can also install the latest fonts for this package in the (guessed?) based on the OS by calling the following function;
+
+=M-x all-the-icons-install-fonts=
+
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons)
+#+END_SRC
+
+** Theme
+
+I use =dichromacy= theme because it's high contrast, colorful, and looks pristine.
+
+#+BEGIN_SRC emacs-lisp
+(setq shou/current-theme 'dichromacy)
+(setq custom--inhibit-theme-enable nil)
+
+(load-theme shou/current-theme t)
+#+END_SRC
+
 ** Set font
 
 I use "Input" as my default font face.
@@ -448,27 +469,6 @@ I use "Input" as my default font face.
                             "||" "&&" "->>" "<<-" "<<->>" "-->" "!->" ))
   )
 #+end_src
-
-** Install all-the-icon
-
-In order for the icons to work it is very important that you install the Resource Fonts included in this package, they are available in the fonts directory. You can also install the latest fonts for this package in the (guessed?) based on the OS by calling the following function;
-
-=M-x all-the-icons-install-fonts=
-
-#+BEGIN_SRC emacs-lisp
-(use-package all-the-icons)
-#+END_SRC
-
-** Theme
-
-I use =dichromacy= theme because it's high contrast, colorful, and looks pristine.
-
-#+BEGIN_SRC emacs-lisp
-(setq shou/current-theme 'dichromacy)
-(setq custom--inhibit-theme-enable nil)
-
-(load-theme shou/current-theme t)
-#+END_SRC
 
 ** Modeline customization
 
@@ -1209,6 +1209,7 @@ Add extra shortcuts for symbols I frequently use to the TeX input method.
                           (":=" ?≔)
                           ("|->" ?↦) ;; \mapsto
                           ("-->" ?⟶) ;; \longrightarrow
+                          ("\sqrt" ?√) ;; \sqrt sometimes disappears
                           ))))
 #+end_src
 
