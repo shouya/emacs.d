@@ -1305,11 +1305,18 @@ Also show a ruler at column 80.
 I use =dumb-jump=, which works out of the box for many languages. I prioritize lsp-mode's find-definition function if it works, otherwise fallback to dumb-jump.
 
 #+BEGIN_SRC emacs-lisp
+(use-package xref
+  :custom
+  (xref-show-definitions-function #'xref-show-definitions-completing-read))
+
 (use-package dumb-jump
   :commands (dumb-jump-xref-activate)
   :custom
   (dumb-jump-selector 'ivy)
-  (dumb-jump-force-searcher 'rg))
+  (dumb-jump-force-searcher 'rg)
+  ;; Defaults to --pcre2. ripgrep's pcre is an opt-in feature that's not enabled by default.
+  (dumb-jump-rg-search-args "--auto-hybrid-regex")
+  )
 
 (defun shou/xref ()
   (let ((loc (and lsp-mode
@@ -1319,13 +1326,12 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
         (dumb-jump-xref-activate)
       (lsp--xref-backend))))
 
+
 (defun insert-dumb-jump-to-xref ()
   (setq-local xref-backend-functions '(shou/xref t)))
 
 (add-hook 'prog-mode-hook 'insert-dumb-jump-to-xref)
 #+END_SRC
-
-
 
 ** Enable flycheck
 
@@ -1814,9 +1820,11 @@ Use =TabNine= for general text completion. Please remember to run
   ;; unbind it as well as I never bother using it.
   (unbind-key "M-n" lsp-signature-mode-map)
 
-  ;; (use-package lsp-ui
-  ;;   :custom
-  ;;   (lsp-ui-doc-enable nil))
+  (use-package lsp-ui
+    :custom
+    (lsp-ui-doc-enable nil)
+    (lsp-ui-sideline-enable nil)
+    )
 
   (use-package lsp-ivy
     :bind (:map lsp-mode-map
