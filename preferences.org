@@ -244,6 +244,24 @@ I switched to readable mode after a web page is rendered.
 (setq recentf-max-saved-items 100)
 #+end_src
 
+** Bookmarks
+
+I keep some frequently accessed files in emacs bookmark so I can quickly jump to them via C-x r b.
+
+Key bindings:
+
+- =C-x r m= (bookmark-set): add bookmark
+- =C-x r b= (bookmark-jump): jump to a bookmark, select interactively
+- =C-x r l= (list-bookmarks): list bookmarks for inspection (and deletion)
+
+#+begin_src emacs-lisp
+(use-package bookmark
+  :custom
+  ;; save bookmark whenever a bookmark is set
+  (bookmark-save-flag 1)
+  )
+#+end_src
+
 ** Remove trailing whitespaces on save
 
 #+BEGIN_SRC emacs-lisp
