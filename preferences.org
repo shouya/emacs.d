@@ -1323,10 +1323,6 @@ Also show a ruler at column 80.
 I use =dumb-jump=, which works out of the box for many languages. I prioritize lsp-mode's find-definition function if it works, otherwise fallback to dumb-jump.
 
 #+BEGIN_SRC emacs-lisp
-(use-package xref
-  :custom
-  (xref-show-definitions-function #'xref-show-definitions-completing-read))
-
 (use-package dumb-jump
   :commands (dumb-jump-xref-activate)
   :custom
@@ -1668,7 +1664,8 @@ Install delta with the instruction here: https://github.com/dandavison/delta
   :hook (magit-mode . magit-delta-mode))
 #+end_src
 
-** Search symbol at point in Dash with =C-c d=
+** Dev docs
+*** Search symbol at point in Dash with =C-c d=
 
 #+BEGIN_SRC emacs-lisp
 (use-package dash-at-point
@@ -1678,6 +1675,14 @@ Install delta with the instruction here: https://github.com/dandavison/delta
   :ensure-system-package
   ("/Applications/Dash.app" . "brew cask install dash"))
 #+END_SRC
+
+*** Query devdocs within Emacs
+
+#+begin_src emacs-lisp
+(use-package devdocs
+  :bind
+  (("C-h D" . devdocs-lookup)))
+#+end_src
 
 ** Auto completion (=M-/=)
 *** Completion engine
