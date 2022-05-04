@@ -111,7 +111,7 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 ** Save customized settings in a separate file
 
 By default the customization is saved into =init.el=. Avoid the mess by saving it
-in a seperate file =custom.el=.
+in a separate file =custom.el=.
 
 #+BEGIN_SRC emacs-lisp
 (setq-default custom-file (expand-file-name "custom.el" user-emacs-directory))
@@ -1684,7 +1684,7 @@ Install delta with the instruction here: https://github.com/dandavison/delta
   (("C-h D" . devdocs-lookup)))
 #+end_src
 
-** Auto completion (=M-/=)
+** Completion and LSP (=M-/=)
 *** Completion engine
 
 Use =company-mode= for auto completion.
@@ -1827,7 +1827,7 @@ Use =TabNine= for general text completion. Please remember to run
   (yas-reload-all))
 #+END_SRC
 
-*** Spport Language Server Protocols (LSP)
+*** Support Language Server Protocols (LSP)
 
 **** LSP mode
 
@@ -1910,7 +1910,6 @@ Use =TabNine= for general text completion. Please remember to run
 
 #+begin_src emacs-lisp
 (use-package dap-mode
-  :disabled t
   :commands (dap-debug dap-hydra)
   :config
   (dap-ui-mode)
@@ -1973,6 +1972,17 @@ Use =TabNine= for general text completion. Please remember to run
   (apheleia-global-mode 1)
   )
 #+END_SRC
+
+** Typos
+
+#+begin_src emacs-lisp
+(use-package typos-mode
+  :after flycheck
+  :straight (:host nil :repo "/home/shou/projects/typos-mode/.git")
+  :config
+  (add-hook 'prog-mode-hook 'typos-mode)
+)
+#+end_src
 
 ** Compile mode configurations
 
