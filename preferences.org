@@ -1228,6 +1228,7 @@ Add extra shortcuts for symbols I frequently use to the TeX input method.
                           ("|->" ?↦) ;; \mapsto
                           ("-->" ?⟶) ;; \longrightarrow
                           ("\sqrt" ?√) ;; \sqrt sometimes disappears
+                          ("\\Phi" ?Φ)
                           ))))
 #+end_src
 
