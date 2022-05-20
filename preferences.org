@@ -2148,9 +2148,8 @@ Colorize function names/arguments in info documentations.
   :custom (exunit-environment '("MIX_ENV=test"))
   :config
   (defun shou/elixir-project-root ()
-    (condition-case nil
-        (exunit-umbrella-project-root)
-      (exunit-project-root)))
+    (or (locate-dominating-file default-directory "apps")
+        (locate-dominating-file default-directory "mix.exs")))
   (advice-add 'exunit-project-root :override 'shou/elixir-project-root)
   )
 #+END_SRC
