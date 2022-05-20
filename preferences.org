@@ -1977,12 +1977,12 @@ Use =TabNine= for general text completion. Please remember to run
 ** Typos
 
 #+begin_src emacs-lisp
-(use-package typos-mode
-  :after flycheck
-  :straight (:host nil :repo "/home/shou/projects/typos-mode/.git")
-  :config
-  (add-hook 'prog-mode-hook 'typos-mode)
-)
+;; (use-package typos-mode
+;;   :after flycheck
+;;   :straight (:host nil :repo "/home/shou/projects/typos-mode/.git")
+;;   :config
+;;   (add-hook 'prog-mode-hook 'typos-mode)
+;; )
 #+end_src
 
 ** Compile mode configurations
