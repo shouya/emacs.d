@@ -2516,11 +2516,11 @@ Kubernetes.el for managing k8s cluster.
     (define-abbrev coq-mode-abbrev-table "gd" "generalize dependent")
     (abbrev-mode 1)
 
-    (custom-theme-set-faces
-     shou/current-theme
-     '(proof-locked-face ((t (:background "#001010"))) t)
-     '(proof-queue-face ((t (:background "#003030"))) t)
-     )
+    ;; (custom-theme-set-faces
+    ;;  shou/current-theme
+    ;;  '(proof-locked-face ((t (:background "#001010"))) t)
+    ;;  '(proof-queue-face ((t (:background "#003030"))) t)
+    ;;  )
 
     (message "coq hook")
     )
