@@ -1918,19 +1918,9 @@ Use =TabNine= for general text completion. Please remember to run
 
   (require 'dap-lldb)
   (require 'dap-gdb-lldb)
+  (require 'dap-elixir)
 
   (dap-gdb-lldb-setup)
-  (dap-register-debug-template
-   "Rust::LLDB Run Configuration"
-   (list :type "lldb"
-         :request "launch"
-         :name "LLDB::Run"
-	       :gdbpath "rust-lldb"
-         :target nil
-         :cwd nil))
-
-  (let ((rustc-ld-path (f-join (s-trim (shell-command-to-string "rustc --print sysroot")) "lib")))
-    (setenv "LD_LIBRARY_PATH" (s-join ":" (list rustc-ld-path (getenv "LD_LIBRARY_PATH")))))
 
   (add-hook 'dap-stopped-hook
             (lambda (arg) (call-interactively #'dap-hydra)))
@@ -2181,6 +2171,37 @@ Press 'g' in compile mode to rerun last command (original 'r').
               (lambda (ret) (append
                              (list "env" (concat "MIX_ENV=" alchemist-mix-env))
                              ret)))
+  )
+#+end_src
+
+**** DAP debugger for exunit tests
+
+#+begin_src emacs-lisp
+(use-package dap-mode
+  :commands (dap-exunit-here)
+  :config
+  (require 'dap-elixir)
+
+  (defun shou/exunit-test-at-point ()
+    (let* ((root (shou/elixir-project-root))
+           (filename (buffer-file-name))
+           (line (line-number-at-pos))
+           (rel-filename (f-relative filename root)))
+      (format "%s:%d" rel-filename line)))
+
+  (defun shou/add-dap-template-this-exunit-test ()
+    (interactive)
+    (dap-register-debug-template
+     (format "Elixir::Test at %s" (shou/exunit-test-at-point))
+     (list :type "Elixir"
+           :cwd nil
+           :request "launch"
+           :program nil
+           :projectDir (f-expand (shou/elixir-project-root))
+           :task "test"
+           :taskArgs (list (shou/exunit-test-at-point))
+           :name "Elixir::Test at point"))
+    )
   )
 #+end_src
 
