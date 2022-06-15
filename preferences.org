@@ -1875,7 +1875,8 @@ Use =TabNine= for general text completion. Please remember to run
   (use-package lsp-ui
     :custom
     (lsp-ui-doc-enable nil)
-    (lsp-ui-sideline-enable nil)
+    (lsp-ui-sideline-enable t)
+    (lsp-ui-sideline-delay 0)
     )
 
   (use-package lsp-ivy
