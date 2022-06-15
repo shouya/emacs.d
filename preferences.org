@@ -2588,7 +2588,7 @@ Kubernetes.el for managing k8s cluster.
   :mode ("\\.clj\\'" "\\.cljs\\'")
   ;; clojure-mode doesn't derive from lisp mode so we have to enable
   ;; parinfer manually
-  :hook (clojure-mode-hook . parinfer-rust-mode)
+  :hook (clojure-mode . parinfer-rust-mode)
   :config
   (use-package cider)
   )
