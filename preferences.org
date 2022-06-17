@@ -1186,7 +1186,9 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 (setq save-abbrevs 'silently)
 
 ;; auto enable abbrev mode
-(setq-default abbrev-mode t)
+(use-package dabbrev
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand)))
 #+end_src
 
 ** MediaWiki
