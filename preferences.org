@@ -1761,13 +1761,28 @@ Orderless allows completion to be filtered by typing space separated words. Simi
   (add-to-list 'load-path (concat (straight--repos-dir) "lsp-mode/" "clients"))
   (setq lsp-keymap-prefix "M-l")
 
+  ;; see https://github.com/minad/corfu/wiki#basic-example-configuration-with-orderless
+  (defun shou/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless))) ;; Configure orderless
+
   :commands (lsp lsp-mode lsp-deferred)
   :bind (:map lsp-mode-map
               ("C-c C-f" . lsp-format-buffer)
               ("M-," . xref-find-definitions)
               ("M-." . xref-find-definitions-other-window)
               )
-  ;; so it can be registered
+
+  :custom
+  ;; use Corfu!
+  (lsp-completion-provider :none)
+
+  ;; 0.5 sec or fail
+  (lsp-response-timeout 0.5)
+
+  :hook
+  (lsp-completion-mode . shou/lsp-mode-setup-completion)
+
   :config
   ;; (use-package lsp-treemacs)
 
@@ -1901,6 +1916,8 @@ Orderless allows completion to be filtered by typing space separated words. Simi
   (apheleia-global-mode 1)
   )
 #+END_SRC
+
+
 
 ** Typos
 
@@ -2579,9 +2596,9 @@ Kubernetes.el for managing k8s cluster.
   (add-hook 'org-mode-hook 'org-indent-mode)
 
   ;; add company completion backend
-  (defun add-org-completion-backend ()
-    (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
-  (add-hook 'org-mode-hook 'add-org-completion-backend)
+  ;; (defun add-org-completion-backend ()
+  ;; (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
+  ;; (add-hook 'org-mode-hook 'add-org-completion-backend)
 
   ;; do not insert blank line after new list items on M-Ret
   (setcdr (assoc 'plain-list-item org-blank-before-new-entry) nil)
