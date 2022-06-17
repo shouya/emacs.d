@@ -1725,63 +1725,6 @@ Use =company-mode= for auto completion.
     (lambda () (interactive) (company-complete-common-or-cycle -1))))
 #+END_SRC
 
-*** TabNine
-
-Use =TabNine= for general text completion. Please remember to run
-=(company-tabnine-install-binary)= after first install.
-
-#+BEGIN_SRC emacs-lisp
-(use-package company-tabnine
-  ;; use my own build with async enabled
-  :straight (:host github :repo "shouya/company-tabnine")
-  :if (eq system-type 'darwin)
-  :after company
-  :disabled
-  :custom
-  (company-tabnine-log-file-path "~/tmp/tabnine.log")
-  (company-tabnine-executable-args '("--log-level" "Trace"))
-  :config
-  (setq company-backends
-        (append company-backends '(company-tabnine))))
-
-(defun shou/tabnine-off ()
-  "turn off TabNine for this buffer"
-  (interactive)
-  (setq-local company-backends (delete 'company-tabnine company-backends)))
-
-
-(defun shou/tabnine-on ()
-  "turn on TabNine for this buffer"
-  (interactive)
-  (setq-local company-backends (add-to-list 'company-backends 'company-tabnine)))
-  #+END_SRC
-
-*** Copilot
-
-#+begin_src emacs-lisp
-(use-package copilot
-  :straight (:host github :repo "zerolfx/copilot.el"
-                   :files ("dist" "copilot.el"))
-  :bind (:map prog-mode-map
-              ("<f8>" . copilot-complete))
-  :config
-  (defun tab-accept-copilot ()
-    (interactive)
-    (or (copilot-accept-completion)
-        (company-indent-or-complete-common nil)))
-
-  ;; modify company-mode behaviors
-  (with-eval-after-load 'company
-    ;; disable inline previews
-    (delq 'company-preview-if-just-one-frontend company-frontends)
-    ;; enable tab completion
-    (define-key company-mode-map (kbd "<tab>") 'tab-accept-copilot)
-    (define-key company-mode-map (kbd "TAB") 'tab-accept-copilot)
-    (define-key company-active-map (kbd "<tab>") 'tab-accept-copilot)
-    (define-key company-active-map (kbd "TAB") 'tab-accept-copilot))
-  )
-#+end_src
-
 *** Company completion
 
 #+BEGIN_SRC emacs-lisp
