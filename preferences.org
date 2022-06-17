@@ -824,7 +824,43 @@ Some modes set this variable automatically, so we need to override them.
 #+END_SRC
 
 ** Minibuffer Completion
-*** Use CtrlF to replace isearch
+
+I now use vertico for minibuffer completion. It's considerable faster than ivy.
+
+#+begin_src emacs-lisp
+(use-package vertico
+  :init
+  (vertico-mode)
+
+  :custom
+  (vertico-cycle t)
+  )
+#+end_src
+
+Show rich info on the margin of vertico completion:
+
+#+begin_src emacs-lisp
+(use-package marginalia
+  :init
+  (marginalia-mode)
+
+  :config
+  (setq marginalia-command-categories
+        (append '((projectile-find-file . project-file)
+                  (projectile-find-dir . project-file)
+                  (projectile-switch-project . file))
+                marginalia-command-categories))
+  )
+#+end_src
+
+Save history across restarts.
+
+#+begin_src emacs-lisp
+(use-package savehist
+  :init
+  (savehist-mode))
+#+end_src
+
 
 #+BEGIN_SRC emacs-lisp
 (use-package ctrlf
@@ -1332,7 +1368,7 @@ Few shortcuts:
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
   :custom
-  (projectile-completion-system 'ivy)
+  (projectile-completion-system 'completing-read)
   (projectile-enable-caching nil)
   (projectile-indexing-method 'alien)
   (projectile-globally-ignored-file-suffixes '("beam"))
@@ -1638,7 +1674,10 @@ I like to manually enable corfu-doc for languages that I'm not familiar with.
 Orderless allows completion to be filtered by typing space separated words. Similar to =prescience.el= but it doesn't sort the result.
 
 #+begin_src emacs-lisp
-(use-package orderless)
+(use-package orderless
+  :config
+  (setq completion-styles '(substring orderless basic))
+  )
 #+end_src
 
 *** Yasnippet
