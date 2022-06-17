@@ -1690,73 +1690,49 @@ Install delta with the instruction here: https://github.com/dandavison/delta
 ** Completion and LSP (=M-/=)
 *** Completion engine
 
-Use =company-mode= for auto completion.
+I now use corfu as my completion engine. Comparing to company, it's more modularized, providing richer feature via opt-in packages.
 
-#+BEGIN_SRC emacs-lisp
-(use-package company
-  :bind ("M-/" . company-complete)
-  :hook (prog-mode . company-mode)
-
+#+begin_src emacs-lisp
+(use-package corfu
   :custom
-  (company-idle-delay 0.3 "Show completion with a small delay")
-  (company-minimum-prefix-length 2 "Show completion after typing n characters")
+  ;; if the line is already indented, try complete instead
+  (tab-always-indent 'complete)
 
-  ;; (company-tooltip-align-annotations t)
-  (company-dabbrev-code-everywhere t)
+  ;; company-coq is more powerful, so let's use that
+  (corfu-excluded-modes '(coq))
+
+  ;; enable auto completion
+  (corfu-auto t)
+  (corfu-auto-delay 0.05)
 
   :config
-  ;; (use-package company-posframe
-  ;;   :config
-  ;;   (company-posframe-mode 1)
+  (global-corfu-mode)
+  )
+#+end_src
 
-  ;;   ;; The below code let desktop.el not record the company-posframe-mode
-  ;;   (require 'desktop)
-  ;;   (push '(company-posframe-mode . nil)
-  ;;         desktop-minor-mode-table)
-  ;;   )
+*** Show docs on completion
 
-  ;; only enable these options
-  (setq company-backends
-        '(company-capf company-dabbrev-code company-files))
+I like to manually enable corfu-doc for languages that I'm not familiar with.
 
-  (define-key company-active-map (kbd "TAB")
-    (lambda () (interactive) (company-complete-common-or-cycle +1)))
-  (define-key company-active-map (kbd "S-TAB")
-    (lambda () (interactive) (company-complete-common-or-cycle -1))))
-#+END_SRC
+#+begin_src emacs-lisp
+(use-package corfu-doc
+  :straight (corfu-doc :host github :repo "galeo/corfu-doc")
+  :after corfu
+  :bind (:map corfu-map
+              ;; Scroll in the documentation window
+              ("M-n" . #'corfu-doc-scroll-up)
+              ("M-p" . #'corfu-doc-scroll-down)
+              )
+  )
+#+end_src
 
-*** Company completion
+*** Completion style
 
-#+BEGIN_SRC emacs-lisp
-(use-package company-quickhelp
-  :hook (company-mode-hook . company-quickhelp-mode)
-  :after company
-  :disabled
-  :custom (company-quickhelp-delay 0.2)
-)
-#+END_SRC
+Orderless allows completion to be filtered by typing space separated words. Similar to =prescience.el= but it doesn't sort the result.
 
-*** Company completion icons on GUI
-
-#+BEGIN_SRC emacs-lisp
-(use-package company-box
-  :init (require 'icons-in-terminal)
-  :disabled
-  :if (display-graphic-p)
-  :hook (company-mode . company-box-mode)
-  :config
-
-  (setq-default company-box-enable-icon t)
-  (setq-default company-box-icons-unknown 'fa_question_circle)
-
-  (setq-default company-box-icons-elisp
-                '((fa_tag :face font-lock-function-name-face) ;; Function
-                  (fa_cog :face font-lock-variable-name-face) ;; Variable
-                  (fa_cube :face font-lock-constant-face)     ;; Feature
-                  (md_color_lens :face font-lock-doc-face)))  ;; Face
-
-  (setq-default company-box-icons-yasnippet 'fa_bookmark))
-#+END_SRC
+#+begin_src emacs-lisp
+(use-package orderless)
+#+end_src
 
 *** Yasnippet
 
@@ -2107,6 +2083,7 @@ Press 'g' in compile mode to rerun last command (original 'r').
 #+begin_src emacs-lisp
 (use-package alchemist
   :after elixir-mode
+  :disabled
   :hook (elixir-mode . alchemist-mode)
 
   :bind (:map alchemist-mode-map
