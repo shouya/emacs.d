@@ -824,101 +824,6 @@ Some modes set this variable automatically, so we need to override them.
 #+END_SRC
 
 ** Minibuffer Completion
-*** Counsel
-
-I use counsel and ivy to complete commands in minibuffer.
-
-Reference: [[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/configuration.org#configure-ivy-and-counsel][hrs/dotfiles]]
-
-#+BEGIN_SRC emacs-lisp
-(use-package counsel
-  :demand t
-  :bind
-  ("M-x" . counsel-M-x)
-  ("M-y" . counsel-yank-pop)
-  ("C-h v" . counsel-describe-variable)
-  ("C-h f" . counsel-describe-function)
-  ("C-x C-f" . counsel-find-file)
-  ("C-c C-S-j" . counsel-org-goto-all)
-  ("C-c f" . counsel-recentf)
-  ("C-c i" . counsel-imenu)
-  ("C-c u" . counsel-unicode-char)
-  ("C-x b" . ivy-switch-buffer)
-  (:map ivy-minibuffer-map
-        ("M-RET" . ivy-immediate-done))
-  (:map org-mode-map
-        ("C-c C-j" . counsel-org-goto))
-
-  :config
-  (setq ivy-count-format "(%d/%d) ")
-  ;; Wrap around when reaches last page
-  (setq ivy-wrap t)
-  ;; Use recentf in switch buffers
-  (setq ivy-use-virtual-buffers t)
-
-  ;; Ignore order for searching words on files
-  ;; Use regular matching for others
-  (setq ivy-re-builders-alist
-        '((read-file-name-internal . ivy--regex-ignore-order)
-          ;; the following will get replaced by ivy-prescient
-          (t . ivy--regex-plus)))
-
-  ;; Do not insert "^" automatically
-  (setq ivy-initial-inputs-alist nil)
-
-  ;; Retain the window after backward-deleted last char
-  (setq ivy-on-del-error-function nil)
-
-  ;; Find file at point
-  (setq counsel-find-file-at-point t)
-
-  ;; auto follow current imenu entry
-  (ivy-configure 'counsel-imenu :update-fn 'auto)
-
-  ;; this package allows richer message for describe variable, etc
-  (use-package ivy-rich)
-
-  ;; Start ivy
-  (ivy-mode)
-  (counsel-mode)
-
-  ;; release the key to unblock ctrlf-search-backwards
-  (unbind-key "C-r" minibuffer-local-map)
-
-  (ivy-rich-mode)
-  )
-#+END_SRC
-
-*** Sort the result produced by =ivy= (ivy-prescient)
-
-=prescient.el= sort the result of ivy based on their "recency" metric.
-
-#+BEGIN_SRC emacs-lisp
-(use-package ivy-prescient
-  :after counsel
-  :hook (emacs-startup . ivy-prescient-mode)
-  :custom
-  ;; save result across sessions
-  (prescient-persist-mode t)
-
-  ;; skip prescient for the following commands
-  (ivy-prescient-sort-commands
-   '(:not swiper
-          swiper-isearch
-          ivy-switch-buffer
-          counsel-imenu
-          org-mru-clock-in
-          counsel-yank-pop
-          flyspell-correct-ivy
-          flyspell-correct-wrapper
-          lsp-ivy-workspace-symbol
-          ))
-
-  ;; try to retain highlighting
-  (ivy-prescient-retain-classic-highlighting t)
-  )
-#+END_SRC
-
 *** Use CtrlF to replace isearch
 
 #+BEGIN_SRC emacs-lisp
@@ -1331,7 +1236,7 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
 (use-package dumb-jump
   :commands (dumb-jump-xref-activate)
   :custom
-  (dumb-jump-selector 'ivy)
+  (dumb-jump-selector 'completing-read)
   (dumb-jump-force-searcher 'rg)
   ;; Defaults to --pcre2. ripgrep's pcre is an opt-in feature that's not enabled by default.
   (dumb-jump-rg-search-args "--auto-hybrid-regex")
@@ -1814,10 +1719,6 @@ Orderless allows completion to be filtered by typing space separated words. Simi
     (lsp-ui-sideline-enable t)
     (lsp-ui-sideline-delay 0)
     )
-
-  (use-package lsp-ivy
-    :bind (:map lsp-mode-map
-                ("C-c C-j" . lsp-ivy-workspace-symbol)))
 
 
   ;; fallback to dumb-jump if lsp can't find defn
