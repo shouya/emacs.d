@@ -240,8 +240,9 @@ I switched to readable mode after a web page is rendered.
 #+begin_src emacs-lisp
 (require 'recentf)
 (add-to-list 'recentf-exclude (rx "bookmarks" eol))
-;; save 100 files instead of default 20 files in history
-(setq recentf-max-saved-items 100)
+;; save 200 files instead of default 20 files in history
+(setq recentf-max-saved-items 200)
+(recentf-mode 1)
 #+end_src
 
 ** Bookmarks
