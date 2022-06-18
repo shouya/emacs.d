@@ -1657,6 +1657,9 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
 
 #+begin_src emacs-lisp
 (use-package corfu
+  :straight (corfu :files (:defaults "extensions/*")
+                   :includes (corfu-info corfu-directory corfu-history))
+
   :custom
   ;; if the line is already indented, try complete instead
   (tab-always-indent 'complete)
@@ -1666,11 +1669,17 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
 
   ;; enable auto completion
   (corfu-auto t)
-  (corfu-auto-delay 0.05)
 
   :config
   (global-corfu-mode)
   )
+#+end_src
+
+Configure corfu extensions:
+
+#+begin_src emacs-lisp
+(use-package corfu-history
+  :after corfu)
 #+end_src
 
 *** Show docs on completion
