@@ -1682,6 +1682,19 @@ Configure corfu extensions:
   :after corfu)
 #+end_src
 
+*** Extra completion
+
+Add more completions to capf for corfu to consume:
+
+#+begin_src emacs-lisp
+(use-package cape
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-ispell)
+  )
+#+end_src
+
 *** Show docs on completion
 
 I like to manually enable corfu-doc for languages that I'm not familiar with.
