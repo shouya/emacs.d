@@ -1105,15 +1105,13 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 ** Multi cursor
 
 #+BEGIN_SRC emacs-lisp
-(global-unset-key (kbd "M-<down-mouse-1>"))
 (use-package multiple-cursors
   :bind (("C-x m" . mc/mark-all-dwim)
          ("C-M-SPC" . mc/mark-next-lines)
          ("C->" . mc/mark-next-like-this-symbol)
          ("C-<" . mc/unmark-next-like-this)
          ("C-M->" . mc/mark-next-like-this)
-         ("C-M-<" . mc/unmark-next-like-this)
-   ("M-<mouse-1>" . mc/add-cursor-on-click))
+         ("C-M-<" . mc/unmark-next-like-this))
   :config (define-key mc/keymap (kbd "<return>") nil))
 #+END_SRC
 
