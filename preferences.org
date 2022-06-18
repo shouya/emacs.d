@@ -845,6 +845,10 @@ Show rich info on the margin of vertico completion:
   :init
   (marginalia-mode)
 
+  :bind
+  (:map minibuffer-local-map
+        ("M-A" . marginalia-cycle))
+
   :config
   (setq marginalia-command-categories
         (append '((projectile-find-file . project-file)
