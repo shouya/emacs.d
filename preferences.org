@@ -870,7 +870,6 @@ Make operations more interactive with =consult.el=.
 (use-package consult
   :bind
   ("M-g g" . consult-goto-line)
-  ("C-x b" . consult-buffer)
   ;; any org heading
   ("C-c C-S-j" . consult-org-agenda)
   (:map org-mode-map
