@@ -913,42 +913,69 @@ entered.
 (use-package expand-region
   :bind (("C-=" . er/expand-region)
          ("C--" . er/contract-region))
+
+  :custom
+  (expand-region-subword-enabled t)
+
+  :config
+  ;; use syntax info in treesitter to mark nodes more properly
+  ;; stolen from https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/20#issue-561155902
+  (defun tree-sitter-mark-bigger-node ()
+    (interactive)
+    (let* ((p (point))
+           (m (or (mark) p))
+           (beg (min p m))
+           (end (max p m))
+           (root (ts-root-node tree-sitter-tree))
+           (node (ts-get-descendant-for-position-range root beg end))
+           (node-beg (ts-node-start-position node))
+           (node-end (ts-node-end-position node)))
+      ;; Node fits the region exactly. Try its parent node instead.
+      (when (and (= beg node-beg) (= end node-end))
+        (when-let ((node (ts-get-parent node)))
+          (setq node-beg (ts-node-start-position node)
+                node-end (ts-node-end-position node))))
+      (set-mark node-end)
+      (goto-char node-beg)))
+
+  (setq er/try-expand-list (append er/try-expand-list
+                                   '(tree-sitter-mark-bigger-node)))
   )
-  ;; :custom
-  ;; (expand-region-subword-enabled t)
-  ;; (expand-region-skip-whitespace t)
-  ;; (expand-region-smart-cursor nil)
+;; :custom
+;;
+;; (expand-region-skip-whitespace t)
+;; (expand-region-smart-cursor nil)
 
-  ;; :config
-  ;; (defun shou/er/mark-org-heading ()
-  ;;   (when (org-at-heading-p)
-  ;;     (end-of-line)
-  ;;     (push-mark nil t t)
-  ;;     (beginning-of-line)))
+;; :config
+;; (defun shou/er/mark-org-heading ()
+;;   (when (org-at-heading-p)
+;;     (end-of-line)
+;;     (push-mark nil t t)
+;;     (beginning-of-line)))
 
-  ;; (require 'the-org-mode-expansions)
-  ;; (defun shou/er/add-org-mode-expansions ()
-  ;;   (set (make-local-variable 'er/try-expand-list)
-  ;;        (append
-  ;;         (remove #'er/mark-defun er/try-expand-list)
-  ;;         '(org-mark-subtree
-  ;;           er/mark-org-element
-  ;;           er/mark-org-element-parent
-  ;;           er/mark-org-code-block
-  ;;           er/mark-sentence
-  ;;           er/mark-org-parent
-  ;;           er/mark-paragraph
-  ;;           shou/er/mark-org-heading
-  ;;           )))
-  ;;   (set (make-local-variable 'er/save-mode-excursion)
-  ;;        #'er/save-org-mode-excursion))
+;; (require 'the-org-mode-expansions)
+;; (defun shou/er/add-org-mode-expansions ()
+;;   (set (make-local-variable 'er/try-expand-list)
+;;        (append
+;;         (remove #'er/mark-defun er/try-expand-list)
+;;         '(org-mark-subtree
+;;           er/mark-org-element
+;;           er/mark-org-element-parent
+;;           er/mark-org-code-block
+;;           er/mark-sentence
+;;           er/mark-org-parent
+;;           er/mark-paragraph
+;;           shou/er/mark-org-heading
+;;           )))
+;;   (set (make-local-variable 'er/save-mode-excursion)
+;;        #'er/save-org-mode-excursion))
 
-  ;; (er/enable-mode-expansions 'org-mode 'shou/er/add-org-mode-expansions)
+;; (er/enable-mode-expansions 'org-mode 'shou/er/add-org-mode-expansions)
 
-  ;; ;; mainly for qualified names like "Struct::method".
-  ;; (require 'cc-mode-expansions)
-  ;; (er/enable-mode-expansions 'rust-mode 'er/add-cc-mode-expansions)
-  ;; )
+;; ;; mainly for qualified names like "Struct::method".
+;; (require 'cc-mode-expansions)
+;; (er/enable-mode-expansions 'rust-mode 'er/add-cc-mode-expansions)
+;; )
 #+END_SRC
 
 ** Writing prose
@@ -1719,6 +1746,8 @@ Orderless allows completion to be filtered by typing space separated words. Simi
 (use-package orderless
   :config
   (setq completion-styles '(substring orderless basic))
+  ;; ignore case for filenames
+  (setq read-file-name-completion-ignore-case t)
   )
 #+end_src
 
