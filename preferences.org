@@ -1717,9 +1717,6 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
   ;; if the line is already indented, try complete instead
   (tab-always-indent 'complete)
 
-  ;; company-coq is more powerful, so let's use that
-  (corfu-excluded-modes '(coq))
-
   ;; enable auto completion
   (corfu-auto t)
 
@@ -1801,6 +1798,7 @@ Orderless allows completion to be filtered by typing space separated words. Simi
 #+begin_src emacs-lisp
 (use-package lsp-mode
   :straight (:host github :repo "emacs-lsp/lsp-mode")
+
   :init
   ;; to fix a weird bug
   (add-to-list 'load-path (concat (straight--repos-dir) "lsp-mode/" "clients"))
@@ -2078,7 +2076,7 @@ Colorize function names/arguments in info documentations.
   ;; Format with C-c C-f
   :bind (:map elixir-mode-map
               ("M-q" . python-fill-paragraph))
-  :hook (elixir-mode . lsp)
+  :hook (elixir-mode . lsp-deferred)
 
   :config
   ;; we don't enable eglot's auto completion functionality
@@ -2537,7 +2535,7 @@ Kubernetes.el for managing k8s cluster.
   )
 
 (use-package company-coq
-  :hook (coq-mode . company-coq-mode)
+  :hook (coq-mode . shou/enable-company-coq)
   :custom
   (company-coq-disabled-features
    '(;; disabling it makes evaluation much faster.
@@ -2550,7 +2548,16 @@ Kubernetes.el for managing k8s cluster.
 
   ;; load symbols and tactics defined externally
   (company-coq-live-on-the-edge t)
-  )
+
+  :config
+  (defun shou/enable-company-coq ()
+    (setq-local completion-at-point-functions
+                (append
+                 (mapcar #'cape-company-to-capf
+                         (list #'company-coq-math-symbols-backend
+                               #'company-coq-choices-backend
+                               #'company-coq-master-backend))
+                 completion-at-point-functions))))
 #+end_src
 
 *** Racket
