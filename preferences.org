@@ -1535,6 +1535,14 @@ Let the project root to be where =mix.exs= is found. This function is used by
   )
 #+end_src
 
+** Connect to external tmux session
+
+Use commands like =emamux:send-buffer=.
+
+#+begin_src emacs-lisp
+(use-package emamux)
+#+end_src
+
 ** Code folding
 
 I use =yafolding= to fold structured code.
@@ -2184,6 +2192,29 @@ Press 'g' in compile mode to rerun last command (original 'r').
            :task "test"
            :taskArgs (list (shou/exunit-test-at-point))
            :name "Elixir::Test at point"))
+    )
+  )
+#+end_src
+
+**** Inferior iex session
+
+#+begin_src emacs-lisp
+(use-package inf-iex
+  :straight (inf-iex :type git
+                  :host github
+                  :repo "DogLooksGood/inf-iex")
+  :hook (elixir-mode . inf-iex-minor-mode)
+  :bind
+  (:map inf-iex-minor-mode-map
+        ("C-c C-c" . inf-iex-eval)
+        ("C-c C-v" . inf-iex-toggle-send-target)
+        ("C-c C-b" . shou/inf-iex-send-buffer)
+        )
+
+  :config
+  (defun shou/inf-iex-send-buffer ()
+    (interactive)
+    (inf-iex--send (buffer-string))
     )
   )
 #+end_src
