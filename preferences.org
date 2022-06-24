@@ -363,6 +363,19 @@ Here I unbind keyboard shortcuts that I frequently mistype.
 (setq confirm-kill-emacs #'yes-or-no-p)
 #+end_src
 
+** Better help
+
+=helpful.el= shows useful extra information for =describe-{function,variable,key}=.
+
+#+begin_src emacs-lisp
+(use-package helpful
+  :bind
+  ("C-h k" . helpful-key)
+  ("C-h f" . helpful-callable)
+  ("C-h v" . helpful-variable)
+  )
+#+end_src
+
 * UI
 ** Tweak main UI
 
