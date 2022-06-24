@@ -536,11 +536,16 @@ Doom modeline
 #+BEGIN_SRC emacs-lisp
 (defun shou/visualize-matching-parens ()
   (show-paren-mode +1)
-  (setq show-paren-style 'expression)
-  (use-package highlight-parentheses)
+  (setq show-paren-style 'mixed)
 )
+(use-package highlight-parentheses
+  :commands
+  (global-highlight-parentheses-mode
+   highlight-parentheses-mode))
+
 
 (add-hook 'emacs-startup-hook 'shou/visualize-matching-parens)
+(add-hook 'emacs-startup-hook 'global-highlight-parentheses-mode)
 
 #+END_SRC
 
