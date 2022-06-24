@@ -1179,13 +1179,17 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 
 ** Auto-correction
 
+I bind M-/ to cape-dabbrev, because dabbrev-completion doesn't search
+other buffers by default. See [[https://stackoverflow.com/questions/22724087/dabbrev-expand-and-dabbrev-completion-inconsistent][emacs - dabbrev-expand and dabbrev-completion inconsistent? - Stack Overflow]].
+
 #+begin_src emacs-lisp
 (setq save-abbrevs 'silently)
 
 ;; auto enable abbrev mode
 (use-package dabbrev
-  :bind (("M-/" . dabbrev-completion)
+  :bind (;; ("M-/" . dabbrev-completion)
          ("C-M-/" . dabbrev-expand)))
+
 #+end_src
 
 ** MediaWiki
@@ -1728,6 +1732,8 @@ Add more completions to capf for corfu to consume:
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-ispell)
+  :bind
+  ("M-/" . cape-dabbrev)
   )
 #+end_src
 
