@@ -238,11 +238,20 @@ I switched to readable mode after a web page is rendered.
 ** Recent file
 
 #+begin_src emacs-lisp
-(require 'recentf)
-(add-to-list 'recentf-exclude (rx "bookmarks" eol))
-;; save 200 files instead of default 20 files in history
-(setq recentf-max-saved-items 200)
-(recentf-mode 1)
+(use-package recentf
+  :ensure nil
+  :bind ("C-x f" . shou/find-recent-file)
+  :config
+  (add-to-list 'recentf-exclude (rx "bookmarks" eol))
+  ;; save 200 files instead of default 20 files in history
+  (setq recentf-max-saved-items 200)
+  (recentf-mode 1)
+  (defun shou/find-recent-file ()
+    (interactive)
+    (find-file (completing-read "Choose recent file: " recentf-list))
+    )
+  (add-to-list 'marginalia-prompt-categories '("Choose recent file:" . file))
+  )
 #+end_src
 
 ** Bookmarks
