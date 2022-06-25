@@ -1758,8 +1758,8 @@ Add more completions to capf for corfu to consume:
 (use-package cape
   :init
   (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-ispell)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   :bind
   ("M-/" . cape-dabbrev)
   )
