@@ -1742,7 +1742,12 @@ Configure corfu extensions:
 
 #+begin_src emacs-lisp
 (use-package corfu-history
-  :after corfu)
+  :after corfu
+  :hook (corfu-mode . corfu-history-mode)
+  :config
+  (savehist-mode 1)
+  (add-to-list 'savehist-additional-variables 'corfu-history)
+  )
 #+end_src
 
 *** Extra completion
