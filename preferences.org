@@ -524,7 +524,7 @@ Doom modeline
   (doom-modeline-lsp nil)
   (doom-modeline-modal-icon nil)
   (doom-modeline-buffer-state-icon t)
-  (doom-modeline-project-detection 'project)
+  (doom-modeline-project-detection 'projectile)
   (doom-modeline-persp-name t)
 
   :config
@@ -878,8 +878,8 @@ Show rich info on the margin of vertico completion:
 
   :config
   (setq marginalia-command-categories
-        (append '((projectile-find-file . project-file)
-                  (projectile-find-dir . project-file)
+        (append '((projectile-find-file . file)
+                  (projectile-find-dir . file)
                   (projectile-switch-project . file))
                 marginalia-command-categories))
   )
@@ -1446,7 +1446,7 @@ Few shortcuts:
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
   :custom
-  (projectile-completion-system 'completing-read)
+  (projectile-completion-system #'completing-read)
   (projectile-enable-caching nil)
   (projectile-indexing-method 'alien)
   (projectile-globally-ignored-file-suffixes '("beam"))
@@ -1474,18 +1474,6 @@ Few shortcuts:
               :filter-return
               #'shou/fix-exs-test-file-name)
   )
-#+END_SRC
-
-*** Customize project-find-functions to find multi-project vc
-
-Let the project root to be where =mix.exs= is found. This function is used by
-=eglot=.
-
-#+BEGIN_SRC emacs-lisp
-(defun shou/elixir-project-finder (dir)
-  (let ((probe (locate-dominating-file dir "mix.exs")))
-    (and probe (cons 'vc probe))))
-(add-hook 'project-find-functions 'shou/elixir-project-finder)
 #+END_SRC
 
 ** Run command
@@ -1757,9 +1745,9 @@ Add more completions to capf for corfu to consume:
 #+begin_src emacs-lisp
 (use-package cape
   :init
-  (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-ispell)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
   :bind
   ("M-/" . cape-dabbrev)
   )
