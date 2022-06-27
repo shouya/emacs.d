@@ -3148,7 +3148,10 @@ Show variable pitch for normal text, and monospace font for codes.
                "sevzi:\n- [ ]\n"
                )
       :time-prompt t
-      :immediate-finish t
+      :immediate-finish t)
+
+     ("n" "News" item (file+olp+datetree "nuzba.org")
+      "%^{News item}"
       :jump-to-captured t)
 
      ("L" "Org protocol link" entry (file+headline "mencti.org" "Captures")
