@@ -2539,7 +2539,11 @@ Kubernetes.el for managing k8s cluster.
   (proof-script-fly-past-comments t)
   (proof-three-window-mode-policy 'hybrid)
   )
+#+end_src
 
+Coq mode completion:
+
+#+begin_src emacs-lisp
 (use-package company-coq
   :hook (coq-mode . shou/enable-company-coq)
   :custom
@@ -2557,6 +2561,8 @@ Kubernetes.el for managing k8s cluster.
 
   :config
   (defun shou/enable-company-coq ()
+    (company-coq-mode +1)
+    (company-mode -1)
     (setq-local completion-at-point-functions
                 (append
                  (mapcar #'cape-company-to-capf
@@ -3140,6 +3146,7 @@ Show variable pitch for normal text, and monospace font for codes.
       "* %(shou/org-time-stamp-string)\n:PROPERTIES:\n:Added: %U\n:END:\n\n\n%?"
       :jump-to-captured t
       )
+
      ("d" "Day planning" plain (file+olp+datetree "plan.org")
       ,(concat ":PROPERTIES:\n:ADDED: %U\n:END:\n"
                "gunka:\n- [ ]%?\n- [ ]\n"
