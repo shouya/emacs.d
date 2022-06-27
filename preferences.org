@@ -521,11 +521,11 @@ Doom modeline
   (doom-modeline-height 19)
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-env-version nil)
-  (doom-modeline-lsp nil)
+  (doom-modeline-lsp t)
   (doom-modeline-modal-icon nil)
   (doom-modeline-buffer-state-icon t)
   (doom-modeline-project-detection 'projectile)
-  (doom-modeline-persp-name t)
+  (doom-modeline-persp-name nil)
 
   :config
   (doom-modeline-mode 1))
