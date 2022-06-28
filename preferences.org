@@ -195,8 +195,16 @@ Features:
 
 ** Web browser
 
+I use eww, firefox, and other programs to open web url in emacs.
 
-I use eww as default web browser when opening web url in emacs.
+#+begin_src emacs-lisp
+(defun shou/open-zoom-url (url &optional _new_window)
+  (shell-command (concat "zoom " url)))
+
+(setq browse-url-browser-function
+      '(("zoom\.us" . shou/open-zoom-url)
+        ("." . browse-url-default-browser)))
+#+end_src
 
 I also like to open the browser in a separate window instead of on the current
 one.
