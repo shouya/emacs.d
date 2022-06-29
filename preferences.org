@@ -199,7 +199,9 @@ I use eww, firefox, and other programs to open web url in emacs.
 
 #+begin_src emacs-lisp
 (defun shou/open-zoom-url (url &optional _new_window)
-  (shell-command (concat "zoom " url)))
+  ;; avoid showing the *Async Shell Command* buffer
+  (let ((async-shell-command-display-buffer nil))
+    (async-shell-command (concat "zoom " url " >/dev/null 2>&1"))))
 
 (setq browse-url-browser-function
       '(("zoom\.us" . shou/open-zoom-url)
