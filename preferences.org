@@ -3170,8 +3170,7 @@ Show variable pitch for normal text, and monospace font for codes.
       )
 
      ("n" "News" item (file+olp+datetree "nuzba.org")
-      "%^{News item}"
-      :jump-to-captured t)
+      "%^{News item}")
 
      ("L" "Org protocol link" entry (file+headline "mencti.org" "Captures")
       "* TODO %:description\n:PROPERTIES:\n:ADDED: %U\n:END:\nSCHEDULED: %t\n%:link\n"
