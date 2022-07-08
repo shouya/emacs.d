@@ -2157,17 +2157,19 @@ Colorize function names/arguments in info documentations.
       (advice-remove 'python-info-docstring-p #'shou/always-docstring)
       (funcall old-major-mode)))
   (advice-add 'python-fill-string :around #'shou/pretend-python-mode)
-  )
 
-  ;;; The original elixir syntax table is a bit awkward. I changed it
-  ;;; a little so things like symbol highlighting works a bit better.
-  ;;
-  ;; original: https://github.com/elixir-editors/emacs-elixir/blob/master/elixir-smie.el#L80
-  ;(modify-syntax-entry ?: "_" elixir-mode-syntax-table) ; make : a punctuation (was symbol)
-  ;(modify-syntax-entry ?@ "." elixir-mode-syntax-table) ; make @ a punctuation (was symbol)
-  ;(modify-syntax-entry ?& "." elixir-mode-syntax-table) ; make & a punctuation (was symbol)
-  ;(modify-syntax-entry ?? "_" elixir-mode-syntax-table) ; make ? a symbol (was word)
-  ;(modify-syntax-entry ?~ "_" elixir-mode-syntax-table) ; make ~ a punctuation (was word)
+  ;; used by templating engines
+  (defun shou/elixir-module-name-for-file (file)
+      (--> file
+           (f-relative it (or (locate-dominating-file it "lib")
+                              (locate-dominating-file it "test")))
+           (f-no-ext it)
+           (f-split it)
+           (cdr it)
+           (mapcar 's-upper-camel-case it)
+           (s-join "." it)
+       ))
+  )
 #+END_SRC
 
 **** Run ExUnit

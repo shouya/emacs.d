@@ -1,0 +1,21 @@
+;; -*- emacs-lisp -*-
+
+fundamental-mode ;; available everywhere
+
+(today (format-time-string "%Y-%m-%d"))
+(now (format-time-string "%H:%M"))
+(calc (p "sin(3.14/2)" formula)  " = " (format "%s" (calc-eval formula)))
+
+elixir-mode
+
+(defmodule "defmodule "
+  (shou/elixir-module-name-for-file (buffer-file-name))
+  " do" n> r n "end")
+(def "def " p " do" n> r> n "  end")
+
+mediawiki-mode
+
+(diary "{{diary}}")
+(code "<code>" r "</code>")
+(syntax "<syntaxhighlight lang=\"" (p "javascript") "\">" n r n "</syntaxhighlight>")
+(s "<syntaxhighlight lang=\"" (p "javascript") "\">" n r n "</syntaxhighlight>")
