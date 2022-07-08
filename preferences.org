@@ -1756,12 +1756,25 @@ Add more completions to capf for corfu to consume:
 
 #+begin_src emacs-lisp
 (use-package cape
-  :init
-  (add-to-list 'completion-at-point-functions #'cape-ispell)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file)
+  :commands (shou/text-mode-completions)
+  :demand t
   :bind
   ("M-/" . cape-dabbrev)
+
+  :hook
+  (text-mode . shou/text-mode-completions)
+
+  :config
+  ;; dabbrev is disabled because it's too noisy. Invoke with M-/ instead.
+  ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-abbrev)
+
+  (defun shou/text-mode-completions ()
+    (make-local-variable 'completion-at-point-functions)
+    ;; add to the end
+    (add-to-list 'completion-at-point-functions #'cape-ispell t)
+    )
   )
 #+end_src
 
