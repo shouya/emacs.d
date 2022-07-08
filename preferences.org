@@ -1807,20 +1807,44 @@ Orderless allows completion to be filtered by typing space separated words. Simi
   )
 #+end_src
 
-*** Yasnippet
+*** Templating with tempel
 
-#+BEGIN_SRC emacs-lisp
-(use-package yasnippet
-  :commands (yas-global-mode yas-minor-mode)
+Templating engine that allows me to quickly enter some text.
+
+#+begin_src emacs-lisp
+(use-package tempel
   :hook
-  (prog-mode . yas-minor-mode)
-  (k8s-mode . yas-minor-mode)
+  (text-mode . shou/add-tempel-to-capf)
+  (prog-mode . shou/add-tempel-to-capf)
+
+  :bind
+  ("C-<tab>" . shou/tempel-expand-or-complete)
+
+  (:map tempel-map
+        ("<tab>" . tempel-next)
+        ("<backtab>" . tempel-previous)
+        ("S-<tab>" . tempel-previous))
+
+
+  :custom
+  ;; cannot be symlinked file because otherwise the auto-reload doesn't work.
+  (tempel-path (f-canonical "~/.emacs.d/templates"))
 
   :config
-  (setq-default yas-snippet-dirs
-                `(,(expand-file-name "snippets" user-emacs-directory)))
-  (yas-reload-all))
-#+END_SRC
+  (defun shou/add-tempel-to-capf ()
+    (make-local-variable 'completion-at-point-functions)
+    (add-to-list 'completion-at-point-functions #'tempel-complete))
+
+
+  ;; expand directly if there is an exact match, otherwise show candidates
+  (defun shou/tempel-expand-or-complete ()
+    (interactive)
+    (if (tempel-expand)
+        (tempel-expand t)
+        (tempel-complete t)))
+  )
+#+end_src
+
 
 *** Support Language Server Protocols (LSP)
 
