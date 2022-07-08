@@ -176,8 +176,6 @@ Features:
 
 #+BEGIN_SRC emacs-lisp
 (bind-key "C-x C-b" 'ibuffer)
-(bind-key "C-<tab>" 'next-buffer)
-(bind-key "C-S-<tab>" 'previous-buffer)
 #+END_SRC
 
 ** Open scratch
