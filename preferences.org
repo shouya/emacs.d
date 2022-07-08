@@ -1226,7 +1226,11 @@ other buffers by default. See [[https://stackoverflow.com/questions/22724087/dab
   :config
   (unbind-key "<tab>" mediawiki-mode-map)
   (unbind-key "S-<tab>" mediawiki-mode-map)
-  )
+  (unbind-key "S-<iso-lefttab>" mediawiki-mode-map)
+  (unbind-key "<backtab>" mediawiki-mode-map)
+  (unbind-key "C-<backslash>" mediawiki-mode-map)
+
+  (bind-key "<tab>" #'completion-at-point mediawiki-mode-map))
 #+end_src
 
 ** CSV file
