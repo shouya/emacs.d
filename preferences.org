@@ -2503,7 +2503,6 @@ K8s mode for editing yaml files.
 #+begin_src emacs-lisp
 (use-package k8s-mode
   :defer t
-  :hook (k8s-mode . yas-minor-mode)
   :magic "apiVersion"
   ;; match all yaml files beneath a folder named "kustom*"
   :mode "/kustom.*ya?ml\\'"
