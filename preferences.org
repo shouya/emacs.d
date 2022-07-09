@@ -865,6 +865,8 @@ I now use vertico for minibuffer completion. It's considerable faster than ivy.
 
 #+begin_src emacs-lisp
 (use-package vertico
+  :straight (vertico :files (:defaults "extensions/*")
+                   :includes (vertico-repeat))
   :init
   (vertico-mode)
 
