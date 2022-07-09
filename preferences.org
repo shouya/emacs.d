@@ -3675,6 +3675,68 @@ I automatically backup my org files using git after idle for a while. The mode i
  )
 #+end_src
 
+* Email
+
+** Email reader
+
+#+begin_src emacs-lisp
+(use-package mu4e
+  ;; I don't use emacs as email client anywhere else
+  :if (and (executable-find "mu")
+           (executable-find "offlineimap"))
+  :commands mu4e
+  :ensure nil
+  :custom
+  (mu4e-sent-folder "/tubi/[Gmail].Sent Mail")
+  (mu4e-drafts-folder "/tubi/[Gmail].Drafts")
+  (mu4e-trash-folder "/tubi/[Gmail].Trash")
+  (mu4e-refile-folder "/tubi/[Gmail].All Mail")
+  ;; update email with U
+  (mu4e-get-mail-command "offlineimap")
+  ;; do not keep message buffer
+  (message-kill-buffer-on-exit t)
+
+  :config
+  (setq user-mail-address (string-trim-right (shell-command-to-string "pass show tubi/email")))
+  (setq user-full-name (string-trim-right
+                        (shell-command-to-string "pass show tubi/gmail/given-name")))
+  )
+#+end_src
+
+** Send email
+
+#+begin_src emacs-lisp
+(use-package smtpmail
+  :ensure nil
+  :after mu4e
+  :custom
+  (smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil)))
+  (smtpmail-auth-credentials
+   '(("smtp.gmail.com" 587 user-email-address nil)))
+  (smtpmail-default-smtp-server "smtp.gmail.com")
+  (smtpmail-smtp-server "smtp.gmail.com")
+  (smtpmail-smtp-service 587)
+
+  :config
+  (setq message-send-mail-function 'smtpmail-send-it)
+  )
+#+end_src
+
+** Email alerts
+
+#+begin_src emacs-lisp
+(use-package mu4e-alert
+  :after mu4e
+  :hook
+  (emacs-startup . mu4e-alert-enable-notifications)
+  (emacs-startup . mu4e-alert-enable-mode-line-display)
+  :custom
+  (mu4e-alert-interesting-mail-query
+   "flag:unread maidir:/tubi/INBOX")
+  (mu4e-alert-set-default-style 'libnotify)
+  )
+#+end_src
+
 * Playground
 
 Try out stuff here and execute manually.
