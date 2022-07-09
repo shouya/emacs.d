@@ -19,3 +19,8 @@ mediawiki-mode
 (code "<code>" r "</code>")
 (syntax "<syntaxhighlight lang=\"" (p "javascript") "\">" n r n "</syntaxhighlight>")
 (s "<syntaxhighlight lang=\"" (p "javascript") "\">" n r n "</syntaxhighlight>")
+
+rust-mode
+
+(todo "todo!()")
+(unused "#[allow(unused)]")

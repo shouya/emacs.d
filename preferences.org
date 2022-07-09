@@ -2332,7 +2332,7 @@ Reformatting JSON.
   (lsp-rust-analyzer-cargo-watch-command "clippy")
 
   ;; show variable types as inlay hints
-  (lsp-rust-analyzer-server-display-inlay-hints t)
+  (lsp-rust-analyzer-server-display-inlay-hints nil)
 
   :bind
   (:map rust-mode-map
