@@ -2568,9 +2568,10 @@ Kubernetes.el for managing k8s cluster.
   (proof-script-fly-past-comments t)
   (proof-three-window-mode-policy 'hybrid)
 
-  :config
+  :init
   (setq proof-splash-enable nil)
 
+  :config
   (defun shou/coq-mode-settings ()
     ;; disable built-in abbrev completions which are pretty annoying.
     (abbrev-mode -1)
