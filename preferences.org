@@ -1856,8 +1856,8 @@ Templating engine that allows me to quickly enter some text.
 
   :init
   ;; to fix a weird bug
-  (add-to-list 'load-path (concat (straight--repos-dir) "lsp-mode/" "clients"))
   (setq lsp-keymap-prefix "M-l")
+  (add-to-list 'load-path (concat (straight--repos-dir) "lsp-mode/" "clients"))
 
   ;; see https://github.com/minad/corfu/wiki#basic-example-configuration-with-orderless
   (defun shou/lsp-mode-setup-completion ()
@@ -1865,18 +1865,21 @@ Templating engine that allows me to quickly enter some text.
           '(orderless))) ;; Configure orderless
 
   :commands (lsp lsp-mode lsp-deferred)
-  :bind (:map lsp-mode-map
-              ("C-c C-f" . lsp-format-buffer)
-              ("M-," . xref-find-definitions)
-              ("M-." . xref-find-definitions-other-window)
-              )
+  :bind
+  (:map lsp-mode-map
+        ("C-c C-f" . lsp-format-buffer)
+        ("M-," . xref-find-definitions)
+        ("M-." . xref-find-definitions-other-window)
+        )
+  :bind-keymap
+  ("M-l" . lsp-command-map)
 
   :custom
   ;; use Corfu!
   (lsp-completion-provider :none)
 
-  ;; 0.5 sec or fail
-  (lsp-response-timeout 0.5)
+  ;; 1 sec or fail
+  (lsp-response-timeout 1.0)
 
   :hook
   (lsp-completion-mode . shou/lsp-mode-setup-completion)
@@ -2613,11 +2616,8 @@ Kubernetes.el for managing k8s cluster.
 
     ;; load symbols and tactics defined externally
     (company-coq-live-on-the-edge t))
-
   )
 #+end_src
-
-
 
 *** Racket
 
