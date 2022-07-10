@@ -3713,19 +3713,12 @@ I automatically backup my org files using git after idle for a while. The mode i
   :commands mu4e
   :ensure nil
   :custom
-  (mu4e-sent-folder "/tubi/[Gmail].Sent Mail")
-  (mu4e-drafts-folder "/tubi/[Gmail].Drafts")
-  (mu4e-trash-folder "/tubi/[Gmail].Trash")
-  (mu4e-refile-folder "/tubi/[Gmail].All Mail")
   ;; update email with U
   (mu4e-get-mail-command "offlineimap")
   ;; do not keep message buffer
   (message-kill-buffer-on-exit t)
-
-  :config
-  (setq user-mail-address (string-trim-right (shell-command-to-string "pass show tubi/email")))
-  (setq user-full-name (string-trim-right
-                        (shell-command-to-string "pass show tubi/gmail/given-name")))
+  ;; ask every time when context is not clear
+  (mu4e-context-policy 'ask)
   )
 #+end_src
 
