@@ -389,6 +389,9 @@ Disable middle and right mouse button. I never use them and often hit them mista
 #+begin_src emacs-lisp
 (global-unset-key [mouse-3])
 (global-unset-key [mouse-2])
+(global-unset-key (kbd "C-<mouse-1>"))
+(global-unset-key (kbd "C-<mouse-2>"))
+(global-unset-key (kbd "C-<mouse-3>"))
 #+end_src
 
 * UI
