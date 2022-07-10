@@ -298,8 +298,6 @@ Copied from [[https://github.com/hrs/sensible-defaults.el/blob/master/sensible-d
 (delete-selection-mode t)
 
 (setq
- ;; middle mouse button yank instead of click
- mouse-yank-at-point t
  ;; search apropos in docs
  apropos-do-all t
  ;; automatically append final new line
@@ -382,6 +380,15 @@ Here I unbind keyboard shortcuts that I frequently mistype.
   ("C-h f" . helpful-callable)
   ("C-h v" . helpful-variable)
   )
+#+end_src
+
+** Pointer behaviour configuration
+
+Disable middle and right mouse button. I never use them and often hit them mistakenly.
+
+#+begin_src emacs-lisp
+(global-unset-key [mouse-3])
+(global-unset-key [mouse-2])
 #+end_src
 
 * UI
@@ -873,6 +880,23 @@ I now use vertico for minibuffer completion. It's considerable faster than ivy.
   :custom
   (vertico-cycle t)
   )
+#+end_src
+
+# Press =M-R= to reveal the last completion session:
+
+#+begin_src emacs-lisp
+;; (use-package vertico-repeat
+;;   :ensure nil
+
+;;   :bind
+;;   (:map minibuffer-local-map
+;;         ("M-r" . vertico-repeat)
+;;         ("M-n" . vertico-next)
+;;         )
+
+;;   :config
+;;   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save 99)
+;;   )
 #+end_src
 
 Show rich info on the margin of vertico completion:
