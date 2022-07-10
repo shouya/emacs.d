@@ -868,12 +868,14 @@ Some modes set this variable automatically, so we need to override them.
 
 ** Minibuffer Completion
 
-I now use vertico for minibuffer completion. It's considerable faster than ivy.
+I now use vertico for minibuffer completion. It's considerably faster than ivy.
 
 #+begin_src emacs-lisp
 (use-package vertico
-  :straight (vertico :files (:defaults "extensions/*")
-                   :includes (vertico-repeat))
+  :straight (:host github
+             :repo "minad/vertico"
+             :files (:defaults "extensions/*")
+             :includes (vertico-repeat))
   :init
   (vertico-mode)
 
@@ -882,21 +884,24 @@ I now use vertico for minibuffer completion. It's considerable faster than ivy.
   )
 #+end_src
 
-# Press =M-R= to reveal the last completion session:
+Press =M-r= to reveal the last completion session:
 
 #+begin_src emacs-lisp
-;; (use-package vertico-repeat
-;;   :ensure nil
+(use-package vertico-repeat
+  :ensure nil
 
-;;   :bind
-;;   (:map minibuffer-local-map
-;;         ("M-r" . vertico-repeat)
-;;         ("M-n" . vertico-next)
-;;         )
+  :bind
+  (:map minibuffer-local-map
+        ("M-r" . vertico-repeat))
 
-;;   :config
-;;   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save 99)
-;;   )
+  :config
+  (setq enable-recursive-minibuffers t)
+
+  (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
+
+  ;; preserve history across restarts
+  (add-to-list 'savehist-additional-variables 'vertico-repeat-history)
+  )
 #+end_src
 
 Show rich info on the margin of vertico completion:
