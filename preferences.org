@@ -1931,7 +1931,7 @@ Templating engine that allows me to quickly enter some text.
   (add-hook 'lsp-mode-hook 'insert-dumb-jump-to-xref)
 
   (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
-  (add-hook 'lsp-mode-hook 'lsp-lens-mode)
+  ;; (add-hook 'lsp-mode-hook 'lsp-lens-mode)
 
   ;; the following line disable lsp-modeline-diagnostics-mode
   (add-hook 'lsp-mode-hook (lambda () (lsp-modeline-diagnostics-mode -1)))
