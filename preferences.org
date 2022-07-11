@@ -3736,7 +3736,6 @@ I automatically backup my org files using git after idle for a while. The mode i
   (message-kill-buffer-on-exit t)
   ;; ask every time when context is not clear
   (mu4e-context-policy 'ask)
-  (mu4e-compose-context-policy 'ask)
   )
 #+end_src
 
@@ -3764,6 +3763,7 @@ I automatically backup my org files using git after idle for a while. The mode i
 #+begin_src emacs-lisp
 (use-package mu4e-alert
   :after mu4e
+  :straight (:host github :repo "xzz53/mu4e-alert")
   :custom
   (mu4e-alert-interesting-mail-query
    "flag:unread maildir:/tubi/INBOX")
