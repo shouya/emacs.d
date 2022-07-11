@@ -3736,6 +3736,8 @@ I automatically backup my org files using git after idle for a while. The mode i
   (message-kill-buffer-on-exit t)
   ;; ask every time when context is not clear
   (mu4e-context-policy 'ask)
+
+  (mu4e-completing-read-function #'completing-read)
   )
 #+end_src
 
