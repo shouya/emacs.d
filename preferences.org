@@ -3766,7 +3766,7 @@ I automatically backup my org files using git after idle for a while. The mode i
   (emacs-startup . mu4e-alert-enable-mode-line-display)
   :custom
   (mu4e-alert-interesting-mail-query
-   "flag:unread maidir:/tubi/INBOX")
+   "flag:unread maildir:/tubi/INBOX")
   (mu4e-alert-set-default-style 'libnotify)
   )
 #+end_src
