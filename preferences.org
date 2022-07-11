@@ -544,6 +544,7 @@ Doom modeline
   (doom-modeline-buffer-state-icon t)
   (doom-modeline-project-detection 'projectile)
   (doom-modeline-persp-name nil)
+  (doom-modeline-mu4e t)
 
   :config
   (doom-modeline-mode 1))
@@ -3722,11 +3723,12 @@ I automatically backup my org files using git after idle for a while. The mode i
 
 #+begin_src emacs-lisp
 (use-package mu4e
-  ;; I don't use emacs as email client anywhere else
+  ;; only use system package. do not install from melpa
   :if (and (executable-find "mu")
            (executable-find "offlineimap"))
-  :commands mu4e
+
   :ensure nil
+  :commands mu4e
   :custom
   ;; update email with U
   (mu4e-get-mail-command "offlineimap")
@@ -3734,6 +3736,7 @@ I automatically backup my org files using git after idle for a while. The mode i
   (message-kill-buffer-on-exit t)
   ;; ask every time when context is not clear
   (mu4e-context-policy 'ask)
+  (mu4e-compose-context-policy 'ask)
   )
 #+end_src
 
@@ -3741,8 +3744,8 @@ I automatically backup my org files using git after idle for a while. The mode i
 
 #+begin_src emacs-lisp
 (use-package smtpmail
-  :ensure nil
   :after mu4e
+  :ensure nil
   :custom
   (smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil)))
   (smtpmail-auth-credentials
@@ -3761,13 +3764,14 @@ I automatically backup my org files using git after idle for a while. The mode i
 #+begin_src emacs-lisp
 (use-package mu4e-alert
   :after mu4e
-  :hook
-  (emacs-startup . mu4e-alert-enable-notifications)
-  (emacs-startup . mu4e-alert-enable-mode-line-display)
   :custom
   (mu4e-alert-interesting-mail-query
    "flag:unread maildir:/tubi/INBOX")
   (mu4e-alert-set-default-style 'libnotify)
+
+  :config
+  (mu4e-alert-enable-notifications)
+  (mu4e-alert-enable-mode-line-display)
   )
 #+end_src
 
