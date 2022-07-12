@@ -1194,6 +1194,31 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 (bind-key "C-S-v" 'shou/mark-line)
 #+END_SRC
 
+*** Symbol case conversion
+
+#+begin_src emacs-lisp
+(defun shou/transform-thing-at-point (thing fn)
+  "Transform thing at point with a string -> string function"
+  (save-excursion
+    (let* ((str (thing-at-point thing t))
+           (region (bounds-of-thing-at-point thing))
+           (replacement (funcall fn str)))
+      (delete-region (car region) (cdr region))
+      (insert replacement))))
+
+(defun shou/to-upper-camel-case ()
+  (interactive)
+  (shou/transform-thing-at-point 'symbol #'s-upper-camel-case))
+
+(defun shou/to-lower-camel-case ()
+  (interactive)
+  (shou/transform-thing-at-point 'symbol #'s-lower-camel-case))
+
+(defun shou/to-snake-case ()
+  (interactive)
+  (shou/transform-thing-at-point 'symbol #'s-snake-case))
+#+end_src
+
 ** Dictionary with =C-c C-d=
 
 #+BEGIN_SRC emacs-lisp
