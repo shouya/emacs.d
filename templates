@@ -12,6 +12,7 @@ elixir-mode
   (shou/elixir-module-name-for-file (buffer-file-name))
   " do" n> r n "end")
 (def "def " p " do" n> r> n "  end")
+(inspect "IO.inspect(" (r "dddd" e) ", label: \"" q p "\")")
 
 mediawiki-mode
 
