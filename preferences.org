@@ -744,6 +744,16 @@ It render =^L= as a page break line, which is nicer to look at.
   :hook (emacs-startup . global-page-break-lines-mode))
 #+end_src
 
+** Fun
+
+#+begin_src emacs-lisp
+(use-package zone
+  :ensure nil
+  :config
+  ;; zone out after 5 minutes
+  (zone-when-idle 300))
+#+end_src
+
 * File management
 ** Basic config
 
