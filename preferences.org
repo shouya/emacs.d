@@ -1961,6 +1961,12 @@ Templating engine that allows me to quickly enter some text.
   ;; 1 sec or fail
   (lsp-response-timeout 1.0)
 
+  ;; do not expect yasnippet is installed
+  (lsp-enable-snippet nil)
+
+  ;; place lens above a line instead at the end of a line
+  (lsp-lens-place-position 'above-line)
+
   :hook
   (lsp-completion-mode . shou/lsp-mode-setup-completion)
 
@@ -1977,7 +1983,6 @@ Templating engine that allows me to quickly enter some text.
   (add-hook 'lsp-mode-hook 'insert-dumb-jump-to-xref)
 
   (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
-  ;; (add-hook 'lsp-mode-hook 'lsp-lens-mode)
 
   ;; the following line disable lsp-modeline-diagnostics-mode
   (add-hook 'lsp-mode-hook (lambda () (lsp-modeline-diagnostics-mode -1)))
