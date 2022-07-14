@@ -2265,7 +2265,8 @@ Colorize function names/arguments in info documentations.
 (use-package exunit
   :after elixir-mode
   :bind (:map elixir-mode-map
-              ("C-c C-t C-t" . exunit-verify-single)
+              ("C-c C-t C-s" . exunit-verify-single)
+              ("C-c C-t C-t" . exunit-rerun)
               ("C-c C-t C-v" . exunit-verify)
               ("C-c C-t C-a" . exunit-verify-all))
   :custom (exunit-environment '("MIX_ENV=test"))
@@ -2274,6 +2275,11 @@ Colorize function names/arguments in info documentations.
     (or (locate-dominating-file default-directory "apps")
         (locate-dominating-file default-directory "mix.exs")))
   (advice-add 'exunit-project-root :override 'shou/elixir-project-root)
+
+  (defun shou/disable-line-move-visual ()
+    (interactive)
+    (setq-local line-move-visual nil))
+  (add-hook 'exunit-compilation-mode-hook #'shou/disable-line-move-visual)
   )
 #+END_SRC
 
