@@ -1815,7 +1815,28 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
 
   :config
   (global-corfu-mode)
+
+  (use-package kind-icon
+    :custom
+    (kind-icon-default-face 'corfu-default)
+    (kind-icon-default-style
+     '(:padding -1.1 :stroke 0 :margin 0 :radius 0 :height 0.4 :scale 1))
+    :config
+    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
   )
+
+;;
+;; Helpful commands for debugging kind icon styles:
+
+;; (insert (let ((kind-icon-default-style
+;;                '(:padding -1 :stroke 0 :margin 0 :radius 0 :height 0.5 :scale 1.0)))
+;;           (kind-icon-reset-cache)
+;;           (kind-icon-formatted 'variable)))
+
+;; (insert (propertize " " 'display `(space :width 10)))
+;; (svg-lib-icon "variable"
+;;               '(:padding -1 :stroke 0 :margin 0 :radius 0 :width 0.5 :height 0.5 :scale 0.5))
+
 #+end_src
 
 Configure corfu extensions:
