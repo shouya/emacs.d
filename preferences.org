@@ -2026,6 +2026,10 @@ Templating engine that allows me to quickly enter some text.
                 (setq my/flycheck-local-cache '((lsp . ((next-checkers . (elixir-credo)))))))
               ))
 
+  ;; See https://github.com/minad/corfu/issues/188#issuecomment-1148658471
+  (with-eval-after-load 'cape
+    (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible))
+
   :custom
   ;; performance tuning
   (read-process-output-max (* 1 1024 1024)) ;; 20mb
