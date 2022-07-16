@@ -2043,9 +2043,6 @@ Templating engine that allows me to quickly enter some text.
   )
 #+end_src
 
-#+RESULTS:
-: #s(hash-table size 65 test eql rehash-size 1.5 rehash-threshold 0.8125 data (:use-package (24591 63835 379792 0) :init (24591 63835 379706 0) :init-secs (0 0 8949 0) :use-package-secs (0 1 984825 0) :config (24591 63835 379701 0) :config-secs (0 0 8937 0)))
-
 *** Debugger support (dap-mode)
 
 #+begin_src emacs-lisp
@@ -3033,17 +3030,6 @@ Make todos respect blocking state.
       (nospace . "-")
       (case-fn . downcase))
     "apply certain rules when generating file name")
-  :config
-
-  ;; fix freeze with message "Deft initializing..."
-  ;; See:
-  ;; - https://github.com/jrblevin/deft/issues/100
-  ;; - https://old.reddit.com/r/emacs/comments/nnk2im
-  (defun deft-parse-summary (contents title)
-  "Parse the file CONTENTS, given the TITLE, and extract a summary.
-The summary is a string extracted from the contents following the
-title."
-  title)
   )
 #+END_SRC
 
