@@ -751,7 +751,12 @@ It render =^L= as a page break line, which is nicer to look at.
   :ensure nil
   :config
   ;; zone out after 5 minutes
-  (zone-when-idle 300))
+  (zone-when-idle 300)
+
+  ;; do not scramble current buffer location
+  (defun shou/save-execursion (f) (save-excursion (funcall f)))
+  (advice-add 'zone :around #'shou/save-execursion)
+  )
 #+end_src
 
 * File management
