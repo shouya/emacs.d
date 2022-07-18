@@ -2679,20 +2679,20 @@ Kubernetes.el for managing k8s cluster.
 *** Coq
 
 #+begin_src emacs-lisp
-;; do not display splash screen
 (use-package proof-general
   :mode ("\\.v\\'" . coq-mode)
-  :hook (coq-mode . shou/enable-company-coq)
+
+  :init
+  ;; do not display splash screen
+  (setq proof-splash-enable nil)
 
   :custom
   ;; do not stuck on comments.
   (proof-script-fly-past-comments t)
   (proof-three-window-mode-policy 'hybrid)
+  )
 
-  :init
-  (setq proof-splash-enable nil)
-
-  :config
+(with-eval-after-load 'coq-mode
   (defun shou/coq-mode-settings ()
     ;; disable built-in abbrev completions which are pretty annoying.
     (abbrev-mode -1)
@@ -2705,23 +2705,27 @@ Kubernetes.el for managing k8s cluster.
 
   (add-hook 'coq-mode-hook #'shou/coq-mode-settings 100)
 
-  ;; Coq mode completion:
-  ;; putting it under proof-general because it loads company-mode and yasnippet which I don't currently use. I will only load it when necessary.
-  (use-package company-coq
-    :commands shou/enable-company-coq
-    :after proof-general
-    :config
-    (defun shou/enable-company-coq ()
-      (company-coq-mode +1)
-      (company-mode -1)
-      (setq-local completion-at-point-functions
-                  (append
-                   (mapcar #'cape-company-to-capf
-                           (list #'company-coq-math-symbols-backend
-                                 #'company-coq-choices-backend
-                                 #'company-coq-master-backend))
-                   completion-at-point-functions)))
+  (defun shou/enable-company-coq ()
+	  (company-coq-mode +1)
+	  (company-mode -1)
+	  (setq-local completion-at-point-functions
+		            (append
+		             (mapcar #'cape-company-to-capf
+			                   (list #'company-coq-math-symbols-backend
+				                       #'company-coq-choices-backend
+				                       #'company-coq-master-backend))
+		             completion-at-point-functions)))
 
+  (add-hook 'coq-mode-hook #'shou/enable-company-coq)
+
+
+  ;; Coq mode completion:
+  ;;
+  ;; putting it under proof-general because it loads company-mode and
+  ;; yasnippet which I don't currently use. I will only load it when
+  ;; necessary.
+  (use-package company-coq
+    :commands company-coq-mode
     :custom
     (company-coq-disabled-features
      '(;; disabling it makes evaluation much faster.
@@ -2733,8 +2737,7 @@ Kubernetes.el for managing k8s cluster.
        ))
 
     ;; load symbols and tactics defined externally
-    (company-coq-live-on-the-edge t))
-  )
+    (company-coq-live-on-the-edge t)))
 #+end_src
 
 *** Racket
