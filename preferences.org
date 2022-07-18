@@ -1850,6 +1850,7 @@ Configure corfu extensions:
 (use-package corfu-history
   :after corfu
   :hook (corfu-mode . corfu-history-mode)
+  :ensure nil
   :config
   (savehist-mode 1)
   (add-to-list 'savehist-additional-variables 'corfu-history)
@@ -2025,6 +2026,10 @@ Templating engine that allows me to quickly enter some text.
     (lsp-ui-sideline-delay 0)
     )
 
+  (use-package lsp-origami
+    :config
+    (add-hook 'lsp-after-open-hook #'lsp-origami-try-enable)
+    )
 
   ;; fallback to dumb-jump if lsp can't find defn
   ;; copied from https://github.com/hlissner/doom-emacs/issues/4662#issuecomment-780911875
