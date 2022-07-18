@@ -1629,12 +1629,24 @@ Few shortcuts:
 
 #+begin_src emacs-lisp
 (use-package eshell
-  :bind ("C-x e" . eshell)
+  :bind
+  ("C-x e" . eshell)
   :defer t
+  :custom
+  (eshell-history-size 10240)
+
   :config
   (setenv "KUBECONFIG"
           (s-join ":" (-map 'f-expand
                             (cons "~/.kube/config" (f-glob "~/.kube/config.d/*")))))
+
+  (defun shou/eshell-insert-history-element ()
+    (interactive)
+    (insert (completing-read "Search history: " (ring-elements eshell-history-ring))))
+
+  (defun shou/eshell-customization ()
+    (bind-key "M-r" #'shou/eshell-insert-history-element eshell-mode-map))
+  (add-hook 'eshell-mode-hook #'shou/eshell-customization)
   )
 #+end_src
 
