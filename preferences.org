@@ -971,15 +971,12 @@ Make operations more interactive with =consult.el=.
 
 #+BEGIN_SRC emacs-lisp
 (use-package ctrlf
-  :bind
-  (("C-s" . ctrlf-forward-default)
-   ("M-s _" . ctrlf-forward-symbol)
-   ("M-s ." . ctrlf-forward-symbol-at-point)
-
-   :map ctrlf-mode-map
-   ("C-r" . ctrlf-backward-default)
-   ("C-M-s" . ctrlf-forward-alternate)
-   ("C-M-r" . ctrlf-backward-alternate))
+  :bind ("C-s" . ctrlf-forward-default)
+  :bind ("C-r" . ctrlf-backward-default)
+  :bind ("C-M-s" . ctrlf-forward-alternate)
+  :bind ("C-M-r" . ctrlf-backward-alternate)
+  :bind ("M-s _" . ctrlf-forward-symbol)
+  :bind ("M-s ." . ctrlf-forward-symbol-at-point)
 )
 #+END_SRC
 
