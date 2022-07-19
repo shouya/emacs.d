@@ -3820,9 +3820,13 @@ I automatically backup my org files using git after idle for a while. The mode i
   ;; do not keep message buffer
   (message-kill-buffer-on-exit t)
   ;; ask every time when context is not clear
-  (mu4e-context-policy 'ask)
+  (mu4e-context-policy 'pick-first)
   ;; use vertico instead of ido
   (mu4e-completing-read-function #'completing-read)
+
+  :init
+  ;; start mu4e in background after 5 seconds of idle
+  (run-with-idle-timer 5 nil (lambda () (mu4e t)))
   )
 #+end_src
 
