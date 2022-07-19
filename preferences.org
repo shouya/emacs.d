@@ -3811,13 +3811,17 @@ I automatically backup my org files using git after idle for a while. The mode i
   :ensure nil
   :commands mu4e
   :custom
-  ;; update email with U
-  (mu4e-get-mail-command "offlineimap")
+  ;; update and reindex email
+  (mu4e-get-mail-command "offlineimap -o -q")
+  ;; update every 10 minutes
+  (mu4e-update-interval (* 60 10))
+  ;; do not spam "Retrieving mail..." in my minibuffer
+  (mu4e-hide-index-messages t)
   ;; do not keep message buffer
   (message-kill-buffer-on-exit t)
   ;; ask every time when context is not clear
   (mu4e-context-policy 'ask)
-
+  ;; use vertico instead of ido
   (mu4e-completing-read-function #'completing-read)
   )
 #+end_src
