@@ -3887,7 +3887,8 @@ Try out stuff here and execute manually.
   (interactive)
   (end-of-buffer)
   (redisplay)
-  (profiler-stop)
+  (when (fboundp 'profiler-stop)
+    (profiler-stop))
   (profiler-start 'cpu)
   (let ((oldgc gcs-done)
         (oldtime (float-time)))
@@ -3895,8 +3896,7 @@ Try out stuff here and execute manually.
       (error (message "GCs: %d Elapsed time: %f seconds"
                         (- gcs-done oldgc) (- (float-time) oldtime))))
     (profiler-report)
-    (profiler-stop)
-))
+    (profiler-stop)))
 #+end_src
 
 
