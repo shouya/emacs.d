@@ -1647,6 +1647,10 @@ Few shortcuts:
   (defun shou/eshell-customization ()
     (bind-key "M-r" #'shou/eshell-insert-history-element eshell-mode-map))
   (add-hook 'eshell-mode-hook #'shou/eshell-customization)
+
+  ;; eshell aliases
+  (fset 'eshell/vi #'find-file)
+  (fset 'eshell/ff #'find-file)
   )
 #+end_src
 
