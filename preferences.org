@@ -1669,8 +1669,19 @@ I use =yafolding= to fold structured code.
 I didn't use =origami.el= because it handles languages like js/json terribly. =yafolding,= on the other hand, is based on indentation alone. This means as long as the document is well-indented, =yafolding= is able to fold correctly.
 
 #+begin_src emacs-lisp
-(use-package yafolding
-  :hook (prog-mode . yafolding-mode))
+;; (use-package yafolding
+;;   :hook (prog-mode . yafolding-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package ts-fold
+  :straight (ts-fold :type git :host github :repo "jcs-elpa/ts-fold")
+  :after tree-sitter
+  :bind (:map prog-mode-map
+              ("C-<return>" . ts-fold-toggle))
+  :config
+  (add-hook 'tree-sitter-after-on-hook #'ts-fold-indicators-mode)
+  )
 #+end_src
 
 ** Auto complete parentheses
@@ -2040,11 +2051,6 @@ Templating engine that allows me to quickly enter some text.
     (lsp-ui-doc-enable nil)
     (lsp-ui-sideline-enable t)
     (lsp-ui-sideline-delay 0)
-    )
-
-  (use-package lsp-origami
-    :config
-    (add-hook 'lsp-after-open-hook #'lsp-origami-try-enable)
     )
 
   ;; fallback to dumb-jump if lsp can't find defn
