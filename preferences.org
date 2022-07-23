@@ -35,12 +35,6 @@ Ensure =use-package= is installed.
 (setq straight-use-package-by-default t)
 #+END_SRC
 
-Allow installing required system packages automatically.
-
-#+BEGIN_SRC emacs-lisp
-(use-package use-package-ensure-system-package)
-#+END_SRC
-
 ** Start server automatically
 
 #+BEGIN_SRC emacs-lisp
@@ -1815,9 +1809,7 @@ Install delta with the instruction here: https://github.com/dandavison/delta
 (use-package dash-at-point
   :if (eq system-type 'darwin)
   :bind (:map prog-mode-map
-              ("C-c d" . dash-at-point))
-  :ensure-system-package
-  ("/Applications/Dash.app" . "brew cask install dash"))
+              ("C-c d" . dash-at-point)))
 #+END_SRC
 
 *** Query devdocs within Emacs
