@@ -2727,21 +2727,18 @@ Kubernetes.el for managing k8s cluster.
   (defun shou/enable-company-coq ()
 	  (company-coq-mode +1)
 	  (company-mode -1)
+
+    ;; a hack to prevent company-coq-master-backend from inserting an
+    ;; extra newline.
+    (fset #'company-coq-post-completion-master #'ignore)
+
 	  (setq-local completion-at-point-functions
 		            (append
-                 (mapcar (lambda (backend)
-                           ;; a hack to prevent
-                           ;; company-coq-master-backend from
-                           ;; inserting excessive newlines.
-                           (-compose
-                            (lambda (capf-result)
-                              (plist-put corfu--extra :exit-function nil)
-                              capf-result)
-                            (cape-company-to-capf backend)))
-			                   (list #'company-coq-math-symbols-backend
+                 (mapcar cape-company-to-capf backend
+		                     (list #'company-coq-math-symbols-backend
 				                       #'company-coq-choices-backend
 				                       #'company-coq-master-backend))
-		             completion-at-point-functions)))
+		             completion-at-point-functions))))))
 
   (add-hook 'coq-mode-hook #'shou/enable-company-coq)
 
