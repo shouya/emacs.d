@@ -3829,6 +3829,10 @@ I automatically backup my org files using git after idle for a while. The mode i
   :init
   ;; start mu4e in background after 5 seconds of idle
   (run-with-idle-timer 5 nil (lambda () (mu4e t)))
+
+  :config
+  (require 'mu4e-icalendar)
+  (mu4e-icalendar-setup)
   )
 #+end_src
 
