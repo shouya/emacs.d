@@ -3840,6 +3840,24 @@ I automatically backup my org files using git after idle for a while. The mode i
   )
 #+end_src
 
+** Mark as spam
+
+#+begin_src emacs-lisp
+  (with-eval-after-load 'mu4e
+    (defvar mu4e-spam-folder)
+
+    (add-to-list 'mu4e-marks
+                 '(spam
+                   :char       "P"
+                   :prompt     "spam"
+                   :show-target (lambda (target) mu4e-spam-folder)
+                   :action      (lambda (docid msg target)
+                                  (mu4e--server-move docid mu4e-spam-folder "+S-u-N"))))
+
+    (mu4e~headers-defun-mark-for spam)
+    (define-key mu4e-headers-mode-map (kbd "P") 'mu4e-headers-mark-for-spam))
+#+end_src
+
 ** Send email
 
 #+begin_src emacs-lisp
