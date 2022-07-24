@@ -2738,7 +2738,7 @@ Kubernetes.el for managing k8s cluster.
 		                     (list #'company-coq-math-symbols-backend
 				                       #'company-coq-choices-backend
 				                       #'company-coq-master-backend))
-		             completion-at-point-functions))))))
+		             completion-at-point-functions)))
 
   (add-hook 'coq-mode-hook #'shou/enable-company-coq)
 
