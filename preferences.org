@@ -2734,7 +2734,7 @@ Kubernetes.el for managing k8s cluster.
 
 	  (setq-local completion-at-point-functions
 		            (append
-                 (mapcar cape-company-to-capf backend
+                 (mapcar #'cape-company-to-capf
 		                     (list #'company-coq-math-symbols-backend
 				                       #'company-coq-choices-backend
 				                       #'company-coq-master-backend))
