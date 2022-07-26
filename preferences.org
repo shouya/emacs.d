@@ -195,9 +195,13 @@ I use eww, firefox, and other programs to open web url in emacs.
   (let ((async-shell-command-display-buffer nil))
     (async-shell-command (concat "zoom " url " >/dev/null 2>&1"))))
 
-(setq browse-url-browser-function
-      '(("zoom\.us" . shou/open-zoom-url)
-        ("." . browse-url-default-browser)))
+(if (< emacs-major-version 28)
+    (setq browse-url-browser-function
+          '(("zoom\.us" . shou/open-zoom-url)
+            ("." . browse-url-default-browser)))
+  (setq browse-url-handlers
+        '(("zoom\.us" . shou/open-zoom-url)
+          ("." . browse-url-default-browser))))
 #+end_src
 
 I also like to open the browser in a separate window instead of on the current
@@ -1737,7 +1741,16 @@ I use =magit= to show git status.
 
   ;; do not show list of tags to faster
   (remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
-)
+
+  ;; magit/transient uses some functions from emacs 28
+  (when (< emacs-major-version 28)
+    (defun length= (str n)
+      (= (length str) n))
+    (defun string-replace (old new s)
+      (s-replace old new s))
+    (defun string-search (needle haystack &optional start-pos)
+      (s-contains? needle haystack)))
+  )
 #+END_SRC
 
 *** Use =forge= for online features
