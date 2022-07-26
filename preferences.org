@@ -1773,6 +1773,13 @@ Hotkey to remember:
   :after magit
   :bind (:map magit-mode-map
               ("M-W" . forge-copy-url-at-point-as-kill))
+  :config
+  ;; '(githost apihost id class)
+  (add-to-list 'forge-alist
+               '("git.lain.li"
+                 "git.lain.li/api/v1"
+                 "git.lain.li"
+                 forge-gitea-repository))
   )
 #+END_SRC
 
