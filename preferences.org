@@ -101,6 +101,15 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
   :commands restart-emacs)
 #+END_SRC
 
+** Boot-time configuration
+
+Mute unimportant warnings at boot time.
+
+#+begin_src emacs-lisp
+;; Mute "ad-handle-definition: ‘url-cache-extract’ got redefined" warning
+(setq ad-redefinition-action 'accept)
+#+end_src
+
 * General behavior
 ** Save customized settings in a separate file
 
