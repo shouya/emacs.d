@@ -1557,6 +1557,7 @@ Few shortcuts:
   (projectile-create-missing-test-files t)
   ;; speed up tramp (https://emacs.stackexchange.com/questions/17543/tramp-mode-is-much-slower-than-using-terminal-to-ssh)
   (projectile-mode-line "P")
+  (projectile-switch-project-action 'shou/action-after-switch-project)
 
   :hook (after-init . projectile-mode)
 
@@ -1577,6 +1578,12 @@ Few shortcuts:
   (advice-add #'projectile--test-name-for-impl-name
               :filter-return
               #'shou/fix-exs-test-file-name)
+
+  (defun shou/action-after-switch-project ()
+    "open magit or prompt for find file"
+    (if (magit-git-repo-p default-directory)
+        (magit)
+        (projectile-find-file)))
   )
 #+END_SRC
 
