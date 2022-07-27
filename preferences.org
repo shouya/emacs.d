@@ -1638,7 +1638,6 @@ Few shortcuts:
 (use-package eshell
   :bind
   ("C-x e" . eshell)
-  :defer t
   :custom
   (eshell-history-size 10240)
 
@@ -1652,7 +1651,9 @@ Few shortcuts:
     (insert (completing-read "Search history: " (ring-elements eshell-history-ring))))
 
   (defun shou/eshell-customization ()
-    (bind-key "M-r" #'shou/eshell-insert-history-element eshell-mode-map))
+    (bind-key "M-r" #'shou/eshell-insert-history-element eshell-mode-map)
+    (bind-key "M-r" #'shou/eshell-insert-history-element eshell-hist-mode-map)
+    )
   (add-hook 'eshell-mode-hook #'shou/eshell-customization)
 
   ;; eshell aliases
