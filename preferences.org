@@ -1352,7 +1352,7 @@ Add extra shortcuts for symbols I frequently use to the TeX input method.
 (use-package avy
   :bind
   ("M-j" . avy-goto-char-timer)
-  ("M-S-j" . avy-pop-mark)
+  ("M-J" . avy-pop-mark)
 
   :custom
   (avy-style 'at-full)
