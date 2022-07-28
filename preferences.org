@@ -971,7 +971,14 @@ Make operations more interactive with =consult.el=.
   (:map org-mode-map
         ;; org heading of this file
         ("C-c C-j" . consult-org-heading))
+
+  :config
   )
+
+(with-eval-after-load 'lsp-mode
+  (use-package consult-lsp
+    :bind (:map lsp-mode-map
+                ("C-c C-j" . consult-lsp-symbols))))
 #+end_src
 
 ** Use CtrlF to replace isearch
