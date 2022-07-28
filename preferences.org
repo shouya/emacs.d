@@ -1588,7 +1588,8 @@ Few shortcuts:
 
   (defun shou/action-after-switch-project ()
     "open magit or prompt for find file"
-    (if (magit-git-repo-p default-directory)
+    (if (and (fboundp 'magit-git-repo-p)
+             (magit-git-repo-p default-directory))
         (magit)
         (projectile-find-file)))
   )
