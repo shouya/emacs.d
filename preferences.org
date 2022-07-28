@@ -2291,6 +2291,14 @@ Colorize function names/arguments in info documentations.
   )
 #+end_src
 
+**** Eval elisp within emacs
+
+Use pretty eval expression by default because it prints the full output when overflows.
+
+#+begin_src emacs-lisp
+(bind-key "M-:" #'pp-eval-expression)
+#+end_src
+
 *** Elixir
 **** Use =elixir-mode= for highlighting
 
