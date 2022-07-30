@@ -401,6 +401,15 @@ Disable middle and right mouse button. I never use them and often hit them mista
 (global-unset-key (kbd "C-<mouse-3>"))
 #+end_src
 
+** Performance optimization for files with long lines
+
+Refer to [[https://200ok.ch/posts/2020-09-29_comprehensive_guide_on_handling_long_lines_in_emacs.html][Comprehensive guide on handling long lines in Emacs]] for additional directions.
+
+#+begin_src emacs-lisp
+(if (version<= "27.1" emacs-version)
+    (global-so-long-mode 1))
+#+end_src
+
 * UI
 ** Tweak main UI
 
