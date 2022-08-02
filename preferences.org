@@ -1888,9 +1888,6 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
   ;; if the line is already indented, try complete instead
   (tab-always-indent 'complete)
 
-  ;; enable auto completion
-  (corfu-auto t)
-
   :config
   (global-corfu-mode)
 
