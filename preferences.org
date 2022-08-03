@@ -1759,6 +1759,9 @@ I use =magit= to show git status.
   ;; https://twitter.com/iLemming/status/1243322552828571649
   (magit-save-repository-buffers 'save-all-and-dont-ask)
 
+  ;; sort branches (or any refs) by creation date
+  (magit-list-refs-sortby "-creatordate")
+
   :config
   ;; so it don't close other windows
   (fset 'magit-restore-window-configuration (lambda (x) (kill-buffer-and-window)))
