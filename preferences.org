@@ -1903,6 +1903,15 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
   ;; enable auto completion
   (corfu-auto t)
 
+  (x-gtk-resize-child-frames
+   (and
+    ;; XXX Hack to fix resizing on gtk3/gnome taken from posframe.el
+    ;; See https://github.com/minad/corfu/issues/17
+    (string-match-p "GTK3" system-configuration-features)
+    (string-match-p "GNOME" (or (getenv "XDG_CURRENT_DESKTOP")
+                                (getenv "DESKTOP_SESSION") ""))
+    'resize-mode))
+
   :config
   (global-corfu-mode)
 
