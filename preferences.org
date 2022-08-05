@@ -683,6 +683,15 @@ Use =C-c <left>= and =C-c <right>= to undo layout.
 
 #+begin_src emacs-lisp
 (use-package transpose-frame
+  :init
+  ;; window-redisplay-end-trigger was obsolete and removed from latest
+  ;; emacs 29 snapshot.
+  ;;
+  ;; I fset these functions to ignore so tranpose-frame doesn't break.
+  (when (not (fboundp 'window-redisplay-end-trigger))
+    (fset 'window-redisplay-end-trigger 'ignore)
+    (fset 'set-window-redisplay-end-trigger 'ignore))
+
   :commands (transpose-frame flip-frame)
   :bind ("C-x C-t" . transpose-frame)
   )
