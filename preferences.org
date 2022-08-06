@@ -1922,6 +1922,13 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
      '(:padding -1.1 :stroke 0 :margin 0 :radius 0 :height 0.4 :scale 1))
     :config
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+  ;; enable corfu completion for eval-expession/shell-command
+  (defun corfu-enable-in-minibuffer ()
+    "Enable Corfu in the minibuffer if `completion-at-point' is bound."
+    (when (where-is-internal #'completion-at-point (list (current-local-map)))
+      (corfu-mode 1)))
+  (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
   )
 
 ;;
