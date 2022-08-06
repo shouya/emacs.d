@@ -622,9 +622,9 @@ Note: Press =C-x z= and keep pressing =z= to repeat the last command.
 (define-key global-map (kbd "C-x -") 'split-window-below)
 (define-key global-map (kbd "C-x |") 'split-window-right)
 
-;; prefer splitting window vertically
-(setq split-width-threshold 70)
-(setq split-height-threshold 40)
+;; prefer splitting window vertically (|)
+(setq split-width-threshold 140)
+(setq split-height-threshold nil)
 #+END_SRC
 
 ** Turn off auto window scroll to get faster movement
