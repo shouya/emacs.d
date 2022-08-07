@@ -1902,15 +1902,6 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
   ;; enable auto completion
   (corfu-auto t)
 
-  (x-gtk-resize-child-frames
-   (and
-    ;; XXX Hack to fix resizing on gtk3/gnome taken from posframe.el
-    ;; See https://github.com/minad/corfu/issues/17
-    (string-match-p "GTK3" system-configuration-features)
-    (string-match-p "GNOME" (or (getenv "XDG_CURRENT_DESKTOP")
-                                (getenv "DESKTOP_SESSION") ""))
-    'resize-mode))
-
   :config
   (global-corfu-mode)
 
@@ -1993,6 +1984,7 @@ I like to manually enable corfu-doc for languages that I'm not familiar with.
 (use-package corfu-doc
   :straight (corfu-doc :host github :repo "galeo/corfu-doc")
   :after corfu
+  :hook (corfu-mode . corfu-doc-mode)
   :bind (:map corfu-map
               ;; Scroll in the documentation window
               ("M-n" . #'corfu-doc-scroll-up)
@@ -2094,6 +2086,20 @@ Templating engine that allows me to quickly enter some text.
   ;; place lens above a line instead at the end of a line
   (lsp-lens-place-position 'above-line)
 
+  ;; performance tuning
+  (read-process-output-max (* 1 1024 1024)) ;; 20mb
+
+  ;; only sort by position
+  (lsp-imenu-sort-methods '(position kind name))
+  (lsp-imenu-show-container-name t)
+
+  ;; do not show breadcrumb
+  (lsp-headerline-breadcrumb-enable nil)
+
+  ;; do not auto configure dap-mode unless I explicitly asked for it.
+  ;; otherwise it starts dap-tooltip-mode which interfere with the corfu popup.
+  (lsp-enable-dap-auto-configure nil)
+
   :hook
   (lsp-completion-mode . shou/lsp-mode-setup-completion)
 
@@ -2155,17 +2161,6 @@ Templating engine that allows me to quickly enter some text.
   ;; See https://github.com/minad/corfu/issues/188#issuecomment-1148658471
   (with-eval-after-load 'cape
     (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible))
-
-  :custom
-  ;; performance tuning
-  (read-process-output-max (* 1 1024 1024)) ;; 20mb
-
-  ;; only sort by position
-  (lsp-imenu-sort-methods '(position kind name))
-  (lsp-imenu-show-container-name t)
-
-  ;; do not show breadcrumb
-  (lsp-headerline-breadcrumb-enable nil)
   )
 #+end_src
 
@@ -2186,6 +2181,8 @@ Templating engine that allows me to quickly enter some text.
 
   (add-hook 'dap-stopped-hook
             (lambda (arg) (call-interactively #'dap-hydra)))
+
+  (dap-tooltip-mode -1)
   )
 #+end_src
 
