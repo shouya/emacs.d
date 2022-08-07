@@ -1456,8 +1456,7 @@ Also show a ruler at column 80.
 ** Show line number
 
 #+BEGIN_SRC emacs-lisp
-(use-package nlinum
-  :hook (prog-mode . nlinum-mode))
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
 
 ;; (add-hook 'prog-mode-hook 'linum-mode)
 #+END_SRC
