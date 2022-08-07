@@ -4014,6 +4014,32 @@ Try out stuff here and execute manually.
 #+RESULTS:
 : 2
 
+* Debugging cheatsheet
+
+** Trace function argument/return value
+
+#+begin_src emacs-lisp :eval never-export
+(trace-function 'dap-tooltip-mode)
+#+end_src
+
+** Show call stack when a function gets called
+
+#+begin_src emacs-lisp :eval never-export
+(debug-on-entry 'dap-tooltip-mode)
+#+end_src
+
+** Show recent interactions
+
+Useful for finding out what gets triggered in a recent user action.
+
+Type =C-h l= or =M-x view-lossage=.
+
+** Enable debug on error
+
+#+begin_src emacs-lisp :eval never-export
+(toggle-debug-on-error)
+#+end_src
+
 * fanmo
 
 .i fanmo
