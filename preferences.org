@@ -4018,13 +4018,13 @@ Try out stuff here and execute manually.
 
 ** Trace function argument/return value
 
-#+begin_src emacs-lisp :eval never-export
+#+begin_src emacs-lisp :tangle no
 (trace-function 'dap-tooltip-mode)
 #+end_src
 
 ** Show call stack when a function gets called
 
-#+begin_src emacs-lisp :eval never-export
+#+begin_src emacs-lisp :tangle no
 (debug-on-entry 'dap-tooltip-mode)
 #+end_src
 
@@ -4036,7 +4036,7 @@ Type =C-h l= or =M-x view-lossage=.
 
 ** Enable debug on error
 
-#+begin_src emacs-lisp :eval never-export
+#+begin_src emacs-lisp :tangle no
 (toggle-debug-on-error)
 #+end_src
 
