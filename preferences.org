@@ -561,6 +561,8 @@ Doom modeline
   (doom-modeline-project-detection 'projectile)
   (doom-modeline-persp-name nil)
   (doom-modeline-mu4e t)
+  ;; do not use project relative path
+  (doom-modeline-buffer-file-name-style 'buffer-name)
 
   :config
   (doom-modeline-mode 1))
