@@ -171,8 +171,10 @@ Features:
 ** =C-x k= Kill current buffer
 
 #+BEGIN_SRC emacs-lisp
-(bind-key "C-x k"
-  (lambda () (interactive) (kill-buffer (current-buffer))))
+(defun shou/kill-current-buffer nil
+  (interactive)
+  (kill-buffer (current-buffer)))
+(bind-key "C-x k" 'shou/kill-current-buffer)
 #+END_SRC
 
 ** =C-x C-b= to view ibuffer
