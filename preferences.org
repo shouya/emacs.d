@@ -3901,8 +3901,11 @@ I automatically backup my org files using git after idle for a while. The mode i
   :if (and (executable-find "mu")
            (executable-find "offlineimap"))
   :init
-  (when (file-directory-p "/usr/share/emacs/site-lisp/elpa-src/mu4e-1.8.7")
-    (add-to-list 'load-path "/usr/share/emacs/site-lisp/elpa-src/mu4e-1.8.7"))
+  ;; add mu4e directory to load-path
+  (let* ((mu4e-src-dirs (f-glob "/usr/share/emacs/site-lisp/elpa-src/mu4e-*"))
+         (mu4e-src-dir (and mu4e-src-dirs (car mu4e-src-dirs))))
+    (when mu4e-src-dir
+      (add-to-list 'load-path mu4e-src-dir)))
 
   :straight nil
   :ensure nil
