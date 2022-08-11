@@ -3900,7 +3900,11 @@ I automatically backup my org files using git after idle for a while. The mode i
   ;; only use system package. do not install from melpa
   :if (and (executable-find "mu")
            (executable-find "offlineimap"))
+  :init
+  (when (file-directory-p "/usr/share/emacs/site-lisp/elpa-src/mu4e-1.8.7")
+    (add-to-list 'load-path "/usr/share/emacs/site-lisp/elpa-src/mu4e-1.8.7"))
 
+  :straight nil
   :ensure nil
   :commands mu4e
   :custom
