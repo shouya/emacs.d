@@ -4053,6 +4053,14 @@ Type =C-h l= or =M-x view-lossage=.
 (toggle-debug-on-error)
 #+end_src
 
+** Invalidate org-babel cache (preferences.el)
+
+Just =C-x C-e= on the following line.
+
+#+begin_src emacs-lisp :tangle no
+(delete-file "~/.emacs.d/preferences.el")
+#+end_src
+
 * fanmo
 
 .i fanmo
