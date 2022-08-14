@@ -1588,6 +1588,7 @@ Few shortcuts:
   ;; speed up tramp (https://emacs.stackexchange.com/questions/17543/tramp-mode-is-much-slower-than-using-terminal-to-ssh)
   (projectile-mode-line "P")
   (projectile-switch-project-action 'shou/action-after-switch-project)
+  (projectile-track-known-projects-automatically nil)
 
   :hook (after-init . projectile-mode)
 
