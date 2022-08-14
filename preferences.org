@@ -500,11 +500,13 @@ I use "Input" as my default font face.
 (cond
  ((eq system-type 'gnu/linux)
   (setq shou/mono-font-height 130)
-  (setq shou/var-font-height 140))
+  (setq shou/mono-font-rel-height 1.0)
+  (setq shou/var-font-rel-height 1.07))
 
  ((eq system-type 'darwin)
   (setq shou/mono-font-height 150)
-  (setq shou/var-font-height 160)
+  (setq shou/mono-font-rel-height 1.0)
+  (setq shou/var-font-rel-height 1.07)
   ))
 
 
@@ -513,9 +515,9 @@ I use "Input" as my default font face.
 (set-face-attribute 'default nil
                     :family shou/mono-font :height shou/mono-font-height)
 (set-face-attribute 'fixed-pitch nil
-                    :family shou/mono-font :height shou/mono-font-height)
+                    :family shou/mono-font :height shou/mono-font-rel-height)
 (set-face-attribute 'variable-pitch nil
-                    :family shou/var-font :height shou/var-font-height)
+                    :family shou/var-font :height shou/var-font-rel-height)
 #+END_SRC
 
 ** Ligature
