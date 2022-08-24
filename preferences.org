@@ -3701,8 +3701,9 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
     (org-pandoc-options-for-mediawiki '((shift-heading-level-by . "1")))
     )
 
-  ;; latex options
+  (setq org-export-with-broken-links 'mark)
 
+  ;; latex options
   (setq org-export-with-smart-quotes t)
   (setq org-latex-pdf-process
    '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
