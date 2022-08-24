@@ -1723,11 +1723,9 @@ I didn't use =origami.el= because it handles languages like js/json terribly. =y
 #+begin_src emacs-lisp
 (use-package ts-fold
   :straight (ts-fold :type git :host github :repo "jcs-elpa/ts-fold")
-  :after tree-sitter
+  :after tree-sitter-langs
   :bind (:map prog-mode-map
               ("C-<return>" . ts-fold-toggle))
-  :config
-  (add-hook 'tree-sitter-after-on-hook #'ts-fold-indicators-mode)
   )
 #+end_src
 
