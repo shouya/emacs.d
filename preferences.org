@@ -1343,7 +1343,16 @@ other buffers by default. See [[https://stackoverflow.com/questions/22724087/dab
   (unbind-key "<backtab>" mediawiki-mode-map)
   (unbind-key "C-<backslash>" mediawiki-mode-map)
 
-  (bind-key "<tab>" #'completion-at-point mediawiki-mode-map))
+  (bind-key "<tab>" #'completion-at-point mediawiki-mode-map)
+  (bind-key "C-c !" #'shou/insert-wiki-date-link mediawiki-mode-map)
+
+  (defun shou/insert-wiki-date-link (arg)
+    (interactive "P")
+    (let* ((format "<[%b %-d, %Y]>")
+           (org-time-stamp-formats (cons format format))
+           (org-read-date-prefer-future nil))
+      (org-time-stamp arg 'inactive)))
+  )
 #+end_src
 
 ** CSV file
