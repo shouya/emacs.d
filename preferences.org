@@ -2347,7 +2347,9 @@ Colorize function names/arguments in info documentations.
 #+begin_src emacs-lisp
 (use-package parinfer-rust-mode
   :straight (:host github :repo "justinbarclay/parinfer-rust-mode" :branch "main")
-  :hook lisp-mode
+  ;; disabled for now because it's making helpful-mode slow at loading
+  ;; up the source code
+  :disabled
   )
 #+end_src
 
