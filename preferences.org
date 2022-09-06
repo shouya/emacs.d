@@ -4004,43 +4004,6 @@ I automatically backup my org files using git after idle for a while. The mode i
   )
 #+end_src
 
-* Playground
-
-Try out stuff here and execute manually.
-
-#+begin_src emacs-lisp :eval query
-(+ 1 1)
-
-(defun scroll-up-benchmark ()
-  (interactive)
-  (end-of-buffer)
-  (redisplay)
-  (let ((oldgc gcs-done)
-        (oldtime (float-time)))
-    (condition-case nil (while t (previous-line) (redisplay))
-      (error (message "GCs: %d Elapsed time: %f seconds"
-                      (- gcs-done oldgc) (- (float-time) oldtime))))))
-
-(defun scroll-up-profile ()
-  (interactive)
-  (end-of-buffer)
-  (redisplay)
-  (when (fboundp 'profiler-stop)
-    (profiler-stop))
-  (profiler-start 'cpu)
-  (let ((oldgc gcs-done)
-        (oldtime (float-time)))
-    (condition-case nil (while t (previous-line) (redisplay))
-      (error (message "GCs: %d Elapsed time: %f seconds"
-                        (- gcs-done oldgc) (- (float-time) oldtime))))
-    (profiler-report)
-    (profiler-stop)))
-#+end_src
-
-
-#+RESULTS:
-: 2
-
 * Debugging cheatsheet
 
 ** Trace function argument/return value
@@ -4074,6 +4037,45 @@ Just =C-x C-e= on the following line.
 #+begin_src emacs-lisp :tangle no
 (delete-file "~/.emacs.d/preferences.el")
 #+end_src
+
+* Playground
+
+Try out stuff here and execute manually.
+
+#+begin_src emacs-lisp :tangle no
+(+ 1 1)
+
+(use-package pass)
+
+(defun scroll-up-benchmark ()
+  (interactive)
+  (end-of-buffer)
+  (redisplay)
+  (let ((oldgc gcs-done)
+        (oldtime (float-time)))
+    (condition-case nil (while t (previous-line) (redisplay))
+      (error (message "GCs: %d Elapsed time: %f seconds"
+                      (- gcs-done oldgc) (- (float-time) oldtime))))))
+
+(defun scroll-up-profile ()
+  (interactive)
+  (end-of-buffer)
+  (redisplay)
+  (when (fboundp 'profiler-stop)
+    (profiler-stop))
+  (profiler-start 'cpu)
+  (let ((oldgc gcs-done)
+        (oldtime (float-time)))
+    (condition-case nil (while t (previous-line) (redisplay))
+      (error (message "GCs: %d Elapsed time: %f seconds"
+                        (- gcs-done oldgc) (- (float-time) oldtime))))
+    (profiler-report)
+    (profiler-stop)))
+#+end_src
+
+
+#+RESULTS:
+: 2
 
 * fanmo
 
