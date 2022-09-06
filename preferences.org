@@ -1436,27 +1436,10 @@ Add extra shortcuts for symbols I frequently use to the TeX input method.
 Stolen from https://stackoverflow.com/a/45363946/1232832.
 
 #+begin_src emacs-lisp
-(define-key global-map [(meta up)]
-  #'(lambda() (interactive) (scroll-other-window -1)))
-(define-key global-map [(meta down)]
-  #'(lambda() (interactive) (scroll-other-window 1)))
+(define-key global-map [(meta up)] #'(lambda() (interactive) (scroll-other-window -1)))
+(define-key global-map [(meta down)] #'(lambda() (interactive) (scroll-other-window 1)))
 #+end_src
 
-** Pulse highlight after jumping
-
-#+begin_src emacs-lisp
-(use-package pulse
-  ;; pulse.el is built-in
-  :ensure nil
-  :config
-  (defun shou/pulse-line (&rest _)
-    (pulse-momentary-highlight-one-line))
-
-  (dolist (command '(other-window
-                     window-configuration-change-hook
-                     ))
-    (advice-add command :after #'shou/pulse-line)))
-#+end_src
 
 * Programming
 ** Show column number
