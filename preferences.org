@@ -388,6 +388,10 @@ Here I unbind keyboard shortcuts that I frequently mistype.
   ("C-h k" . helpful-key)
   ("C-h f" . helpful-callable)
   ("C-h v" . helpful-variable)
+
+  :config
+  (add-hook 'helpful-mode-hook #'shou/set-tab-width-to-8)
+  (defun shou/set-tab-width-to-8 nil (setq-local tab-width 8))
   )
 #+end_src
 
