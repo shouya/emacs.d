@@ -1950,7 +1950,7 @@ Install delta with the instruction here: https://github.com/dandavison/delta
 #+end_src
 
 ** Completion and LSP (=M-/=)
-*** Completion engine
+*** Completion engine (corfu)
 
 I now use corfu as my completion engine. Comparing to company, it's more modularized, providing richer feature via opt-in packages.
 
@@ -2037,6 +2037,14 @@ Add more completions to capf for corfu to consume:
     ;; add to the end
     (add-to-list 'completion-at-point-functions #'cape-ispell t)
     )
+
+  ;; c.f. https://github.com/minad/corfu#completing-in-the-eshell-or-shell
+  (when (version< emacs-version "29")
+    ;; Silence the pcomplete capf, no errors or messages!
+    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
+    ;; Ensure that pcomplete does not write to the buffer
+    ;; and behaves as a pure `completion-at-point-function'.
+    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify))
   )
 #+end_src
 
