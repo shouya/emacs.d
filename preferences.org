@@ -1739,6 +1739,13 @@ Few shortcuts:
 
   (shou/def-eshell-alias "ll" "ls -al $*")
   (shou/def-eshell-alias "k" "kubectl $*")
+  (shou/def-eshell-alias "z" "kubectl $*")
+
+  (defun eshell/z (&optional regexp)
+    "fasd-like cd"
+    (if (not regexp)
+        (eshell/cd "=")
+      (eshell/cd (format "=%s" regexp))))
   )
 #+end_src
 
