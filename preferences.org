@@ -342,11 +342,9 @@ most GUI editors.
 #+BEGIN_SRC emacs-lisp
 (use-package explain-pause-mode
   :straight (:host github :repo "lastquestion/explain-pause-mode")
-  :disabled
-  :hook (emacs-startup . explain-pause-mode)
-
+  :commands explain-pause-mode
   ;; only report if the pauses exceed 100ms
-  :custom (explain-pause-blocking-too-long-ms 15)
+  :custom (explain-pause-blocking-too-long-ms 100)
 )
 #+END_SRC
 
