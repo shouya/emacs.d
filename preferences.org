@@ -1725,11 +1725,20 @@ Few shortcuts:
     (bind-key "M-r" #'shou/eshell-insert-history-element eshell-mode-map)
     (bind-key "M-r" #'shou/eshell-insert-history-element eshell-hist-mode-map)
     )
+
   (add-hook 'eshell-mode-hook #'shou/eshell-customization)
 
   ;; eshell aliases
   (fset 'eshell/vi #'find-file)
   (fset 'eshell/ff #'find-file)
+
+  (defun shou/def-eshell-alias (name def)
+    (when (not (equal (eshell-lookup-alias name)
+                      `(,name ,def)))
+      (eshell/alias name def)))
+
+  (shou/def-eshell-alias "ll" "ls -al $*")
+  (shou/def-eshell-alias "k" "kubectl $*")
   )
 #+end_src
 
