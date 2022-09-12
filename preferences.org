@@ -1710,6 +1710,7 @@ Few shortcuts:
   ("C-x e" . eshell)
   :custom
   (eshell-history-size 10240)
+  (eshell-last-dir-ring-size 512)
 
   :config
   (setenv "KUBECONFIG"
