@@ -993,14 +993,26 @@ Make operations more interactive with =consult.el=.
 #+begin_src emacs-lisp
 (use-package consult
   :bind
-  ("M-g g" . consult-goto-line)
-  ;; any org heading
-  ("C-c C-S-j" . consult-org-agenda)
-  (:map org-mode-map
-        ;; org heading of this file
-        ("C-c C-j" . consult-org-heading))
+  (("M-g g" . consult-goto-line)
+   ;; any org heading
+   ("C-c C-S-j" . consult-org-agenda)
+   ("C-x b" . consult-buffer)
+   ("M-s L" . consult-line-multi)
+
+   :map org-mode-map
+   ;; org heading of this file
+   ("C-c C-j" . consult-org-heading)
+   )
+
+  :custom
+  ;; only show preview when pressing M-.
+  (consult-preview-key (kbd "M-."))
 
   :config
+  ;; show preview automatically for some commands
+  (consult-customize
+   consult-goto-line
+   :preview-key '(:debounce 0.1 any))
   )
 
 (with-eval-after-load 'lsp-mode
