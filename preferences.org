@@ -1315,9 +1315,26 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 ** TRAMP
 
 #+BEGIN_SRC emacs-lisp
-(require 'tramp)
-(setq tramp-default-method "scp")
-(setq remote-file-name-inhibit-cache nil)
+(use-package tramp
+  :ensure nil
+  :custom
+  (tramp-default-method "scp")
+  (remote-file-name-inhibit-cache nil)
+
+  :config
+  ;; stolen from https://stackoverflow.com/questions/33275790/how-sudo-edit-local-file-with-emacs-on-ubuntu
+  (defun sudo-edit (&optional arg)
+    "Edit currently visited file as root.
+
+With a prefix ARG prompt for a file to visit.
+Will also prompt for a file to visit if current
+buffer is not visiting a file."
+    (interactive "P")
+    (if (or arg (not buffer-file-name))
+        (find-file (concat "/sudo:root@localhost:"
+                           (ido-read-file-name "Find file(as root): ")))
+      (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+  )
 #+END_SRC
 
 ** Auto-correction
