@@ -3197,6 +3197,7 @@ Make todos respect blocking state.
       (nospace . "-")
       (case-fn . downcase))
     "apply certain rules when generating file name")
+  (deft-file-limit 40)
   )
 #+END_SRC
 
