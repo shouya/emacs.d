@@ -1548,8 +1548,20 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
 
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
-  :demand t
-  :commands (flycheck-mode)
+  :commands flycheck-mode
+  :hook (prog-mode . flycheck-mode)
+
+  :preface
+  ;; adapted from
+  ;; https://github.com/flycheck/flycheck/issues/1762#issuecomment-750458442
+  (defvar-local shou/flycheck-local-cache nil)
+
+  (defun shou/flycheck-checker-get (fn checker property)
+    (or (alist-get property (alist-get checker shou/flycheck-local-cache))
+        (funcall fn checker property)))
+
+  (advice-add 'flycheck-checker-get :around 'shou/flycheck-checker-get)
+
   :config
 
   ;; display pos-tip for flycheck errors
@@ -1560,19 +1572,7 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
 
     :config
     (add-hook 'flycheck-mode-hook 'flycheck-pos-tip-mode)
-    )
-
-  ;; (use-package flycheck-posframe
-  ;;   :custom
-  ;;   (flycheck-posframe-position 'window-bottom-left-corner)
-  ;;   (flycheck-posframe-border-width 0)
-
-  ;;   :config
-  ;;   (flycheck-posframe-configure-pretty-defaults)
-
-  ;;   (add-hook 'flycheck-mode-hook 'flycheck-posframe-mode)
-  ;;   )
-  )
+    ))
 #+END_SRC
 
 ** Highlight all occurrences word at point
@@ -2217,25 +2217,13 @@ Templating engine that allows me to quickly enter some text.
           (lsp-show-xrefs (lsp--locations-to-xref-items loc) nil nil)
         (dumb-jump-go))))
 
-  ;; adapted from
-  ;; https://github.com/flycheck/flycheck/issues/1762#issuecomment-750458442
-  (defvar-local shou/flycheck-local-cache nil)
-
-  (defun shou/flycheck-checker-get (fn checker property)
-    (or (alist-get property (alist-get checker shou/flycheck-local-cache))
-        (funcall fn checker property)))
-
-  (advice-add 'flycheck-checker-get :around 'shou/flycheck-checker-get)
-
-  (add-hook 'lsp-managed-mode-hook
-            (lambda ()
-              (when (derived-mode-p 'elixir-mode)
-                (setq my/flycheck-local-cache '((lsp . ((next-checkers . (elixir-credo)))))))
-              ))
-
   ;; See https://github.com/minad/corfu/issues/188#issuecomment-1148658471
   (with-eval-after-load 'cape
     (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible))
+
+  (defun shou/add-lsp-next-checker (checker)
+    (setq shou/flycheck-local-cache
+          `((lsp . ((next-checkers . (,checker)))))))
   )
 #+end_src
 
@@ -2428,7 +2416,7 @@ Use pretty eval expression by default because it prints the full output when ove
   ;; Format with C-c C-f
   :bind (:map elixir-mode-map
               ("M-q" . python-fill-paragraph))
-  :hook (elixir-mode . lsp-deferred)
+  :hook (elixir-mode . lsp)
 
   :config
   ;; we don't enable eglot's auto completion functionality
@@ -2466,6 +2454,10 @@ Use pretty eval expression by default because it prints the full output when ove
            (mapcar 's-upper-camel-case it)
            (s-join "." it)
        ))
+
+  ;; enable elixir-credo after lsp
+  (require 'lsp)
+  (add-hook 'elixir-mode-hook (lambda () (shou/add-lsp-next-checker 'elixir-credo)))
   )
 #+END_SRC
 
