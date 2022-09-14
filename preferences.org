@@ -2172,6 +2172,11 @@ Templating engine that allows me to quickly enter some text.
   ;; otherwise it starts dap-tooltip-mode which interfere with the corfu popup.
   (lsp-enable-dap-auto-configure nil)
 
+  ;; only load clients that I actually need
+  (lsp-client-packages
+   '(lsp-elixir
+     lsp-rust))
+
   :hook
   (lsp-completion-mode . shou/lsp-mode-setup-completion)
 
@@ -2189,7 +2194,7 @@ Templating engine that allows me to quickly enter some text.
 
   (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
 
-  ;; the following line disable lsp-modeline-diagnostics-mode
+  ;; disable lsp-modeline-diagnostics-mode
   (add-hook 'lsp-mode-hook (lambda () (lsp-modeline-diagnostics-mode -1)))
 
   ;; conflict with projectile prefix
@@ -2966,7 +2971,6 @@ Kubernetes.el for managing k8s cluster.
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
   )
 #+end_src
-
 
 * Org mode
 
