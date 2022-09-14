@@ -889,10 +889,7 @@ Some modes set this variable automatically, so we need to override them.
 ** Detect indentation using heuristics
 
 #+BEGIN_SRC emacs-lisp
-(use-package dtrt-indent
-  :commands dtrt-indent-mode
-  :hook (prog-mode . dtrt-indent-mode)
-)
+(use-package dtrt-indent :commands dtrt-indent-mode)
 (defalias 'detect-indentation 'dtrt-indent-mode)
 (defalias 'detect-tab-size 'dtrt-indent-mode)
 #+END_SRC
@@ -2142,6 +2139,7 @@ Templating engine that allows me to quickly enter some text.
         ("M-," . xref-find-definitions)
         ("M-." . xref-find-definitions-other-window)
         )
+
   :bind-keymap
   ("M-l" . lsp-command-map)
 
