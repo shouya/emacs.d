@@ -1563,6 +1563,8 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
   (advice-add 'flycheck-checker-get :around 'shou/flycheck-checker-get)
 
   :config
+  ;; add frequent typo
+  (define-key flycheck-mode-map (kbd "C-c 1") flycheck-command-map)
 
   ;; display pos-tip for flycheck errors
   (use-package flycheck-pos-tip
