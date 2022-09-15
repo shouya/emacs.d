@@ -71,7 +71,9 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 
 #+BEGIN_SRC emacs-lisp
 (use-package dash :demand t)
-(use-package f :demand t)
+(use-package f :demand t
+  :straight (;; f-shortdoc.el was not correctly specified in Cask file
+             :files (:defaults "*")))
 (use-package s :demand t)
 #+END_SRC
 
