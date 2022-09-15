@@ -1718,9 +1718,16 @@ Few shortcuts:
 (use-package eshell
   :bind
   ("C-x e" . eshell)
+
   :custom
   (eshell-history-size 10240)
   (eshell-last-dir-ring-size 512)
+
+  :preface
+  (defun shou/def-eshell-alias (name def)
+    (when (not (equal (eshell-lookup-alias name)
+                      `(,name ,def)))
+      (eshell/alias name def)))
 
   :config
   (setenv "KUBECONFIG"
@@ -1734,22 +1741,17 @@ Few shortcuts:
   (defun shou/eshell-customization ()
     (bind-key "M-r" #'shou/eshell-insert-history-element eshell-mode-map)
     (bind-key "M-r" #'shou/eshell-insert-history-element eshell-hist-mode-map)
-    )
+
+    ;; eshell-lookup-alias is defined buffer-locally
+    (shou/def-eshell-alias "ll" "ls -al $*")
+    (shou/def-eshell-alias "k" "kubectl $*")
+    (shou/def-eshell-alias "z" "kubectl $*"))
 
   (add-hook 'eshell-mode-hook #'shou/eshell-customization)
 
   ;; eshell aliases
   (fset 'eshell/vi #'find-file)
   (fset 'eshell/ff #'find-file)
-
-  (defun shou/def-eshell-alias (name def)
-    (when (not (equal (eshell-lookup-alias name)
-                      `(,name ,def)))
-      (eshell/alias name def)))
-
-  (shou/def-eshell-alias "ll" "ls -al $*")
-  (shou/def-eshell-alias "k" "kubectl $*")
-  (shou/def-eshell-alias "z" "kubectl $*")
 
   (defun eshell/z (&optional regexp)
     "fasd-like cd"
