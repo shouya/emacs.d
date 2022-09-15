@@ -2481,13 +2481,14 @@ Use pretty eval expression by default because it prints the full output when ove
   (defun shou/elixir-project-root ()
     (or (locate-dominating-file default-directory "apps")
         (locate-dominating-file default-directory "mix.exs")))
-  (advice-add 'exunit-project-root :override 'shou/elixir-project-root)
+  (defun shou/set-exunit-project-root ()
+    (setq-local exunit-project-root (shou/elixir-project-root)))
+  (add-hook 'exunit-compilation-mode-hook #'shou/set-exunit-project-root)
 
   (defun shou/disable-line-move-visual ()
     (interactive)
     (setq-local line-move-visual nil))
-  (add-hook 'exunit-compilation-mode-hook #'shou/disable-line-move-visual)
-  )
+  (add-hook 'exunit-compilation-mode-hook #'shou/disable-line-move-visual))
 #+END_SRC
 
 **** Alchemist
@@ -3186,7 +3187,7 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
   (org-log-done 'time)
   (org-log-into-drawer t))
 #+END_SRC
-*** Customize TODO colors
+*** Customize colors
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
