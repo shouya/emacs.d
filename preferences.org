@@ -2478,8 +2478,9 @@ Use pretty eval expression by default because it prints the full output when ove
     (or (locate-dominating-file default-directory "apps")
         (locate-dominating-file default-directory "mix.exs")))
   (defun shou/set-exunit-project-root ()
-    (setq-local exunit-project-root (shou/elixir-project-root)))
+    (setq exunit-project-root (shou/elixir-project-root)))
   (add-hook 'exunit-compilation-mode-hook #'shou/set-exunit-project-root)
+  (advice-add 'exunit-project-root :override 'shou/elixir-project-root)
 
   (defun shou/disable-line-move-visual ()
     (interactive)
