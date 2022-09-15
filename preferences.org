@@ -2288,6 +2288,13 @@ Templating engine that allows me to quickly enter some text.
 
   (advice-add 'apheleia--create-rcs-patch :around #'shou/fix-apheleia-accidental-deletion)
 
+  (defun shou/fix-apheleia-messing-up-buffer-by-interruption-mix-process
+      (f &rest args)
+    (cl-flet ((interrupt-process kill-process))
+      (apply f args)))
+
+  (advice-add 'apheleia--make-process :around  #'shou/fix-apheleia-messing-up-buffer-by-interruption-mix-process)
+
   (apheleia-global-mode 1)
   )
 #+END_SRC
