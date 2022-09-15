@@ -759,17 +759,6 @@ Use =C-c <left>= and =C-c <right>= to undo layout.
   )
 #+END_SRC
 
-** Lock window for purpose
-
-#+begin_src emacs-lisp
-(with-eval-after-load 'bind-key
-  (unbind-key "C-c ," org-mode-map))
-
-(use-package window-purpose
-  :bind (("C-c , d" . purpose-toggle-window-purpose-dedicated)
-         ("C-c , D" . purpose-toggle-window-buffer-dedicated)))
-#+end_src
-
 ** Page break lines =^L=
 
 It render =^L= as a page break line, which is nicer to look at.
