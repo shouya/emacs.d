@@ -25,3 +25,9 @@ rust-mode
 
 (todo "todo!()")
 (unused "#[allow(unused)]")
+
+sh-mode
+
+(cdpwd "DIR=$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" >/dev/null && pwd )")
+(setpwd "cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" >/dev/null")
+(shb "#!/bin/bash -e\n")
