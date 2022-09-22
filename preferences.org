@@ -206,7 +206,7 @@ I use eww, firefox, and other programs to open web url in emacs.
 (defun shou/open-zoom-url (url &optional _new_window)
   ;; avoid showing the *Async Shell Command* buffer
   (let ((async-shell-command-display-buffer nil))
-    (async-shell-command (concat "zoom " url " >/dev/null 2>&1"))))
+    (async-shell-command (concat "zoom \"" url "\" >/dev/null 2>&1"))))
 
 (if (< emacs-major-version 28)
     (setq browse-url-browser-function
