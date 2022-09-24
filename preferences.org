@@ -2310,6 +2310,9 @@ Templating engine that allows me to quickly enter some text.
 
   (advice-add 'apheleia--make-process :around  #'shou/fix-apheleia-messing-up-buffer-by-interruption-mix-process)
 
+  ;; used in hooks to turn off apheleia mode for some modes
+  (defun shou/disable-apheleia-mode nil (apheleia-mode -1))
+
   (apheleia-global-mode 1)
   )
 #+END_SRC
@@ -2771,6 +2774,7 @@ project related functionalities.
               ("C-c C-t" . haskell-process-do-type)
               ("C-c C-i" . haskell-process-do-info)
               ("M-." . haskell-mode-jump-to-def))
+  :hook (haskell-mode . shou/disable-apheleia-mode)
   :mode (("\\.hs\\'" . haskell-mode))
   :custom
   ;; build with "stack build"
