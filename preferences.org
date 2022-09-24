@@ -893,10 +893,26 @@ Some modes set this variable automatically, so we need to override them.
 ;   :hook (emacs-startup . global-syntax-subword-mode))
 #+END_SRC
 
-** Undo tree
+** Undo tree with vundo
 
-#+BEGIN_SRC emacs-lisp
+Undo-tree is good, but it sometimes slows down saving (uses too much memory), and I don't really need all its rich functionalities. Now I'm trying out vundo on emacs 28.
+
+#+begin_src emacs-lisp
+(use-package vundo
+  ;; vundo requires emacs 28
+  :when (version<= "28" emacs-version)
+  :straight (vundo :type git :host github :repo "casouri/vundo")
+  :bind ("C-x u" . vundo)
+  :custom
+  (vundo-compact-display t)
+  )
+#+end_src
+
+When emacs version is lower, I still use undo-tree:
+
+#+begin_src emacs-lisp
 (use-package undo-tree
+  :when (version< emacs-version "28")
   :hook (emacs-startup . global-undo-tree-mode)
   :custom
   ;; allow undo in active region only
@@ -904,7 +920,7 @@ Some modes set this variable automatically, so we need to override them.
   ;; do not create undo-tree history files =.file.~undo-tree~= under file directories
   (undo-tree-history-directory-alist '((".*" . "~/.cache/undo-tree")))
   )
-#+END_SRC
+#+end_src
 
 ** Minibuffer Completion
 
