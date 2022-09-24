@@ -1554,12 +1554,21 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
 
   (advice-add 'flycheck-checker-get :around 'shou/flycheck-checker-get)
 
+  :custom
+  ;; do not recheck syntax on newline or on save, which can result in
+  ;; perceivable lagging.
+  (flycheck-check-syntax-automatically '(mode-enable idle-change))
+  ;; only check syntax after 4 seconds of idling
+  (flycheck-idle-change-delay 4)
+
   :config
   ;; add frequent typo
   (define-key flycheck-mode-map (kbd "C-c 1") flycheck-command-map)
 
   ;; display pos-tip for flycheck errors
   (use-package flycheck-pos-tip
+    ;; disabled because it uses a bit too much memory, resulting in
+    ;; more gc pauses.
     :custom
     ;; do not timeout when I'm reading the text. (default: 5)
     (flycheck-pos-tip-timeout 30)
@@ -2763,6 +2772,7 @@ project related functionalities.
 
 #+begin_src emacs-lisp
 (use-package lsp-haskell
+  :disabled
   :hook (haskell-mode . lsp)
   :hook (haskell-literate-mode . lsp))
 #+end_src
