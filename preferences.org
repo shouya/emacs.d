@@ -2344,6 +2344,21 @@ Templating engine that allows me to quickly enter some text.
 #+end_src
 
 ** Languages
+*** C
+
+The default C style determines the style of a number of modes.
+
+#+begin_src emacs-lisp
+;; Set the default label indentation to 2 (from 1). this affects the
+;; indentation in front of "int x" in the example.
+;;
+;; struct foo {
+;;   int x
+;; ...
+;;
+(setf (alist-get 'c-label-minimum-indentation c-fallback-style) 2)
+#+end_src
+
 *** Lisps
 **** Use =paredit= in lisp modes to balance parentheses
 
