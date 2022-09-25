@@ -2966,11 +2966,21 @@ Kubernetes.el for managing k8s cluster.
   )
 #+end_src
 
-*** GLSL
+*** Shader languages
+
+GLSL:
 
 #+begin_src emacs-lisp
 (use-package glsl-mode
   :mode ("\\.glsl\\'" "\\.vert\\'" "\\.frag\\'"))
+#+end_src
+
+WGSL:
+
+#+begin_src emacs-lisp
+(use-package wgsl-mode
+  :straight (:host github :repo "acowley/wgsl-mode")
+  :mode ("\\.wgsl\\'"))
 #+end_src
 
 *** Clojure
