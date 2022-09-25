@@ -2344,7 +2344,7 @@ Templating engine that allows me to quickly enter some text.
 #+end_src
 
 ** Languages
-*** C
+*** C/C++
 
 The default C style determines the style of a number of modes.
 
@@ -2356,7 +2356,8 @@ The default C style determines the style of a number of modes.
 ;;   int x
 ;; ...
 ;;
-(setf (alist-get 'c-label-minimum-indentation c-fallback-style) 2)
+(with-eval-after-load 'cc-vars
+  (setf (alist-get 'c-label-minimum-indentation c-fallback-style) 2))
 #+end_src
 
 *** Lisps
