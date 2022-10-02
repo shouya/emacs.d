@@ -316,11 +316,11 @@ Copied from [[https://github.com/hrs/sensible-defaults.el/blob/master/sensible-d
  ;; visual bell
  visible-bell t)
 
-;; was zap-to-char
-(bind-key* "M-z" 'zap-up-to-char)
-
 ;; I don't use bidir text at all. This hugely increase scroll speed.
 (setq-default bidi-inhibit-bpa t)
+
+;; enable minibuffer-in-minibuffer
+(setq enable-recursive-minibuffers t)
 #+END_SRC
 
 ** Save last position for each file
@@ -951,8 +951,6 @@ Press =M-r= to reveal the last completion session:
         ("M-r" . vertico-repeat))
 
   :config
-  (setq enable-recursive-minibuffers t)
-
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 
   ;; preserve history across restarts
