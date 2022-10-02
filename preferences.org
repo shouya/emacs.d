@@ -1434,8 +1434,6 @@ Add extra shortcuts for symbols I frequently use to the TeX input method.
   (avy-style 'at-full)
 
   :config
-  (use-package embark)
-
   ;; https://karthinks.com/software/avy-can-do-anything/#avy-plus-embark-any-action-anywhere
   (defun shou/def/avy-action-at-point (:key key :action f)
     "define custom avy action"
@@ -1459,6 +1457,22 @@ Add extra shortcuts for symbols I frequently use to the TeX input method.
   (shou/def/avy-action-at-point
    :key ?K
    :action 'kill-whole-line)
+  )
+#+end_src
+
+** Embark
+
+#+begin_src emacs-lisp
+(use-package embark
+  :bind ("M-m" . embark-act)
+  :config
+  (embark-define-keymap embark-identifier-map
+    "Actions on symbol"
+    ("," xref-find-definitions)
+    ("." xref-find-definitions-other-window)
+    ("R" lsp-rename)
+    ("g" rg-dwim)
+    )
   )
 #+end_src
 
@@ -2111,7 +2125,6 @@ Templating engine that allows me to quickly enter some text.
         ("<tab>" . tempel-next)
         ("<backtab>" . tempel-previous)
         ("S-<tab>" . tempel-previous))
-
 
   :custom
   ;; cannot be symlinked file because otherwise the auto-reload doesn't work.
