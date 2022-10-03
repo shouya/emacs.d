@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: default
+
+commonLabels:
+  app: myapp
+
+configMapGenerator:
+  - name: myapp-conf
+    files:
+      - LocalSettings.php
+      - php.ini
+
+secretGenerator:
+  - name: myapp-secret
+    files:
+      - preferences.json
+
+resources:
+  - service.yml
+  - deployment.yml
+  - secret.hidden.yml
+  # myapp.lain.li from lan
+  - ingressroute-internal.yml
+  # myapp.lain.li from vultr
+  - ingressroute-private.yml

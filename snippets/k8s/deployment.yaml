@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: container-host
+
+      containers:
+        - name: myapp
+          image: myapp/myapp:2
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          envFrom:
+            - secretRef:
+                name: myapp-secret
+          env:
+            - name: MYAPP_SERVER_HOST
+              value: host
+            - name: MYAPP_SERVER_PROTO
+              value: https
+
+      volumes:
+        - name: data
+          nfs:
+            path: /mnt/storage/archive/container-state/myapp
+            server: nfs.lain.li

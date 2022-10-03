@@ -1,0 +1,12 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: myservice
+spec:
+  routes:
+    - kind: Rule
+      match: Host(`myservice.lain.li`)
+      services:
+        - kind: Service
+          name: myservice
+          port: 8080

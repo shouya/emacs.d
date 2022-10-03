@@ -2143,6 +2143,10 @@ Templating engine that allows me to quickly enter some text.
     (if (tempel-expand)
         (tempel-expand t)
         (tempel-complete t)))
+
+  (setq tempel-snippet-path (f-canonical "~/.emacs.d/snippets"))
+  (defun shou/tempel-snippet (file)
+    (f-read-text (f-join tempel-snippet-path file)))
   )
 #+end_src
 
@@ -2328,7 +2332,6 @@ Templating engine that allows me to quickly enter some text.
   (apheleia-global-mode 1)
   )
 #+END_SRC
-
 
 
 ** Typos

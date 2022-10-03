@@ -31,3 +31,12 @@ sh-mode
 (cdpwd "DIR=$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" >/dev/null && pwd )")
 (setpwd "cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" >/dev/null")
 (shb "#!/bin/bash -e\n")
+
+yaml-mode
+
+(kustomization (shou/tempel-snippet "k8s/kustomization.yaml"))
+(configmap (shou/tempel-snippet "k8s/configmap.yaml"))
+(secret (shou/tempel-snippet "k8s/secret.yaml"))
+(deployment (shou/tempel-snippet "k8s/deployment.yaml"))
+(service (shou/tempel-snippet "k8s/service.yaml"))
+(ingressroute (shou/tempel-snippet "k8s/ingressroute.yaml"))
