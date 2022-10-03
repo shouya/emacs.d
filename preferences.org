@@ -998,6 +998,7 @@ Make operations more interactive with =consult.el=.
    ("C-c C-S-j" . consult-org-agenda)
    ("C-x b" . consult-buffer)
    ("M-s L" . consult-line-multi)
+   ("M-s m" . consult-global-mark)
 
    :map org-mode-map
    ;; org heading of this file
