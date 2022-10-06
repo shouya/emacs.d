@@ -1380,6 +1380,7 @@ other buffers by default. See [[https://stackoverflow.com/questions/22724087/dab
 
   (bind-key "<tab>" #'completion-at-point mediawiki-mode-map)
   (bind-key "C-c !" #'shou/insert-wiki-date-link mediawiki-mode-map)
+  (bind-key "C-c ." #'shou/insert-wiki-date-link mediawiki-mode-map)
   (bind-key "M-<return>" 'mediawiki-terminate-paragraph mediawiki-mode-map)
 
   (defun shou/insert-wiki-date-link (arg)
