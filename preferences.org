@@ -1386,7 +1386,7 @@ other buffers by default. See [[https://stackoverflow.com/questions/22724087/dab
   (defun shou/default-date-from-firefox ()
     (let* ((line (shell-command-to-string "wmctrl -l -x | grep Firefox"))
            ;; matching text like Sep 20, 2022
-           (regexp "[A-Z][a-z]\\{2\\} [0-9]\\{2\\}, [0-9]\\{4\\}")
+           (regexp "[A-Z][a-z]\\{2\\} [0-9]\\{1,2\\}, [0-9]\\{4\\}")
            (match (s-match regexp line)))
       (pcase match
         (`(,text) text)
