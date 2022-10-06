@@ -1383,12 +1383,23 @@ other buffers by default. See [[https://stackoverflow.com/questions/22724087/dab
   (bind-key "C-c ." #'shou/insert-wiki-date-link mediawiki-mode-map)
   (bind-key "M-<return>" 'mediawiki-terminate-paragraph mediawiki-mode-map)
 
+  (defun shou/default-date-from-firefox ()
+    (let* ((line (shell-command-to-string "wmctrl -l -x | grep Firefox"))
+           ;; matching text like Sep 20, 2022
+           (regexp "[A-Z][a-z]\\{2\\} [0-9]\\{2\\}, [0-9]\\{4\\}")
+           (match (s-match regexp line)))
+      (pcase match
+        (`(,text) text)
+        (_ nil))))
+
   (defun shou/insert-wiki-date-link (arg)
     (interactive "P")
     (let* ((format "<[%b %-d, %Y]>")
            (org-time-stamp-formats (cons format format))
-           (org-read-date-prefer-future nil))
-      (org-time-stamp arg 'inactive)))
+           (org-read-date-prefer-future nil)
+           (default-date (shou/default-date-from-firefox))
+           (time (org-read-date arg 'totime nil nil nil default-date)))
+      (org-insert-time-stamp time t 'inactive)))
   )
 #+end_src
 
