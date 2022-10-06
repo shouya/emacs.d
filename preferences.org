@@ -2376,6 +2376,8 @@ I customized several bindings because "C-<left>/<right>" is bound to
 
 #+BEGIN_SRC emacs-lisp
 (use-package paredit
+  :hook clojure-mode
+  :hook cider-repl-mode
   :bind (:map paredit-mode-map
               ;; ((a|) b) => ((a| b))
               ("M-<right>" . paredit-forward-slurp-sexp)
@@ -3012,9 +3014,6 @@ WGSL:
 #+begin_src emacs-lisp
 (use-package clojure-mode
   :mode ("\\.clj\\'" "\\.cljs\\'")
-  ;; clojure-mode doesn't derive from lisp mode so we have to enable
-  ;; parinfer manually
-  :hook (clojure-mode . parinfer-rust-mode)
   :config
   (use-package cider)
   )
