@@ -1877,6 +1877,7 @@ I use =magit= to show git status.
   ;; sort branches (or any refs) by creation date
   (magit-list-refs-sortby "-creatordate")
 
+
   :config
   ;; so it don't close other windows
   (fset 'magit-restore-window-configuration (lambda (x) (kill-buffer-and-window)))
@@ -1902,6 +1903,11 @@ I use =magit= to show git status.
       (s-replace old new s))
     (defun string-search (needle haystack &optional start-pos)
       (s-contains? needle haystack)))
+
+  ;; show exact date on revision page
+  (setq magit-revision-headers-format (->> magit-revision-headers-format
+                                           (s-replace "%ad" "%ad (%aD)")
+                                           (s-replace "%cd" "%cd (%cD)")))
   )
 #+END_SRC
 
