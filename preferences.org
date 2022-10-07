@@ -803,6 +803,9 @@ It render =^L= as a page break line, which is nicer to look at.
   ;; Ask once before deleting
   (dired-recursive-deletes 'top)
 
+  ;; used for deft
+  (unbind-key "C-M-n" dired-mode-map)
+
   :config
   (use-package dired-x
     :straight (:type built-in))
