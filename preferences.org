@@ -1308,8 +1308,8 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
          ("C-M-SPC" . mc/mark-next-lines)
          ("C->" . mc/mark-next-like-this-symbol)
          ("C-<" . mc/unmark-next-like-this)
-         ("C-M->" . mc/mark-next-like-this)
-         ("C-M-<" . mc/unmark-next-like-this))
+         ("C-M->" . mc/skip-to-next-like-this)
+         ("C-M-<" . mc/skip-to-previous-like-this))
   :config (define-key mc/keymap (kbd "<return>") nil))
 #+END_SRC
 
