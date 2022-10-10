@@ -1998,7 +1998,17 @@ Install delta with the instruction here: https://github.com/dandavison/delta
 #+begin_src emacs-lisp
 (use-package devdocs
   :bind
-  (("C-h D" . devdocs-lookup)))
+  ("C-h D" . devdocs-lookup)
+  ("C-h d" . devdocs-lookup)
+  ("C-c d" . shou/devdocs-at-point)
+
+  :config
+  (defun shou/devdocs-at-point ()
+    (interactive)
+    (if-let ((symbol (thing-at-point 'symbol 'no-properties)))
+        (devdocs-lookup t symbol)
+      (devdocs-lookup t)))
+  )
 #+end_src
 
 ** Completion and LSP (=M-/=)
