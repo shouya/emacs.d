@@ -2357,6 +2357,24 @@ Templating engine that allows me to quickly enter some text.
   )
 #+END_SRC
 
+*** AI completion with tabnine
+
+#+begin_src emacs-lisp
+(use-package company-tabnine
+  :after lsp
+  :config
+  (fset 'tabnine-capf (cape-company-to-capf #'company-tabnine))
+
+  (defun shou/enable-tabnine ()
+    (interactive)
+    (add-to-list 'completion-at-point-functions #'tabnine-capf))
+
+  (defun shou/disable-tabnine ()
+    (interactive)
+    (setq-local completion-at-point-functions
+                (remove #'tabnine-capf completion-at-point-functions)))
+  )
+#+end_src
 
 ** Typos
 
