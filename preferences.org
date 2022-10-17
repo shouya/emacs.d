@@ -2439,8 +2439,7 @@ I customized several bindings because "C-<left>/<right>" is bound to
 
 #+BEGIN_SRC emacs-lisp
 (use-package paredit
-  :hook clojure-mode
-  :hook cider-repl-mode
+  :commands paredit-mode
   :bind (:map paredit-mode-map
               ;; ((a|) b) => ((a| b))
               ("M-<right>" . paredit-forward-slurp-sexp)
@@ -2456,6 +2455,8 @@ I customized several bindings because "C-<left>/<right>" is bound to
               ("M-<up>" . paredit-wrap-sexp)
               ;; (|a b) => ((a) b)
               ("M-(" . paredit-wrap-round)))
+
+
 #+END_SRC
 
 **** Use =rainbow-delimiters=
@@ -2468,19 +2469,13 @@ I customized several bindings because "C-<left>/<right>" is bound to
 **** Enable above two modes for all lisp languages
 
 #+BEGIN_SRC emacs-lisp
-(setq lispy-mode-hooks
-      '(clojure-mode-hook
-        emacs-lisp-mode-hook
-        lisp-mode-hook
-        scheme-mode-hook
-        racket-mode-hook
-        ))
-
-(dolist (hook lispy-mode-hooks)
-  (add-hook hook
-            (lambda ()
-              (paredit-mode)
-              (rainbow-delimiters-mode))))
+(dolist (hook '(clojure-mode-hook
+                emacs-lisp-mode-hook
+                scheme-mode-hook
+                racket-mode-hook
+                cider-repl-mode))
+  (add-hook hook 'paredit-mode)
+  (add-hook hook 'rainbow-delimiters-mode))
 #+END_SRC
 
 **** Shorten =Emacs lisp= into =Elisp= in mode name
