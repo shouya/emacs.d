@@ -498,7 +498,8 @@ I use "Input" as my default font face.
 
     (set-frame-font name)
     (set-face-attribute 'default nil :family name :height font-height)
-    (set-face-attribute 'fixed-pitch nil :family name :height font-rel-height)))
+    (set-face-attribute 'fixed-pitch nil :family name :height font-rel-height)
+    t))
 
 (defun shou/set-var-font (name)
   (when-let* ((exists (font-exists-p name))
@@ -506,7 +507,14 @@ I use "Input" as my default font face.
               (font-rel-height (or (plist-get font-spec :rel-height) 1.0)))
 
     (setq shou/var-font name)
-		(set-face-attribute 'variable-pitch nil :family name :height font-rel-height)))
+		(set-face-attribute 'variable-pitch nil :family name :height font-rel-height)
+    t))
+
+(defun auto-set-fonts ()
+  (when-let ((font (car (-filter 'font-exists-p (mapcar 'car shou/mono-font-list)))))
+    (shou/set-mono-font font))
+  (when-let ((font (car (-filter 'font-exists-p (mapcar 'car shou/var-font-list)))))
+    (shou/set-var-font font)))
 
 (setq shou/var-font-list
       '(("Spectral" :rel-height 1.07)
@@ -517,8 +525,7 @@ I use "Input" as my default font face.
         ("Noto Mono" :height 130)
         ("Dejavu Sans Mono" :height 130)))
 
-(shou/set-mono-font "Noto Mono")
-(shou/set-var-font "Spectral")
+(auto-set-fonts)
 #+END_SRC
 
 ** Ligature
