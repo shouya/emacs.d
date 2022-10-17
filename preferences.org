@@ -483,45 +483,42 @@ I use "Input" as my default font face.
   "check if font exists"
   (if (null (x-list-fonts font)) nil t))
 
-;; Experiment with different fonts here:
-;; (set-frame-font shou/mono-font)
+(defvar shou/var-font-list)
+(defvar shou/mono-font-list)
+(defvar shou/var-font)
+(defvar shou/mono-font)
 
-;; Conditionally set variable and monospace fonts
-(cond
- ((font-exists-p "Spectral")
-  (setq shou/var-font "Spectral"))
- ((font-exists-p "Charter")
-  (setq shou/var-font "Charter"))
- )
+(defun shou/set-mono-font (name)
+  (when-let* ((exists (font-exists-p name))
+              (font-spec (alist-get name shou/mono-font-list nil nil 'equal))
+              (font-height (or (plist-get font-spec :height) 100))
+              (font-rel-height (or (plist-get font-spec :rel-height) 1.0)))
 
-(cond
- ((font-exists-p "Fira Code")
-  (setq shou/mono-font "Fira Code"))
- ((font-exists-p "Dejavu Sans Mono")
-  (setq shou/mono-font "Dejavu Sans Mono"))
- )
+    (setq shou/mono-font name)
 
-(cond
- ((eq system-type 'gnu/linux)
-  (setq shou/mono-font-height 130)
-  (setq shou/mono-font-rel-height 1.0)
-  (setq shou/var-font-rel-height 1.07))
+    (set-frame-font name)
+    (set-face-attribute 'default nil :family name :height font-height)
+    (set-face-attribute 'fixed-pitch nil :family name :height font-rel-height)))
 
- ((eq system-type 'darwin)
-  (setq shou/mono-font-height 150)
-  (setq shou/mono-font-rel-height 1.0)
-  (setq shou/var-font-rel-height 1.07)
-  ))
+(defun shou/set-var-font (name)
+  (when-let* ((exists (font-exists-p name))
+              (font-spec (alist-get name shou/var-font-list nil nil 'equal))
+              (font-rel-height (or (plist-get font-spec :rel-height) 1.0)))
 
+    (setq shou/var-font name)
+		(set-face-attribute 'variable-pitch nil :family name :height font-rel-height)))
 
-;; Use the chosen font
-(set-frame-font shou/mono-font)
-(set-face-attribute 'default nil
-                    :family shou/mono-font :height shou/mono-font-height)
-(set-face-attribute 'fixed-pitch nil
-                    :family shou/mono-font :height shou/mono-font-rel-height)
-(set-face-attribute 'variable-pitch nil
-                    :family shou/var-font :height shou/var-font-rel-height)
+(setq shou/var-font-list
+      '(("Spectral" :rel-height 1.07)
+        ("Charter" :rel-height 1.07)))
+
+(setq shou/mono-font-list
+      '(("Fira Code" :height 130)
+        ("Noto Mono" :height 130)
+        ("Dejavu Sans Mono" :height 130)))
+
+(shou/set-mono-font "Noto Mono")
+(shou/set-var-font "Spectral")
 #+END_SRC
 
 ** Ligature
