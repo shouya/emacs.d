@@ -522,7 +522,7 @@ I use "Input" as my default font face.
 
 (setq shou/mono-font-list
       '(("Fira Code" :height 130)
-        ("Noto Mono" :height 130)
+        ("Noto Mono" :height 135)
         ("Dejavu Sans Mono" :height 130)))
 
 (auto-set-fonts)
@@ -535,6 +535,7 @@ I use "Input" as my default font face.
   :straight (:host github :repo "mickeynp/ligature.el")
   :hook (prog-mode . ligature-mode)
   :when window-system
+  :disabled
   :config
   ;; Fira code ligatures that I use
   (ligature-set-ligatures t '("www" ":="
