@@ -2582,10 +2582,10 @@ Use pretty eval expression by default because it prints the full output when ove
 (use-package exunit
   :after elixir-mode
   :bind (:map elixir-mode-map
-              ("C-c C-t" . exunit-transient)
+              ("C-c C-t" . exunit-transient))
+  :bind (:map projectile-command-map
               ;; override projectile-toggle-between-implementation-and-test
-              ("M-` t" . exunit-toggle-file-and-test)
-              )
+              ("t" . exunit-toggle-file-and-test))
   :custom (exunit-environment '("MIX_ENV=test"))
   :config
   (defun shou/elixir-project-root ()
