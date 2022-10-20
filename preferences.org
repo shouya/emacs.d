@@ -3885,6 +3885,7 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
     (org-pandoc-menu-entry
      '(
        (?w "as mediawiki." org-pandoc-export-as-mediawiki)
+       (?g "as gfm." org-pandoc-export-as-gfm)
        ))
     (org-pandoc-options-for-mediawiki '((shift-heading-level-by . "1")))
     )
