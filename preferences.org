@@ -450,6 +450,12 @@ Show file name in window title.
 (setq frame-title-format '("%b - %m @ Emacs"))
 #+END_SRC
 
+Do not attempt to resize frame on font-size change, etc. (Copied from [[https://tony-zorman.com/posts/2022-10-22-emacs-potpourri.html][Emacs Potpourri]])
+
+#+begin_src emacs-lisp
+(setq frame-inhibit-implied-resize t)
+#+end_src
+
 ** Install all-the-icon
 
 In order for the icons to work it is very important that you install the Resource Fonts included in this package, they are available in the fonts directory. You can also install the latest fonts for this package in the (guessed?) based on the OS by calling the following function;
