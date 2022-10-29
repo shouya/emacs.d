@@ -689,6 +689,15 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
 (global-unset-key (kbd "C-x o"))
 #+END_SRC
 
+** Automatic resizing with golden-ratio.el
+
+This allows the currently focusing window to expand to occupy a decent portion of the frame.
+
+#+begin_src emacs-lisp
+(use-package golden-ratio
+  :hook (emacs-startup . golden-ratio-mode))
+#+end_src
+
 ** Remember layout for undoing
 
 Use =C-c <left>= and =C-c <right>= to undo layout.
