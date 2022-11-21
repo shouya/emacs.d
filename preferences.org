@@ -888,6 +888,18 @@ So it doesn't block the main UI when copying large files.
   )
 #+end_src
 
+** Disk usage
+
+ncdu inside Emacs, works great over tramp.
+
+#+begin_src emacs-lisp
+(use-package disk-usage
+  :commands (disk-usage disk-usage-here ncdu)
+  :config
+  (defalias 'ncdu #'disk-usage-here)
+  )
+#+end_src
+
 * Editing
 ** Indentation
 
