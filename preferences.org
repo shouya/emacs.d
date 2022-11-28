@@ -456,6 +456,12 @@ Do not attempt to resize frame on font-size change, etc. (Copied from [[https://
 (setq frame-inhibit-implied-resize t)
 #+end_src
 
+Don't pop up UI dialog in any case:
+
+#+begin_src emacs-lisp
+(setq use-dialog-box nil)
+#+end_src
+
 ** Install all-the-icon
 
 In order for the icons to work it is very important that you install the Resource Fonts included in this package, they are available in the fonts directory. You can also install the latest fonts for this package in the (guessed?) based on the OS by calling the following function;
