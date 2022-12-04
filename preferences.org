@@ -3111,6 +3111,14 @@ WGSL:
   )
 #+end_src
 
+*** Perl and Raku
+
+#+begin_src emacs-lisp
+(use-package raku-mode
+  :mode ("\\.raku\\'"))
+#+end_src
+
+
 ** Tree sitter
 
 #+begin_src emacs-lisp
