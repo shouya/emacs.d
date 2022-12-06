@@ -2067,7 +2067,10 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
 #+begin_src emacs-lisp
 (use-package corfu
   :straight (corfu :files (:defaults "extensions/*")
-                   :includes (corfu-info corfu-directory corfu-history))
+                   :includes (corfu-info
+                              corfu-directory
+                              corfu-history
+                              corfu-popupinfo))
 
   :custom
   ;; if the line is already indented, try complete instead
@@ -2160,19 +2163,18 @@ Add more completions to capf for corfu to consume:
 
 *** Show docs on completion
 
-I like to manually enable corfu-doc for languages that I'm not familiar with.
+I like to show documentation on the side of popup. Using the official extension corfu-popupinfo since corfu-doc is deprecated.
 
 #+begin_src emacs-lisp
-(use-package corfu-doc
-  :straight (corfu-doc :host github :repo "galeo/corfu-doc")
+(use-package corfu-popupinfo
   :after corfu
-  :hook (corfu-mode . corfu-doc-mode)
+  :hook (corfu-mode . corfu-popupinfo-mode)
+  :ensure nil
   :bind (:map corfu-map
               ;; Scroll in the documentation window
-              ("M-n" . #'corfu-doc-scroll-up)
-              ("M-p" . #'corfu-doc-scroll-down)
-              )
-  )
+              ("M-n" . #'corfu-popupinfo-scroll-up)
+              ("M-p" . #'corfu-popupinfo-scroll-down)
+              ))
 #+end_src
 
 *** Completion style
