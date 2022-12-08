@@ -701,7 +701,13 @@ This allows the currently focusing window to expand to occupy a decent portion o
 
 #+begin_src emacs-lisp
 (use-package golden-ratio
-  :hook (emacs-startup . golden-ratio-mode))
+  :hook (emacs-startup . golden-ratio-mode)
+  :config
+  ;; Instead of each window occupies 0.618 of the screen, makes it
+  ;; occupy half of the screen. This prevents unnecessary resizing
+  ;; when two side-by-side windows are open.
+  (setq golden-ratio--value 2.0)
+  )
 #+end_src
 
 ** Remember layout for undoing
