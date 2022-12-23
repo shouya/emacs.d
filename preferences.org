@@ -1119,24 +1119,24 @@ entered.
   ;; stolen from https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/20#issue-561155902
   (defun tree-sitter-mark-bigger-node ()
     (interactive)
-    (let* ((p (point))
-           (m (or (mark) p))
-           (beg (min p m))
-           (end (max p m))
-           (root (ts-root-node tree-sitter-tree))
-           (node (ts-get-descendant-for-position-range root beg end))
-           (node-beg (ts-node-start-position node))
-           (node-end (ts-node-end-position node)))
-      ;; Node fits the region exactly. Try its parent node instead.
-      (when (and (= beg node-beg) (= end node-end))
-        (when-let ((node (ts-get-parent node)))
-          (setq node-beg (ts-node-start-position node)
-                node-end (ts-node-end-position node))))
-      (set-mark node-end)
-      (goto-char node-beg)))
+    (when-let (root (tsc-root-node tree-sitter-tree))
+      (let* ((mark (or (mark) (point)))
+             (region-start (min (point) mark))
+             (region-end (max (point) mark))
+             (node (tsc-get-descendant-for-position-range root region-start region-end))
+             (node-start (tsc-node-start-position node))
+             (node-end (tsc-node-end-position node)))
+        ;; Node fits the region exactly. Try its parent node instead.
+        (when (and (= region-start node-start) (= region-end node-end))
+          (when-let ((node (tsc-get-parent node)))
+            (setq node-start (tsc-node-start-position node)
+                  node-end (tsc-node-end-position node))))
+        (set-mark node-end)
+        (goto-char node-start))))
 
-  (setq er/try-expand-list (append er/try-expand-list
-                                   '(tree-sitter-mark-bigger-node)))
+  (add-to-list 'er/try-expand-list
+               #'tree-sitter-mark-bigger-node
+               'append)
   )
 ;; :custom
 ;;
