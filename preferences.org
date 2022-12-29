@@ -2795,6 +2795,9 @@ Reformatting JSON.
   ;; default: "check".
   (lsp-rust-analyzer-cargo-watch-command "clippy")
 
+  ;; enable clippy by default
+  (lsp-rust-clippy-preference "on")
+
   ;; show variable types as inlay hints
   (lsp-rust-analyzer-server-display-inlay-hints nil)
 
