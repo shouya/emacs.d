@@ -2188,7 +2188,7 @@ Orderless allows completion to be filtered by typing space separated words. Simi
 #+begin_src emacs-lisp
 (use-package orderless
   :config
-  (setq completion-styles '(substring orderless basic))
+  (setq completion-styles '(orderless basic))
   ;; ignore case for filenames
   (setq read-file-name-completion-ignore-case t)
   )
