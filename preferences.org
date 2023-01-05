@@ -1406,6 +1406,13 @@ buffer is not visiting a file."
   )
 #+END_SRC
 
+*** Tramp for kubernetes containers
+
+#+begin_src emacs-lisp
+(use-package kubernetes-tramp
+  :after tramp)
+#+end_src
+
 ** Auto-correction
 
 I bind M-/ to cape-dabbrev, because dabbrev-completion doesn't search
