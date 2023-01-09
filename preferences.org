@@ -2118,6 +2118,10 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
                               corfu-history
                               corfu-popupinfo))
 
+  :bind
+  (:map corfu-map
+        ("C-SPC" . corfu-insert-separator))
+
   :custom
   ;; if the line is already indented, try complete instead
   (tab-always-indent 'complete)
