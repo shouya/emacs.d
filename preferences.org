@@ -919,8 +919,9 @@ ncdu inside Emacs, works great over tramp.
   (defun shou/xdg-open (file)
     "Open a file through xdg-open"
     (interactive "f")
-    (message "Opening %s with xdg-open" file)
-    (let ((process-connection-type nil))
+    (let ((file (expand-file-name file))
+          (process-connection-type nil))
+      (message "Opening %s with xdg-open" file)
       (call-process-shell-command (format "xdg-open '%s' &" file))))
 
   (defun shou/dired-xdg-open ()
