@@ -910,6 +910,30 @@ ncdu inside Emacs, works great over tramp.
   )
 #+end_src
 
+** Perform xdg-open from dired
+
+#+begin_src emacs-lisp
+(use-package dired
+  :ensure nil
+  :config
+  (defun shou/xdg-open (file)
+    "Open a file through xdg-open"
+    (interactive "f")
+    (message "Opening %s with xdg-open" file)
+    (let ((process-connection-type nil))
+      (call-process-shell-command (format "xdg-open '%s' &" file))))
+
+  (defun shou/dired-xdg-open ()
+    (interactive)
+    (dolist (file (dired-get-marked-files))
+      (message file)
+      (shou/xdg-open file)))
+
+  (define-key dired-mode-map (kbd "C-c C-o") 'shou/dired-xdg-open)
+  (define-key dired-mode-map (kbd "C-o") 'shou/dired-xdg-open)
+)
+#+end_src
+
 * Editing
 ** Indentation
 
