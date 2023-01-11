@@ -1889,15 +1889,12 @@ Few shortcuts:
 
   ;; colorize command line tool outputs
   ;; stolen from https://old.reddit.com/r/emacs/comments/b6n3t8/what_would_it_take_to_get_terminal_colors_in/
-  (add-hook 'eshell-mode-hook
-            (lambda ()
-              (setenv "TERM" "xterm-256color")))
-  (add-hook 'eshell-before-prompt-hook (setq xterm-color-preserve-properties t))
-  (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
-  (setq eshell-output-filter-functions
-        (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
+  (add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm-256color")))
   )
 #+end_src
+
+#+RESULTS:
+: #s(hash-table size 65 test eql rehash-size 1.5 rehash-threshold 0.8125 data (:use-package (25534 53253 454816 546000) :preface (25534 53253 454812 418000) :init (25534 53253 454757 3000) :init-secs (0 0 199 737000) :preface-secs (0 0 319 21000) :use-package-secs (0 0 332 853000) :config (25534 53253 454743 723000) :config-secs (0 0 153 72000)))
 
 ** Connect to external tmux session
 
