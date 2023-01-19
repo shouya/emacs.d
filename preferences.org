@@ -4003,6 +4003,9 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
 
 #+BEGIN_SRC emacs-lisp
 (with-eval-after-load 'ox
+  ;; code highlight in html export
+  (use-package htmlize)
+
   ;; gfm, mediawiki, etc
   (use-package ox-pandoc
     :custom
