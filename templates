@@ -40,3 +40,5 @@ yaml-mode
 (deployment (shou/tempel-snippet "k8s/deployment.yaml"))
 (service (shou/tempel-snippet "k8s/service.yaml"))
 (ingressroute (shou/tempel-snippet "k8s/ingressroute.yaml"))
+(pvpvc (shou/tempel-snippet "k8s/pvpvc.yaml"))
+(storage (shou/tempel-snippet "k8s/pvpvc.yaml"))

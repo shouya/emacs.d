@@ -1,0 +1,74 @@
+# This template defines two pvcs ready for use:
+#
+#   - rclone-alist-state
+#   - rclone-alist-data
+#
+# Simply s/alist/<your-app>/g.
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rclone-alist-state
+  labels:
+    name: rclone-alist-state
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 10Gi
+  storageClassName: rclone
+  csi:
+    driver: csi-rclone
+    volumeHandle: rclone-alist-state
+    volumeAttributes:
+      remote: container-state
+      remotePath: alist
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rclone-alist-state
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: rclone
+  selector:
+    matchLabels:
+      name: rclone-alist-state
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rclone-alist-data
+  labels:
+    name: rclone-alist-data
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 10Gi
+  storageClassName: rclone
+  csi:
+    driver: csi-rclone
+    volumeHandle: rclone-alist-data
+    volumeAttributes:
+      remote: container-data
+      remotePath: alist
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rclone-alist-data
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: rclone
+  selector:
+    matchLabels:
+      name: rclone-alist-data
