@@ -538,6 +538,22 @@ I use "Input" as my default font face.
 (auto-set-fonts)
 #+END_SRC
 
+** Font for non-latin scripts
+
+Ensure non-latin scripts font are rendered in a consistent font.
+
+#+begin_src emacs-lisp
+(cl-loop for (script . font) in
+         '((han . "Noto Sans CJK TC DemiLight")
+           (kana . "Noto Sans CJK JP DemiLight")
+           (hangul . "Noto Sans CJK KR DemiLight")
+           (phonetic . "Noto Sans"))
+         do
+         (set-fontset-font (frame-parameter nil 'font)
+                           script
+                           (font-spec :family font)))
+#+end_src
+
 ** Ligature
 
 #+begin_src emacs-lisp
