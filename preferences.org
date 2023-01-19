@@ -2543,6 +2543,7 @@ I customized several bindings because "C-<left>/<right>" is bound to
 #+BEGIN_SRC emacs-lisp
 (use-package paredit
   :commands paredit-mode
+  :hook (lisp-mode-map-hook . paredit-mode)
   :bind (:map paredit-mode-map
               ;; ((a|) b) => ((a| b))
               ("M-<right>" . paredit-forward-slurp-sexp)
