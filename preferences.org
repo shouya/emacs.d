@@ -2134,6 +2134,9 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
   (:map corfu-map
         ("C-SPC" . corfu-insert-separator))
 
+  :hook
+  (emacs-startup . global-corfu-mode)
+
   :custom
   ;; if the line is already indented, try complete instead
   (tab-always-indent 'complete)
@@ -2142,8 +2145,6 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
   (corfu-auto t)
 
   :config
-  (global-corfu-mode)
-
   (use-package kind-icon
     :config
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
@@ -2559,8 +2560,6 @@ I customized several bindings because "C-<left>/<right>" is bound to
               ("M-<up>" . paredit-wrap-sexp)
               ;; (|a b) => ((a) b)
               ("M-(" . paredit-wrap-round)))
-
-
 #+END_SRC
 
 **** Use =rainbow-delimiters=
