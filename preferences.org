@@ -2576,7 +2576,8 @@ I customized several bindings because "C-<left>/<right>" is bound to
                 emacs-lisp-mode-hook
                 scheme-mode-hook
                 racket-mode-hook
-                cider-repl-mode))
+                cider-repl-mode-hook
+                lisp-mode-hook))
   (add-hook hook 'paredit-mode)
   (add-hook hook 'rainbow-delimiters-mode))
 #+END_SRC
@@ -3200,6 +3201,14 @@ WGSL:
   :mode ("\\.raku\\'"))
 #+end_src
 
+*** eww and yuck
+
+#+begin_src emacs-lisp
+(use-package lisp-mode
+  :ensure nil
+  :straight
+  :mode ("\\.yuck\\'"))
+#+end_src
 
 ** Tree sitter
 
