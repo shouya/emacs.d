@@ -4221,8 +4221,17 @@ I automatically backup my org files using git after idle for a while. The mode i
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'org
-  (setf (plist-get org-format-latex-options :scale) 3.0)
-  )
+  (cond
+   ((executable-find "dvisvgm")
+    ;; use svg to avoid blurring or scaling
+    (setq org-preview-latex-default-process 'dvisvgm)
+    (setf (plist-get org-format-latex-options :scale) 1.5))
+
+   (t
+    (setf (plist-get org-format-latex-options :scale) 3.0))))
+
+(use-package org-fragtog
+  :commands org-fragtog-mode)
 #+end_src
 
 * Email
