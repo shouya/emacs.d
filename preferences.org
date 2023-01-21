@@ -3648,9 +3648,10 @@ Show variable pitch for normal text, and monospace font for codes.
 
 #+begin_src emacs-lisp
 (use-package mixed-pitch
-  :hook
-  (org-mode . mixed-pitch-mode)
-  (git-commit-mode . mixed-pitch-mode)
+  :commands (mixed-pitch-mode)
+  ;; :hook
+  ;; (org-mode . mixed-pitch-mode)
+  ;; (git-commit-mode . mixed-pitch-mode)
 
   :custom
   ;; use the default box cursor instead of the I cursor
