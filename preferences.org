@@ -481,7 +481,7 @@ I use =dichromacy= theme because it's high contrast, colorful, and looks pristin
 (load-theme shou/current-theme t)
 #+END_SRC
 
-** Set font
+** Set font families
 
 I use "Input" as my default font face.
 
@@ -531,8 +531,9 @@ I use "Input" as my default font face.
         ("Charter" :rel-height 1.07)))
 
 (setq shou/mono-font-list
-      '(("Fira Code" :height 130)
+      '(("JetBrains Mono ExtraLight" :height 130)
         ("Noto Mono" :height 135)
+        ("Fira Code Light" :height 130)
         ("Dejavu Sans Mono" :height 130)))
 
 (auto-set-fonts)
@@ -549,9 +550,10 @@ Ensure non-latin scripts font are rendered in a consistent font.
            (hangul . "Noto Sans CJK KR DemiLight")
            (phonetic . "Noto Sans"))
          do
-         (set-fontset-font (frame-parameter nil 'font)
+         (set-fontset-font t ;; font for 'default face
                            script
-                           (font-spec :family font)))
+                           (font-spec :family font))
+         )
 #+end_src
 
 ** Ligature
@@ -582,6 +584,14 @@ Ensure non-latin scripts font are rendered in a consistent font.
                             "<<" "<<<" ">>" ">>>" "//" "///"
                             "||" "&&" "->>" "<<-" "<<->>" "-->" "!->" ))
   )
+#+end_src
+
+** Make italic face slanted
+
+By default, emacs shows italic faces with an underline. Better simply show a slanted face.
+
+#+begin_src emacs-lisp
+(set-face-attribute 'italic nil :slant 'italic :underline nil)
 #+end_src
 
 ** Modeline customization
