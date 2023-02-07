@@ -2908,6 +2908,13 @@ Reformatting JSON.
 
   ;; enable LSP for type info and more
   (add-hook 'rust-mode-hook #'lsp)
+
+  ;; fix incorrect filename regexp in compilation mode
+  ;; See https://github.com/rust-lang/rust-mode/issues/452
+  (setq error_stack-regexps
+        '("\\(?:at\\|',\\) \\(\\([^:\s]+\\):\\([0-9]+\\)\\)"
+          2 3 nil nil 1))
+  (setf (cdr (assoc 'cargo compilation-error-regexp-alist-alist)) error_stack-regexps)
   )
 #+END_SRC
 
