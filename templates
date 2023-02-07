@@ -13,6 +13,8 @@ elixir-mode
   " do" n> r n "end")
 (def "def " p " do" n> r> n "  end")
 (inspect "IO.inspect(" (r "dddd" e) ", label: \"" q p "\")")
+(moduledoc "@moduledoc \"\"\"" n> r n> "\"\"\"")
+(@moduledoc "@moduledoc \"\"\"" n> r n> "\"\"\"")
 
 mediawiki-mode
 
