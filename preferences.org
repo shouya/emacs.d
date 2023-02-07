@@ -1444,6 +1444,9 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
   (tramp-default-method "scp")
   (remote-file-name-inhibit-cache nil)
 
+  ;; do not store remote command history over tramp
+  (tramp-histfile-override t)
+
   :config
   ;; stolen from https://stackoverflow.com/questions/33275790/how-sudo-edit-local-file-with-emacs-on-ubuntu
   (defun sudo-edit (&optional arg)
