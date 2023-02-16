@@ -699,7 +699,7 @@ This trick is based on [[https://emacs.stackexchange.com/questions/28736/emacs-p
 
 (use-package ace-window
   ;; :bind ("M-o" . ace-window)
-  :bind
+  :bind*
   ("M-o" . other-window)
   ("M-O" . shou/other-window-backwards)
   :custom
