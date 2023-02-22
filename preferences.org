@@ -729,6 +729,7 @@ This allows the currently focusing window to expand to occupy a decent portion o
 
 #+begin_src emacs-lisp
 (use-package golden-ratio
+  :straight (:host github :repo "shouya/golden-ratio.el")
   :hook (emacs-startup . golden-ratio-mode)
   :config
   ;; Instead of each window occupies 0.618 of the screen, makes it
