@@ -4020,10 +4020,22 @@ Ref: [[https://lists.gnu.org/archive/html/emacs-orgmode/2012-02/msg00854.html][R
 
 ** Presentation
 
+Hotkeys:
+
+- =f5=:: edit
+- =j=/=k=:: scroll
+- =c=/=C=:: jump between src blocks
+- =e=:: edit src block
+
 #+BEGIN_SRC emacs-lisp
 (use-package epresent
   :after org
-  :commands epresent-run)
+  :commands epresent-run
+  :custom
+  (epresent-text-scale 1.0)
+  (epresent-pretty-entities t)
+  (epresent-hide-emphasis-markers t)
+  )
 #+END_SRC
 
 ** Inline Image
