@@ -248,7 +248,7 @@ I switched to readable mode after a web page is rendered.
 
 #+BEGIN_SRC emacs-lisp
 (let* ((base-dir (cond
-                  ((f-directory? "~/tmp") "~/tmp")
+                  ((f-directory? "~/.cache") "~/.cache")
                   (t "/tmp")))
        (backup-dir (f-join base-dir "emacs-backup")))
   (when (not (f-directory? backup-dir))(f-mkdir backup-dir))
