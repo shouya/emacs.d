@@ -552,7 +552,9 @@ Ensure non-latin scripts font are rendered in a consistent font.
          '((han . "Noto Sans CJK TC DemiLight")
            (kana . "Noto Sans CJK JP DemiLight")
            (hangul . "Noto Sans CJK KR DemiLight")
-           (phonetic . "Noto Sans"))
+           (phonetic . "Noto Sans")
+           (greek . "Noto Sans Light")
+           )
          do
          (set-fontset-font t ;; font for 'default face
                            script
