@@ -2519,6 +2519,7 @@ Templating engine that allows me to quickly enter some text.
 #+begin_src emacs-lisp
 (use-package copilot
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :disabled
   :commands
   (copilot-mode
    copilot-clear-overlay
@@ -2533,6 +2534,17 @@ Templating engine that allows me to quickly enter some text.
         ("C-c C-p" . copilot-previous-completion)
         ("C-g" . copilot-clear-overlay)
         ))
+#+end_src
+
+*** Codex Completion
+
+#+begin_src emacs-lisp
+(use-package codex-completion
+  :straight (codex-completion :type git :host github :repo "debanjum/codex-completion")
+  :bind ("C-<iso-lefttab>" . 'codex-completion)
+  :config
+  (use-package password-store)
+  (setq codex-completion-openai-api-token (password-store-get "openai/api-key")))
 #+end_src
 
 ** Typos
@@ -4045,7 +4057,7 @@ Hotkeys:
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :custom (org-image-actual-width 600))
+  :custom (org-image-actual-width nil))
 #+END_SRC
 
 *** Enable drag-n-drop download for images
