@@ -1119,7 +1119,7 @@ Make operations more interactive with =consult.el=.
 
   :custom
   ;; only show preview when pressing M-.
-  (consult-preview-key (kbd "M-."))
+  (consult-preview-key "M-.")
 
   :config
   ;; show preview automatically for some commands
