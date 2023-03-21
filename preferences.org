@@ -2541,10 +2541,19 @@ Templating engine that allows me to quickly enter some text.
 #+begin_src emacs-lisp
 (use-package codex-completion
   :straight (codex-completion :type git :host github :repo "debanjum/codex-completion")
-  :bind ("C-<iso-lefttab>" . 'codex-completion)
-  :config
+  :bind ("C-x C-r" . 'codex-completion-instruct)
+  :custom
+  (codex-completion-openai-model "gpt-3.5-turbo")
+  (codex-completion-openai-api-token
+   (with-eval-after-load 'password-store
+     (password-store-get "openai/api-key")))
+  )
+
+(defun codex-completion-after-load ()
   (use-package password-store)
-  (setq codex-completion-openai-api-token (password-store-get "openai/api-key")))
+  )
+
+(add-hook 'with-editor-mode-hook #'codex-completion-after-load)
 #+end_src
 
 ** Typos
