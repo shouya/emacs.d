@@ -2495,63 +2495,6 @@ Templating engine that allows me to quickly enter some text.
   )
 #+END_SRC
 
-** AI coding partner
-*** TabNine completion
-
-I now prefer GitHub Copilot over TabNine.
-
-#+begin_src emacs-lisp
-(use-package company-tabnine
-  :after lsp
-  :disabled
-  :config
-  (fset 'tabnine-capf (cape-company-to-capf #'company-tabnine))
-
-  (defun shou/enable-tabnine ()
-    (interactive)
-    (add-to-list 'completion-at-point-functions #'tabnine-capf))
-
-  (defun shou/disable-tabnine ()
-    (interactive)
-    (setq-local completion-at-point-functions
-                (remove #'tabnine-capf completion-at-point-functions)))
-  )
-#+end_src
-
-*** copilot.el
-
-#+begin_src emacs-lisp
-(use-package copilot
-  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :commands (copilot-mode copilot-clear-overlay copilot-complete)
-  :bind
-  ;; C-S-tab
-  (("C-<iso-lefttab>" . copilot-complete)
-   :map copilot-completion-map
-        ("TAB" . copilot-accept-completion)
-        ("C-e" . copilot-accept-completion)
-        ("M-f" . copilot-accept-completion-by-word)
-        ("M-n" . copilot-next-completion)
-        ("M-p" . copilot-previous-completion)
-        ("C-g" . copilot-clear-overlay)
-        ))
-#+end_src
-
-*** Codex Completion
-
-Instruct the AI to modify codes.
-
-#+begin_src emacs-lisp
-(use-package password-store)
-(use-package codex-completion
-  :straight (codex-completion :type git :host github :repo "debanjum/codex-completion")
-  :bind ("C-x C-r" . 'codex-completion-instruct)
-  :custom
-  (codex-completion-openai-model "gpt-3.5-turbo")
-  (codex-completion-openai-api-token (password-store-get "openai/api-key"))
-  )
-#+end_src
-
 ** Typos
 
 #+begin_src emacs-lisp
@@ -2574,6 +2517,17 @@ Instruct the AI to modify codes.
           (lambda ()
             (let ((inhibit-read-only t))
               (ansi-color-apply-on-region compilation-filter-start (point)))))
+#+end_src
+
+** Tree sitter
+
+#+begin_src emacs-lisp
+(use-package tree-sitter
+  :config
+  (use-package tree-sitter-langs)
+  (global-tree-sitter-mode +1)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+  )
 #+end_src
 
 ** Languages
@@ -3275,14 +3229,60 @@ WGSL:
   :mode ("\\.yuck\\'"))
 #+end_src
 
-** Tree sitter
+** AI coding partner
+*** TabNine completion
+
+I now prefer GitHub Copilot over TabNine.
 
 #+begin_src emacs-lisp
-(use-package tree-sitter
+(use-package company-tabnine
+  :after lsp
+  :disabled
   :config
-  (use-package tree-sitter-langs)
-  (global-tree-sitter-mode +1)
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+  (fset 'tabnine-capf (cape-company-to-capf #'company-tabnine))
+
+  (defun shou/enable-tabnine ()
+    (interactive)
+    (add-to-list 'completion-at-point-functions #'tabnine-capf))
+
+  (defun shou/disable-tabnine ()
+    (interactive)
+    (setq-local completion-at-point-functions
+                (remove #'tabnine-capf completion-at-point-functions)))
+  )
+#+end_src
+
+*** copilot.el
+
+#+begin_src emacs-lisp
+(use-package copilot
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :commands (copilot-mode copilot-clear-overlay copilot-complete)
+  :bind
+  ;; C-S-tab
+  (("C-<iso-lefttab>" . copilot-complete)
+   :map copilot-completion-map
+        ("TAB" . copilot-accept-completion)
+        ("C-e" . copilot-accept-completion)
+        ("M-f" . copilot-accept-completion-by-word)
+        ("M-n" . copilot-next-completion)
+        ("M-p" . copilot-previous-completion)
+        ("C-g" . copilot-clear-overlay)
+        ))
+#+end_src
+
+*** Codex Completion
+
+Instruct the AI to modify codes.
+
+#+begin_src emacs-lisp
+(use-package password-store)
+(use-package codex-completion
+  :straight (codex-completion :type git :host github :repo "debanjum/codex-completion")
+  :bind ("C-x C-r" . 'codex-completion-instruct)
+  :custom
+  (codex-completion-openai-model "gpt-3.5-turbo")
+  (codex-completion-openai-api-token (password-store-get "openai/api-key"))
   )
 #+end_src
 
