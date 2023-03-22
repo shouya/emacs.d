@@ -2495,11 +2495,15 @@ Templating engine that allows me to quickly enter some text.
   )
 #+END_SRC
 
-*** AI completion with tabnine
+** AI coding partner
+*** TabNine completion
+
+I now prefer GitHub Copilot over TabNine.
 
 #+begin_src emacs-lisp
 (use-package company-tabnine
   :after lsp
+  :disabled
   :config
   (fset 'tabnine-capf (cape-company-to-capf #'company-tabnine))
 
@@ -2534,6 +2538,8 @@ Templating engine that allows me to quickly enter some text.
 #+end_src
 
 *** Codex Completion
+
+Instruct the AI to modify codes.
 
 #+begin_src emacs-lisp
 (use-package password-store)
