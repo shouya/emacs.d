@@ -2519,19 +2519,16 @@ Templating engine that allows me to quickly enter some text.
 #+begin_src emacs-lisp
 (use-package copilot
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :disabled
-  :commands
-  (copilot-mode
-   copilot-clear-overlay
-   copilot-complete)
+  :commands (copilot-mode copilot-clear-overlay copilot-complete)
   :bind
   ;; C-S-tab
   (("C-<iso-lefttab>" . copilot-complete)
    :map copilot-completion-map
         ("TAB" . copilot-accept-completion)
         ("C-e" . copilot-accept-completion)
-        ("C-c C-n" . copilot-next-completion)
-        ("C-c C-p" . copilot-previous-completion)
+        ("M-f" . copilot-accept-completion-by-word)
+        ("M-n" . copilot-next-completion)
+        ("M-p" . copilot-previous-completion)
         ("C-g" . copilot-clear-overlay)
         ))
 #+end_src
