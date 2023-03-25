@@ -1137,6 +1137,8 @@ Make operations more interactive with =consult.el=.
   (consult-customize
    consult-goto-line
    :preview-key '(:debounce 0.1 any))
+
+  (require 'recentf)
   )
 
 (with-eval-after-load 'lsp-mode
