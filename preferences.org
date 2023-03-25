@@ -3305,14 +3305,15 @@ I now prefer GitHub Copilot over TabNine.
 Instruct the AI to modify codes.
 
 #+begin_src emacs-lisp
-(use-package password-store)
 (use-package codex-completion
   :straight (codex-completion :type git :host github :repo "debanjum/codex-completion")
-  :bind ("C-x C-r" . 'codex-completion-instruct)
+  :bind ("C-x C-r" . codex-completion-instruct)
   :custom
   (codex-completion-openai-model "gpt-3.5-turbo")
-  (codex-completion-openai-api-token (password-store-get "openai/api-key"))
-  )
+  :config
+  ;; this step is a little slow (because of decryption of password
+  ;; store). so we put in in config block to make it load on-demand.
+  (setq codex-completion-openai-api-token (shou/get-pass-entry "openai/api-key")))
 #+end_src
 
 * Org mode
