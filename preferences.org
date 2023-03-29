@@ -4087,6 +4087,12 @@ Hotkeys:
   )
 #+END_SRC
 
+Make plain lists folded by default:
+
+#+begin_src emacs-lisp
+(setq org-cycle-include-plain-lists 'integrate)
+#+end_src
+
 ** Inline Image
 *** Set inline image width to 600px
 
