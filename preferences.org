@@ -3048,7 +3048,7 @@ project related functionalities.
 
 (use-package idris2-mode
   :after popwin
-  :straight (:host github :repo "idris-community/idris2-mode")
+  :straight (:host github :repo "jeroendehaas/idris2-mode")
   :commands idris2-mode
   :mode "\\.idr\\'"
   :config
@@ -3059,9 +3059,6 @@ project related functionalities.
                                  :noselect nil
                                  :position bottom
                                  :stick t))
-
-  (advice-add #'idris2-complete-at-point :around #'cape-wrap-silent)
-  (advice-add #'idris2-complete-at-point :around #'cape-wrap-purify)
   )
 #+END_SRC
 
