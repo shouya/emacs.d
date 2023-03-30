@@ -3300,20 +3300,18 @@ I now prefer GitHub Copilot over TabNine.
         ))
 #+end_src
 
-*** Codex Completion
-
-Instruct the AI to modify codes.
+*** Ancilla
 
 #+begin_src emacs-lisp
-(use-package codex-completion
-  :straight (codex-completion :type git :host github :repo "debanjum/codex-completion")
-  :bind ("C-x C-r" . codex-completion-instruct)
+(use-package ancilla
+  :straight (:local-repo "~/projects/ancilla")
+  :bind ("C-x C-r" . ancilla-generate-or-rewrite)
   :custom
-  (codex-completion-openai-model "gpt-3.5-turbo")
+  (ancilla-adaptor-chat-model "gpt-4")
   :config
-  ;; this step is a little slow (because of decryption of password
-  ;; store). so we put in in config block to make it load on-demand.
-  (setq codex-completion-openai-api-token (shou/get-pass-entry "openai/api-key")))
+  (setq ancilla-adaptor-chat-openai-api-key
+        (shou/get-pass-entry "openai/api-key"))
+  )
 #+end_src
 
 * Org mode
