@@ -1483,7 +1483,13 @@ buffer is not visiting a file."
 
 #+begin_src emacs-lisp
 (use-package kubernetes-tramp
-  :after tramp)
+  :when (f-exists-p "~/.kube/config")
+  :custom
+  (tramp-remote-shell-executable "sh")
+  :config
+  (let* ((paths (cons "~/.kube/config" (f-glob "~/.kube/config.d/*"))))
+    (setenv "KUBECONFIG"
+            (s-join ":" (mapcar 'f-expand paths)))))
 #+end_src
 
 ** Auto-correction
