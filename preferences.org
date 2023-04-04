@@ -3316,17 +3316,18 @@ I now prefer GitHub Copilot over TabNine.
   (setq ancilla-adaptor-chat-openai-api-key
         (shou/get-pass-entry "openai/api-key"))
 
-(defun shou/ancilla-generate-or-rewrite (arg)
-  "Generate or rewrite text using GPT-3.5-turbo or GPT-4 based on the prefix argument.
+  (defun shou/ancilla-generate-or-rewrite (arg)
+    "Generate or rewrite text using GPT-3.5-turbo or GPT-4 based on the prefix argument.
 With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
-  (interactive "P")
-  (cond
-   (arg
-    (let ((ancilla-adaptor-chat-model "gpt-4"))
-      (ancilla-generate-or-rewrite)))
-   (t
-    (let ((ancilla-adaptor-chat-model "gpt-3.5-turbo"))
-      (ancilla-generate-or-rewrite))))))
+    (interactive "P")
+    (cond
+     (arg
+      (let ((ancilla-adaptor-chat-model "gpt-4"))
+        (ancilla-generate-or-rewrite)))
+     (t
+      (let ((ancilla-adaptor-chat-model "gpt-3.5-turbo"))
+        (ancilla-generate-or-rewrite)))))
+  )
 #+end_src
 
 * Org mode
