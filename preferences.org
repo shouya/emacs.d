@@ -3263,30 +3263,8 @@ WGSL:
   :mode ("\\.yuck\\'"))
 #+end_src
 
-** AI coding partner
-*** TabNine completion
-
-I now prefer GitHub Copilot over TabNine.
-
-#+begin_src emacs-lisp
-(use-package company-tabnine
-  :after lsp
-  :disabled
-  :config
-  (fset 'tabnine-capf (cape-company-to-capf #'company-tabnine))
-
-  (defun shou/enable-tabnine ()
-    (interactive)
-    (add-to-list 'completion-at-point-functions #'tabnine-capf))
-
-  (defun shou/disable-tabnine ()
-    (interactive)
-    (setq-local completion-at-point-functions
-                (remove #'tabnine-capf completion-at-point-functions)))
-  )
-#+end_src
-
-*** copilot.el
+* AI
+** copilot.el
 
 #+begin_src emacs-lisp
 (use-package copilot
@@ -3306,7 +3284,7 @@ I now prefer GitHub Copilot over TabNine.
         ))
 #+end_src
 
-*** Ancilla
+** Ancilla
 
 #+begin_src emacs-lisp
 (use-package ancilla
