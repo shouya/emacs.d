@@ -3268,6 +3268,7 @@ WGSL:
 #+end_src
 
 * AI
+
 ** copilot.el
 
 #+begin_src emacs-lisp
@@ -3310,6 +3311,18 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
       (let ((ancilla-adaptor-chat-model "gpt-3.5-turbo"))
         (ancilla-generate-or-rewrite)))))
   )
+#+end_src
+
+** ChatGPT shell
+
+#+begin_src emacs-lisp
+(use-package chatgpt-shell
+  :straight (:host github :repo "xenodium/chatgpt-shell")
+  :commands (chatgpt-shell-explain-code chatgpt-shell)
+  :custom
+  (chatgpt-shell-chatgpt-streaming t)
+  :config
+  (setq chatgpt-shell-openai-key (shou/get-pass-entry "openai/api-key")))
 #+end_src
 
 * Org mode
