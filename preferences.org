@@ -78,12 +78,16 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 ** Helper functions
 
 #+begin_src emacs-lisp
+(defvar shou/cached-pass-entries '())
+
 (defun shou/get-pass-entry (entry)
-  ;; because auth-source-pass-get depends on the auto-mode-alist for
-  ;; gpg files, which is purposely unset on boot to speed up the load
-  ;; time.
-  (let ((file-name-handler-alist '(("\\.gpg\\(~\\|\\.~[0-9]+~\\)?\\'" . epa-file-handler))))
-    (auth-source-pass-get 'secret entry)))
+  (if-let ((value (assoc entry shou/cached-pass-entries)))
+      (cdr value)
+    (let ((file-name-handler-alist
+           '(("\\.gpg\\(~\\|\\.~[0-9]+~\\)?\\'" . epa-file-handler))))
+      (let ((pass-entry (auth-source-pass-get 'secret entry)))
+        (push (cons entry pass-entry) shou/cached-pass-entries)
+        pass-entry))))
 #+end_src
 
 ** Set exec path
