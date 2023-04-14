@@ -1925,9 +1925,25 @@ Few shortcuts:
     (interactive)
     (insert (completing-read "Search history: " (ring-elements eshell-history-ring))))
 
+  (defun shou/eshell-insert-arguments-from-previous-command ()
+    "Bring up the arguments from the previous command. Similar to M-. in shell."
+    (interactive)
+    (let ((begin))
+      (save-excursion
+		    (eshell-previous-prompt 1)
+        ;; to ensure the cursor lands on the beginning of word
+        (eshell-forward-argument 1)
+        (eshell-forward-argument 1)
+        (eshell-backward-argument 1)
+		    (setq begin (point))
+        (end-of-line)
+        (kill-ring-save begin (point)))
+      (yank)))
+
   (defun shou/eshell-customization ()
     (bind-key "M-r" #'shou/eshell-insert-history-element eshell-mode-map)
     (bind-key "M-r" #'shou/eshell-insert-history-element eshell-hist-mode-map)
+    (bind-key "M-." #'shou/eshell-insert-arguments-from-previous-command eshell-mode-map)
 
     ;; eshell-lookup-alias is defined buffer-locally
     (shou/def-eshell-alias "ll" "ls -al $*")
