@@ -1973,6 +1973,13 @@ Few shortcuts:
 
 ** EAT
 
+Emulate A Terminal (EAT) is a terminal emulator for Emacs written in native Elisp. Cheatsheet:
+
+| Key       | Description              |
+|-----------+--------------------------|
+| =C-c C-e= | switch to emacs mode     |
+| =C-c C-j= | switch to semi-char mode |
+
 #+begin_src emacs-lisp
 (use-package eat
   :straight '(eat :type git
@@ -1982,7 +1989,14 @@ Few shortcuts:
 	                        "*.ti" ("terminfo/e" "terminfo/e/*")
 	                        ("terminfo/65" "terminfo/65/*")
 	                        ("integration" "integration/*")
-	                        (:exclude ".dir-locals.el" "*-tests.el"))))
+	                        (:exclude ".dir-locals.el" "*-tests.el")))
+  :commands (eat eat-eshell-mode eat-project)
+  :bind
+  ("C-x E" . eat)
+  ("M-` x E" . eat-project)
+  :hook
+  (eshell-load . eat-eshell-mode)
+  (eshell-load . eat-eshell-visual-command-mode))
 #+end_src
 
 ** Connect to external tmux session
