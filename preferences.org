@@ -641,7 +641,10 @@ Doom modeline
 ** Highlight current line
 
 #+BEGIN_SRC emacs-lisp
-(global-hl-line-mode)
+(dolist (hook '(prog-mode-hook
+                text-mode-hook
+                conf-mode-hook))
+  (add-hook hook 'hl-line-mode))
 #+END_SRC
 
 ** Highlight uncommitted changes
