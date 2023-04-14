@@ -2007,7 +2007,13 @@ Emulate A Terminal (EAT) is a terminal emulator for Emacs written in native Elis
       (projectile-with-default-dir project
         (let ((eat-buffer-name
                (projectile-generate-process-name "eat" arg project)))
-          (eat nil arg))))))
+          (eat nil arg)))))
+
+  ;; allow switching file via projectile (M-`)
+  (add-to-list
+   'eat-semi-char-non-bound-keys
+   [?\e ?`])
+  (eat-update-semi-char-mode-map))
 #+end_src
 
 ** Connect to external tmux session
