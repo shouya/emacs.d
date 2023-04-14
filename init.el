@@ -41,6 +41,14 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(setq straight-recipe-repositories
+      '(org-elpa
+        melpa
+        gnu-elpa-mirror
+        el-get
+        emacsmirror-mirror
+        nongnu-elpa))
+
 ;; must load org before calling org-babel. Otherwise it tries to use system org
 (straight-use-package 'org)
 
