@@ -61,8 +61,7 @@
 
 ;; this avoid jit emacs from compiling the file using system org mode
 (with-eval-after-load 'org
-  (org-babel-load-file "~/.emacs.d/preferences.org")
-  )
+  (org-babel-load-file "~/.emacs.d/preferences.org"))
 (require 'org)
 
 ;; ---------- config managed by emacs ----------

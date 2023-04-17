@@ -3357,7 +3357,7 @@ WGSL:
      (derived-mode-p 'mediawiki-mode)
      ;; do not enable copilot on files that may contain secrets
      (string-match-p "\\(?:secret\\|cred\\|hidden\\|private\\)" (buffer-name))))
-  (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
+  (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate))
 #+end_src
 
 ** Ancilla
