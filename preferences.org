@@ -1999,6 +1999,9 @@ Emulate A Terminal (EAT) is a terminal emulator for Emacs written in native Elis
   :hook
   (eshell-load . eat-eshell-mode)
   (eshell-load . eat-eshell-visual-command-mode)
+  :custom
+  ;; unlimited scrollback
+  (eat-term-scrollback-size nil)
   :config
   (defun shou/eat-projectile (arg)
     (interactive "P")
