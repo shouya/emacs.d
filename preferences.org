@@ -2575,8 +2575,7 @@ Templating engine that allows me to quickly enter some text.
   ;; used in hooks to turn off apheleia mode for some modes
   (defun shou/disable-apheleia-mode nil (apheleia-mode -1))
 
-  (apheleia-global-mode 1)
-  )
+  (apheleia-global-mode 1))
 #+END_SRC
 
 ** Typos
@@ -3336,6 +3335,9 @@ WGSL:
 (use-package copilot
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
   :commands (copilot-mode copilot-clear-overlay copilot-complete)
+  :custom
+  ;; enable logging (max size: 1000)
+  (copilot-log-max 1000)
   :bind
   ;; C-S-tab
   (("C-<iso-lefttab>" . copilot-complete)
