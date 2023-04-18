@@ -2013,9 +2013,7 @@ Emulate A Terminal (EAT) is a terminal emulator for Emacs written in native Elis
           (eat nil arg)))))
 
   ;; allow switching file via projectile (M-`)
-  (add-to-list
-   'eat-semi-char-non-bound-keys
-   [?\e ?`])
+  (add-to-list 'eat-semi-char-non-bound-keys [?\e ?`])
   (eat-update-semi-char-mode-map))
 #+end_src
 
@@ -2939,6 +2937,9 @@ Reformatting JSON.
 #+END_SRC
 
 *** Rust
+
+**** Rust mode
+
 #+BEGIN_SRC emacs-lisp
 (use-package rust-mode
   :mode ("\\.rs\\'" . rust-mode)
@@ -2966,30 +2967,6 @@ Reformatting JSON.
         ("C-c C-c C-e" . lsp-rust-analyzer-open-cargo-toml))
 
   :config
-  (use-package cargo
-    :bind
-    (:map rust-mode-map
-          ("C-c C-c r" . cargo-process-run-release)
-          ("C-c C-c C-r" . cargo-process-run)
-          ("C-c C-c C-c" . cargo-process-check)
-          ("C-c C-c C-k" . cargo-process-clippy)
-          ("C-c C-c C-a" . cargo-process-add)
-          ("C-c C-c C-f" . cargo-process-fmt)
-          )
-    :custom
-    ;; show backtrace in cargo-run
-    (cargo-process--enable-rust-backtrace t)
-    :config
-    (defun cargo-process-run-release ()
-      (interactive)
-      (let ((cargo-process--command-run "run --release"))
-        (cargo-process-run)))
-    )
-
-  ;; Rusty Object Notation
-  (use-package ron-mode
-    :mode "\\.ron\\'")
-
   ;; enable LSP for type info and more
   (add-hook 'rust-mode-hook #'lsp)
 
@@ -2998,9 +2975,48 @@ Reformatting JSON.
   (setq error_stack-regexps
         '("\\(?:at\\|',\\) \\(\\([^:\s]+\\):\\([0-9]+\\)\\)"
           2 3 nil nil 1))
-  (setf (cdr (assoc 'cargo compilation-error-regexp-alist-alist)) error_stack-regexps)
-  )
+  (setf (cdr (assoc 'cargo compilation-error-regexp-alist-alist)) error_stack-regexps))
 #+END_SRC
+
+**** Cargo commands
+
+#+begin_src emacs-lisp
+(use-package cargo
+  :bind
+  (:map cargo-minor-mode
+        ("C-c C-c r" . cargo-process-run-release)
+        ("C-c C-c C-r" . cargo-process-run)
+        ("C-c C-c C-c" . cargo-process-check)
+        ("C-c C-c C-k" . cargo-process-clippy)
+        ("C-c C-c C-a" . cargo-process-add)
+        ("C-c C-c C-f" . cargo-process-fmt))
+
+  :hook
+  (rust-mode . cargo-minor-mode)
+  (conf-toml-mode . cargo-minor-mode)
+
+  :custom
+  ;; show backtrace in cargo-run
+  (cargo-process--enable-rust-backtrace t)
+
+  :config
+  (defun cargo-process-run-release ()
+    (interactive)
+    (let ((cargo-process--command-run "run --release"))
+      (cargo-process-run))))
+
+;; avoid conflict with cargo mode
+(with-eval-after-load 'conf-mode
+  (unbind-key "C-c C-c" conf-mode-map))
+#+end_src
+
+**** Other rust related packages
+
+Rusty Object Notation (RON) mode:
+
+#+begin_src emacs-lisp
+(use-package ron-mode :mode "\\.ron\\'")
+#+end_src
 
 *** Shell
 
