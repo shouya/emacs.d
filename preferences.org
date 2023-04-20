@@ -1282,7 +1282,10 @@ entered.
                 org-mode-hook))
 #+END_SRC
 
+
 *** Enable spell checking
+
+**** flyspell
 
 Remember to install =aspell= command line tool.
 
@@ -1290,6 +1293,7 @@ Correct word with =C-;= key.
 
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell
+  :disabled
   :hook ((git-commit-mode org-mode text-mode) . flyspell-mode)
   :hook (prog-mode . flyspell-prog-mode)
   :commands flyspell-mode
@@ -1332,6 +1336,27 @@ Correct word with =C-;= key.
   (flyspell-lazy-mode 1)
   )
 #+END_SRC
+
+**** Jinx
+
+Run =apt install libenchant-2-dev libhunspell-dev hunspell hunspell-en-us= to install the dependencies.
+
+#+begin_src emacs-lisp
+(use-package jinx
+  :config
+  (when (not (f-exists? "~/.config/enchant/enchant.ordering"))
+    (f-mkdir-full-path "~/.config/enchant")
+    (f-write "en_US:hunspell,aspell\n" 'utf-8
+             "~/.config/enchant/enchant.ordering")
+    (f-symlink (f-expand "~/.emacs.d/user-dict")
+               "~/.config/enchant/en_US.dic"))
+  :hook (emacs-startup . global-jinx-mode)
+  :bind (:map jinx-mode-map
+              ("C-;" . jinx-correct))
+  :custom
+  (jinx-languages "en_US")
+  (jinx-camel-modes '(prog-mode org-mode)))
+#+end_src
 
 *** Visual line mode for text modes
 
@@ -1703,6 +1728,7 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
 #+BEGIN_SRC emacs-lisp
 (use-package dumb-jump
   :commands (dumb-jump-xref-activate)
+
   :custom
   (dumb-jump-selector 'completing-read)
   (dumb-jump-force-searcher 'rg)
