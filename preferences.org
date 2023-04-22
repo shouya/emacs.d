@@ -3578,7 +3578,7 @@ aka. disabling the feature that "smartly" insert heading after the current subtr
 (use-package org
   :bind
   (:map org-mode-map
-        ("C-RET" . org-insert-heading)))
+        ("C-<return>" . org-insert-heading)))
 #+end_src
 
 
