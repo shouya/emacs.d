@@ -3570,6 +3570,18 @@ there is one, return it."
        (cons link end)))))
 #+end_src
 
+*** Insert heading at cursor
+
+aka. disabling the feature that "smartly" insert heading after the current subtree.
+
+#+begin_src emacs-lisp
+(use-package org
+  :bind
+  (:map org-mode-map
+        ("C-RET" . org-insert-heading)))
+#+end_src
+
+
 ** Visual Tweaks
 *** Turn on native source fontification in org buffer
 
@@ -3621,6 +3633,13 @@ I'd like to hide ===, =+=, =*= symbols when not necessary.
 #+end_src
 
 I disabled it because I experienced some glitches with it.
+
+*** Allow in safe variables
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (put 'org-pretty-entities 'safe-local-variable #'booleanp))
+#+end_src
 
 ** Source editing
 *** Do not add indentation from org-src-edit
