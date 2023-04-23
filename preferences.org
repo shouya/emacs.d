@@ -433,6 +433,27 @@ Refer to [[https://200ok.ch/posts/2020-09-29_comprehensive_guide_on_handling_lon
     (global-so-long-mode 1))
 #+end_src
 
+** Copy full path of current file
+
+#+begin_src emacs-lisp
+(defun shou/copy-full-path ()
+  "Copy the full path of the current buffer to the kill ring."
+  (interactive)
+  (let ((path))
+    (setq path
+          (if (derived-mode-p 'dired-mode)
+              (dired-get-filename)
+            (buffer-file-name)))
+    (if (not path)
+        (message "full path not found: %s" (buffer-file-name))
+      (message path)
+      (kill-new path))))
+
+(with-eval-after-load 'dired
+  (bind-key "W" #'shou/copy-full-path dired-mode-map))
+#+end_src
+
+
 * UI
 ** Tweak main UI
 
