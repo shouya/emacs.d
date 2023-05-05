@@ -2660,7 +2660,10 @@ Templating engine that allows me to quickly enter some text.
   :config
   (use-package tree-sitter-langs)
   (global-tree-sitter-mode +1)
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+  ;; tree-sitter-hl-mode doesn't work good with rust-mode on some new
+  ;; syntax (e.g. let..else), disabling for now.
+
+  ;; (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
   )
 #+end_src
 
