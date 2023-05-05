@@ -2513,7 +2513,8 @@ Templating engine that allows me to quickly enter some text.
   ;; only load clients that I actually need
   (lsp-client-packages
    '(lsp-elixir
-     lsp-rust))
+     lsp-rust
+     lsp-pylsp))
 
   :hook
   (lsp-completion-mode . shou/lsp-mode-setup-completion)
@@ -3392,8 +3393,20 @@ WGSL:
 #+begin_src emacs-lisp
 (use-package lisp-mode
   :ensure nil
-  :straight
+  :straight nil
   :mode ("\\.yuck\\'"))
+#+end_src
+
+*** Python
+
+#+begin_src emacs-lisp
+(use-package python-mode
+  :straight nil
+  :mode ("\\.py\\'" . python-mode)
+  :custom
+  (python-shell-interpreter "ipython")
+  (python-shell-interpreter-args "--simple-prompt -i")
+  )
 #+end_src
 
 * AI
