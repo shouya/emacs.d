@@ -2061,6 +2061,8 @@ Emulate A Terminal (EAT) is a terminal emulator for Emacs written in native Elis
 
   ;; allow switching file via projectile (M-`)
   (add-to-list 'eat-semi-char-non-bound-keys [?\e ?`])
+  (add-to-list 'eat-semi-char-non-bound-keys [C-n])
+  (add-to-list 'eat-semi-char-non-bound-keys [C-p])
   (eat-update-semi-char-mode-map))
 #+end_src
 
