@@ -1897,6 +1897,37 @@ Few shortcuts:
   )
 #+END_SRC
 
+*** Find project marker file
+
+This helper function finds the marker files (Cargo.toml, mix.exs, etc) for the current project. If it's already opening a marker file, it will look from the parent directory. (For example, if current file is already =src/app/manager/mix.exs=, it may jump to =src/mix.exs=)
+
+#+begin_src emacs-lisp
+(defun shou/projectile-find-marker-file ()
+  "Find the marker file (Cargo.toml, mix.exs, etc) for the current project."
+  (interactive)
+  (if-let* ((this-file (buffer-file-name))
+            (marker-files (projectile-project-type-attribute
+                           (projectile-project-type)
+                           'marker-files))
+            (get-target-marker-file
+             (lambda (f)
+               (when-let* ((dir (locate-dominating-file default-directory f))
+                           (full-path (concat dir f))
+                           (_ (not (f-same-p this-file full-path))))
+                 full-path)))
+            (marker-file (seq-find get-target-marker-file marker-files))
+            (target-marker-file (funcall get-target-marker-file marker-file)))
+      (find-file target-marker-file)
+    (if-let* ((default-directory (f-dirname default-directory))
+              (parent-marker-file (seq-find get-target-marker-file marker-files))
+              (target-parent-marker-file (funcall get-target-marker-file parent-marker-file)))
+        (find-file target-parent-marker-file)
+      (message "No marker file found"))))
+
+(with-eval-after-load 'projectile
+  (bind-key "m" 'shou/projectile-find-marker-file projectile-command-map))
+#+end_src
+
 ** Run command
 
 #+begin_src emacs-lisp
