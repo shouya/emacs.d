@@ -3454,6 +3454,7 @@ WGSL:
   :custom
   ;; enable logging (max size: 1000)
   (copilot-log-max 1000)
+  (copilot-idle-delay 1)
   :bind
   ;; C-S-tab
   (("C-<iso-lefttab>" . copilot-complete)
