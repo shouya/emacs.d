@@ -17,12 +17,6 @@
 (add-to-list 'load-path (expand-file-name "site-lisp" user-emacs-directory))
 #+END_SRC
 
-** Enable ELPA with straight
-
-#+BEGIN_SRC emacs-lisp
-(straight-use-package 'el-patch)
-#+END_SRC
-
 ** Install =use-package= with straight.el
 Ensure =use-package= is installed.
 
