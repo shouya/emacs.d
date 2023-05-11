@@ -3681,7 +3681,7 @@ I'd like to hide ===, =+=, =*= symbols when not necessary.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :custom (org-hide-emphasis-markers nil))
+  :custom (org-hide-emphasis-markers t))
 #+END_SRC
 
 *** Customize wrap around symbol
