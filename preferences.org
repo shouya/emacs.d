@@ -1730,7 +1730,7 @@ Also show a ruler at column 80.
 ** String edit in separate buffer
 
 #+begin_src emacs-lisp
-(use-package string-edit
+(use-package string-edit-at-point
   :commands string-edit-at-point
   :bind (:map prog-mode-map
               ("C-c '" . string-edit-at-point)))
@@ -3449,6 +3449,7 @@ WGSL:
   ;; enable logging (max size: 1000)
   (copilot-log-max 1000)
   (copilot-idle-delay 1)
+
   :bind
   ;; C-S-tab
   (("C-<iso-lefttab>" . copilot-complete)
@@ -3460,9 +3461,11 @@ WGSL:
    ("M-n" . copilot-next-completion)
    ("M-p" . copilot-previous-completion)
    ("C-g" . copilot-clear-overlay))
+
   :hook
   (text-mode . copilot-mode)
   (prog-mode . copilot-mode)
+
   :config
   (defun shou/copilot-disable-predicate nil
     (or
