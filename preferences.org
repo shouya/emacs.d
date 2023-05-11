@@ -3454,13 +3454,10 @@ WGSL:
   ;; C-S-tab
   (("C-<iso-lefttab>" . copilot-complete)
    :map copilot-completion-map
-   ("TAB" . copilot-accept-completion)
    ("C-e" . copilot-accept-completion)
    ("M-f" . copilot-accept-completion-by-word)
-   ;; ("C-n" . copilot-accept-completion-by-line)
-   ("M-n" . copilot-next-completion)
-   ("M-p" . copilot-previous-completion)
-   ("C-g" . copilot-clear-overlay))
+   ("C-g" . copilot-clear-overlay)
+   )
 
   :hook
   (text-mode . copilot-mode)
