@@ -2539,7 +2539,8 @@ Templating engine that allows me to quickly enter some text.
   (lsp-client-packages
    '(lsp-elixir
      lsp-rust
-     lsp-pylsp))
+     lsp-pylsp
+     lsp-javascript))
 
   :hook
   (lsp-completion-mode . shou/lsp-mode-setup-completion)
@@ -3131,7 +3132,19 @@ Rusty Object Notation (RON) mode:
 
 #+BEGIN_SRC emacs-lisp
 (use-package web-mode
-  :mode "\\.html\\'")
+  :mode ("\\.html?\\'"
+         "\\.tsx\\'"
+         "\\.jsx\\'")
+  :custom
+  (web-mode-css-indent-offset 2)
+  (web-mode-markup-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  (web-mode-enable-css-colorization t)
+  (web-mode-enable-auto-pairing t)
+  (web-mode-enable-comment-keywords t)
+  (web-mode-enable-current-element-highlight t)
+  (web-mode-enable-auto-quoting nil)
+  )
 #+END_SRC
 
 *** Systemd unit files
@@ -3277,12 +3290,22 @@ Kubernetes.el for managing k8s cluster.
 *** TypeScript
 
 #+begin_src emacs-lisp
-(use-package typescript-mode
-  :mode "\\.ts\'"
-  :hook (typescript-mode . lsp)
-  )
+(use-package tide
+  :after web-mode
+  :config
+  (defun shou/setup-tide-mode ()
+    "Set up Tide mode."
+    (interactive)
+    (when (or (string-equal "jsx" (file-name-extension buffer-file-name))
+              (string-equal "tsx" (file-name-extension buffer-file-name))
+              (string-equal "ts" (file-name-extension buffer-file-name)))
+      (lsp-deferred)
+      (tide-setup)))
+  (with-eval-after-load 'web-mode
+    (add-hook 'web-mode-hook #'shou/setup-tide-mode))
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
+  (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append))
 #+end_src
-
 
 *** PHP
 
