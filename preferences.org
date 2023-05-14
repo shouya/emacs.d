@@ -660,6 +660,9 @@ Doom modeline
                 text-mode-hook
                 conf-mode-hook))
   (add-hook hook 'hl-line-mode))
+
+;; avoid overriding foreground color
+(custom-set-faces '(hl-line ((t (:background "white smoke")))))
 #+END_SRC
 
 ** Highlight uncommitted changes
