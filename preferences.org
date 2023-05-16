@@ -2543,7 +2543,8 @@ Templating engine that allows me to quickly enter some text.
    '(lsp-elixir
      lsp-rust
      lsp-pylsp
-     lsp-javascript))
+     lsp-javascript
+     lsp-json))
 
   :hook
   (lsp-completion-mode . shou/lsp-mode-setup-completion)
@@ -2643,12 +2644,12 @@ Templating engine that allows me to quickly enter some text.
   ;; sometimes apheleia erase the whole buffer, which is pretty annoying.
   ;; fix it by detecting this scenario and simply doing no-op
   (defun shou/fix-apheleia-accidental-deletion
-      (orig-fn old-buffer new-buffer callback)
+      (orig-fn old-buffer new-buffer &rest rest)
     (if (and (=  0 (buffer-size new-buffer))
              (/= 0 (buffer-size old-buffer)))
         ;; do not override anything
         nil
-        (funcall orig-fn old-buffer new-buffer callback)))
+        (apply orig-fn old-buffer new-buffer rest)))
 
   (advice-add 'apheleia--create-rcs-patch :around #'shou/fix-apheleia-accidental-deletion)
 
@@ -3137,7 +3138,9 @@ Rusty Object Notation (RON) mode:
 (use-package web-mode
   :mode ("\\.html?\\'"
          "\\.tsx\\'"
-         "\\.jsx\\'")
+         "\\.jsx\\'"
+         "\\.ts\\'"
+         "\\.js\\'")
   :custom
   (web-mode-css-indent-offset 2)
   (web-mode-markup-indent-offset 2)
