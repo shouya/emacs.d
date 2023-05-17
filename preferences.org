@@ -4386,7 +4386,9 @@ Make plain lists folded by default:
        (?g "as gfm." org-pandoc-export-as-gfm)
        ))
     (org-pandoc-options-for-mediawiki '((shift-heading-level-by . "1")))
-    )
+    (org-pandoc-options-for-gfm '((shift-heading-level-by . "1")
+                                  (wrap . "none")
+                                  )))
 
   (setq org-export-with-broken-links 'mark)
 
