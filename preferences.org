@@ -592,6 +592,14 @@ Ensure non-latin scripts font are rendered in a consistent font.
          )
 #+end_src
 
+** Fonts for special copoints
+
+
+#+begin_src emacs-lisp
+;; IPA symbols and diacritic marks
+(set-fontset-font nil '(#x0250 . #x036F) (font-spec :family "DejaVu Sans Mono"))
+#+end_src
+
 ** Ligature
 
 #+begin_src emacs-lisp
