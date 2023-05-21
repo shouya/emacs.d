@@ -1693,8 +1693,10 @@ Add extra shortcuts for symbols I frequently use to the TeX input method.
 Stolen from https://stackoverflow.com/a/45363946/1232832.
 
 #+begin_src emacs-lisp
-(define-key global-map [(meta up)] #'(lambda() (interactive) (scroll-other-window -1)))
-(define-key global-map [(meta down)] #'(lambda() (interactive) (scroll-other-window 1)))
+(define-key global-map [(meta up)]
+  #'(lambda() (interactive) (scroll-other-window -1)))
+(define-key global-map [(meta down)]
+  #'(lambda() (interactive) (scroll-other-window 1)))
 #+end_src
 
 
