@@ -3158,6 +3158,11 @@ Rusty Object Notation (RON) mode:
   (web-mode-enable-comment-keywords t)
   (web-mode-enable-current-element-highlight t)
   (web-mode-enable-auto-quoting nil)
+  :config
+  (with-eval-after-load 'lsp-mode
+    ;; fix lsp incorrect indentation: https://github.com/emacs-lsp/lsp-mode/issues/2915
+    (setf (alist-get 'web-mode lsp--formatting-indent-alist) 'web-mode-code-indent-offset)
+    )
   )
 #+END_SRC
 
