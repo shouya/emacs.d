@@ -1369,6 +1369,13 @@ Run =apt install libenchant-2-dev libhunspell-dev hunspell hunspell-en-us= to in
 
 #+begin_src emacs-lisp
 (use-package jinx
+  :hook (emacs-startup . global-jinx-mode)
+  :bind (:map jinx-mode-map
+              ("C-;" . jinx-correct))
+  :custom
+  (jinx-languages "en_US")
+  (jinx-camel-modes '(prog-mode org-mode))
+
   :config
   (when (not (f-exists? "~/.config/enchant/enchant.ordering"))
     (f-mkdir-full-path "~/.config/enchant")
@@ -1376,12 +1383,17 @@ Run =apt install libenchant-2-dev libhunspell-dev hunspell hunspell-en-us= to in
              "~/.config/enchant/enchant.ordering")
     (f-symlink (f-expand "~/.emacs.d/user-dict")
                "~/.config/enchant/en_US.dic"))
-  :hook (emacs-startup . global-jinx-mode)
-  :bind (:map jinx-mode-map
-              ("C-;" . jinx-correct))
-  :custom
-  (jinx-languages "en_US")
-  (jinx-camel-modes '(prog-mode org-mode)))
+
+  :config
+  (defun shou/jinx--add-to-abbrev (overlay choice)
+    "Add word -> CHOICE to abbrev table. (word is under OVERLAY.)"
+    (let ((word (buffer-substring-no-properties
+                 (overlay-start overlay)
+                 (overlay-end overlay))))
+      (message "Abbrev: %s -> %s" word choice)
+      (define-abbrev global-abbrev-table word choice)))
+
+  (advice-add 'jinx--correct-replace :before #'shou/jinx--add-to-abbrev))
 #+end_src
 
 *** Visual line mode for text modes
@@ -3604,6 +3616,9 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
   :config
   ;; We enable org-indent-mode to make contents align with their settings
   (add-hook 'org-mode-hook 'org-indent-mode)
+
+  ;; turn on abbrev mode
+  (add-hook 'org-mode-hook 'abbrev-mode)
 
   ;; add company completion backend
   ;; (defun add-org-completion-backend ()
