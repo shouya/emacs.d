@@ -777,6 +777,9 @@ This allows the currently focusing window to expand to occupy a decent portion o
 (use-package golden-ratio
   :straight (:host github :repo "shouya/golden-ratio.el")
   :hook (emacs-startup . golden-ratio-mode)
+  :custom
+  (golden-ratio-exclude-buffer-name
+   '("*Ediff Control Panel*"))
   :config
   ;; Instead of each window occupies 0.618 of the screen, makes it
   ;; occupy half of the screen. This prevents unnecessary resizing
