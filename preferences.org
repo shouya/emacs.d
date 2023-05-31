@@ -923,14 +923,18 @@ It render =^L= as a page break line, which is nicer to look at.
 ** Dired+
 
 #+begin_src emacs-lisp
+;; do not show compressed files with face for ignored files
+;; this variable must be set before dired+ is loaded because it affects font-lock
+(setq diredp-ignore-compressed-flag nil)
+
 ;; fail silently if dired+ is not installed
 (require 'dired+ nil t)
 
 ;; face customization
 (with-eval-after-load 'dired+
-  (set-face-attribute 'diredp-dir-name nil :foreground "blue" :weight 'bold)
+  (set-face-attribute 'diredp-dir-name nil :foreground "blue" :weight 'bold :background 'unspecified)
   (set-face-attribute 'diredp-ignored-file-name nil :foreground "darkgray")
-  (set-face-attribute 'diredp-compressed-file-suffix nil :foreground )
+  (set-face-attribute 'diredp-compressed-file-suffix nil :foreground 'unspecified :inherit 'diredp-compressed-file-name)
   (set-face-attribute 'diredp-file-suffix nil :foreground 'unspecified)
   (set-face-attribute 'diredp-file-name nil :foreground 'unspecified)
   (set-face-attribute 'diredp-write-priv nil :background 'unspecified)
