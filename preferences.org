@@ -917,6 +917,24 @@ It render =^L= as a page break line, which is nicer to look at.
   (unbind-key "C-M-n" dired-mode-map)
 
   :config
+  (require 'dired+)
+  (with-eval-after-load 'dired+
+    (set-face-attribute 'diredp-dir-name nil :foreground "blue" :weight 'bold)
+    (set-face-attribute 'diredp-ignored-file-name nil :foreground "darkgray")
+    (set-face-attribute 'diredp-compressed-file-suffix nil :foreground )
+    (set-face-attribute 'diredp-file-suffix nil :foreground 'unspecified)
+    (set-face-attribute 'diredp-file-name nil :foreground 'unspecified)
+    (set-face-attribute 'diredp-write-priv nil :background 'unspecified)
+    (set-face-attribute 'diredp-read-priv nil :background 'unspecified)
+    (set-face-attribute 'diredp-exec-priv nil :background 'unspecified)
+    (set-face-attribute 'diredp-no-priv nil :background 'unspecified)
+    (set-face-attribute 'diredp-dir-priv nil :background 'unspecified :foreground "blue")
+    (set-face-attribute 'diredp-symlink nil :background 'unspecified :foreground "magenta")
+    (set-face-attribute 'diredp-date-time nil :background 'unspecified :foreground "RoyalBlue")
+    (set-face-attribute 'diredp-flag-mark-line nil :background "gray94" :weight 'bold)
+    (set-face-attribute 'diredp-flag-mark nil :background 'unspecified :foreground "orange")
+    (set-face-attribute 'diredp-omit-file-name nil :strike-through 'unspecified)
+    )
   (use-package dired-x
     :straight (:type built-in))
   )
