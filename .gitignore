@@ -62,3 +62,4 @@ projectile.cache
 /straight/build-cache.el
 /request/
 persp-confs
+dired+.el
