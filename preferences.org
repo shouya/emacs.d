@@ -4665,8 +4665,8 @@ I automatically backup my org files using git after idle for a while. The mode i
   ;; do not put label to the right
   (setq org-tags-column 0)
 
-  ;; do not align agenda tags to the right
-  (setq org-agenda-tags-column 0
+  ;; align agenda tags to the right at 80 column
+  (setq org-agenda-tags-column -80
         org-agenda-block-separator ?─)
 
   ;; label should have the same size as normal text
