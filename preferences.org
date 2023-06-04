@@ -4689,8 +4689,12 @@ I automatically backup my org files using git after idle for a while. The mode i
 
   ;; dot not prettify block names
   (setq org-modern-block-name nil)
-  )
 
+  ;; customize the list bullets
+  (setq org-modern-list '((?+ . "◦")
+                          (?- . "•")
+                          (?* . "‣")))
+  )
 #+end_src
 
 * Email
