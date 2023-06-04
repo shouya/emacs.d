@@ -584,6 +584,7 @@ Ensure non-latin scripts font are rendered in a consistent font.
            (hangul . "Noto Sans CJK KR DemiLight")
            (phonetic . "Noto Sans")
            (greek . "Noto Sans Light")
+           (symbol . "Noto Sans Mono")
            )
          do
          (set-fontset-font t ;; font for 'default face
@@ -2117,8 +2118,8 @@ This helper function finds the marker files (Cargo.toml, mix.exs, etc) for the c
 
 Emulate A Terminal (EAT) is a terminal emulator for Emacs written in native Elisp. Cheatsheet:
 
-| Key       | Description              |
-|-----------+--------------------------|
+| Key     | Description              |
+|---------+--------------------------|
 | =C-c C-e= | switch to emacs mode     |
 | =C-c C-j= | switch to semi-char mode |
 
@@ -4668,7 +4669,7 @@ I automatically backup my org files using git after idle for a while. The mode i
                       :height 'unspecified)
 
   ;; the original level-2 star doesn't look good in my font.
-  (setq org-modern-star '("◉" "⃝" "◈" "◇" "✳"))
+  (setq org-modern-star '("◉" "○" "◆" "◇" "▶" "▷"))
   )
 #+end_src
 
