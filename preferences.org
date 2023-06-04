@@ -654,7 +654,7 @@ Doom modeline
 #+BEGIN_SRC emacs-lisp
 (use-package doom-modeline
   :custom
-  (doom-modeline-height 19)
+  (doom-modeline-height 20)
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-env-version nil)
   (doom-modeline-lsp t)
@@ -667,7 +667,10 @@ Doom modeline
   (doom-modeline-buffer-file-name-style 'buffer-name)
 
   :config
-  (doom-modeline-mode 1))
+  (doom-modeline-mode 1)
+  (set-face-attribute 'mode-line nil :height 0.8)
+  (set-face-attribute 'mode-line-inactive nil :height 0.8)
+  )
 #+END_SRC
 
 ** Highlight current line
