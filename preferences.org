@@ -3759,14 +3759,6 @@ aka. disabling the feature that "smartly" insert heading after the current subtr
   :custom (org-src-fontify-natively t))
 #+END_SRC
 
-*** Fancy bullet headers
-
-#+BEGIN_SRC emacs-lisp
-(use-package org-bullets
-  :after org
-  :hook (org-mode . org-bullets-mode))
-#+END_SRC
-
 *** Hide leading stars
 
 #+BEGIN_SRC emacs-lisp
@@ -3787,21 +3779,8 @@ I'd like to hide ===, =+=, =*= symbols when not necessary.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org
-  :custom (org-ellipsis " ⤵"))
+  :custom (org-ellipsis "…"))
 #+END_SRC
-
-*** "Modern org"
-
-#+begin_src emacs-lisp
-(use-package org-modern
-  :disabled
-  :after org
-  :hook (org-mode . org-modern-mode)
-  :hook (org-agenda-finalize . org-modern-mode)
-  )
-#+end_src
-
-I disabled it because I experienced some glitches with it.
 
 *** Allow in safe variables
 
@@ -4664,6 +4643,33 @@ I automatically backup my org files using git after idle for a while. The mode i
 
 (use-package org-fragtog
   :commands org-fragtog-mode)
+#+end_src
+
+** Org modern
+
+
+#+begin_src emacs-lisp
+(use-package org-modern
+  :after org
+  :config
+  (global-org-modern-mode)
+
+  ;; do not put label to the right
+  (setq org-tags-column 0)
+
+  ;; do not align agenda tags to the right
+  (setq org-agenda-tags-column 0
+        org-agenda-block-separator ?─)
+
+  ;; label should have the same size as normal text
+  ;; as not to screw up table alignment.
+  (set-face-attribute 'org-modern-label nil
+                      :inherit 'fixed-pitch
+                      :height 'unspecified)
+
+  ;; the original level-2 star doesn't look good in my font.
+  (setq org-modern-star '("◉" "⃝" "◈" "◇" "✳"))
+  )
 #+end_src
 
 * Email
