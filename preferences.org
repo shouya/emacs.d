@@ -4669,7 +4669,7 @@ I automatically backup my org files using git after idle for a while. The mode i
                       :height 'unspecified)
 
   ;; the original level-2 star doesn't look good in my font.
-  (setq org-modern-star '("◉" "○" "◆" "◇" "▶" "▷"))
+  (setq org-modern-star '("◉" " ○" "  ◆" "   ◇" "    ▶" "     ▷"))
   )
 #+end_src
 
