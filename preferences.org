@@ -587,7 +587,6 @@ Ensure non-latin scripts font are rendered in a consistent font.
            (hangul . "Noto Sans CJK KR DemiLight")
            (phonetic . "Noto Sans")
            (greek . "Noto Sans Light")
-           (symbol . "Noto Sans Mono")
            )
          do
          (set-fontset-font t ;; font for 'default face
@@ -596,12 +595,18 @@ Ensure non-latin scripts font are rendered in a consistent font.
          )
 #+end_src
 
-** Fonts for special copoints
+** Fonts for special codepoints
 
 
 #+begin_src emacs-lisp
 ;; IPA symbols and diacritic marks
-(set-fontset-font nil '(#x0250 . #x036F) (font-spec :family "DejaVu Sans Mono"))
+(set-fontset-font t '(#x0250 . #x036F) (font-spec :family "DejaVu Sans Mono"))
+
+;; gemoetric shapes
+(set-fontset-font t '(#x25A0 . #x25FF)
+                  (font-spec :family "Noto Sans Mono"))
+;; symbols cannot be overriden by fontset by default. Turning off this setting.
+(setq use-default-font-for-symbols nil)
 #+end_src
 
 ** Ligature
