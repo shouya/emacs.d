@@ -541,8 +541,11 @@ I use "Input" as my default font face.
     (setq shou/mono-font name)
 
     (set-frame-font name)
-    (set-face-attribute 'default nil :family name :height font-height)
-    (set-face-attribute 'fixed-pitch nil :family name :height font-rel-height)
+    (set-face-attribute 'default nil
+                        :family name
+                        :height font-height)
+    ;; use default font family
+    (set-face-attribute 'fixed-pitch nil :family 'unspecified)
     t))
 
 (defun shou/set-var-font (name)
