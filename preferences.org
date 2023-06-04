@@ -4680,6 +4680,8 @@ I automatically backup my org files using git after idle for a while. The mode i
 
   ;; the original level-2 star doesn't look good in my font.
   (setq org-modern-star '("◉" " ○" "  ◆" "   ◇" "    ▶" "     ▷"))
+  ;; dot not prettify block names
+  (setq org-modern-block-name nil)
   )
 
 #+end_src
