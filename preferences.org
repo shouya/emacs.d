@@ -4656,7 +4656,6 @@ I automatically backup my org files using git after idle for a while. The mode i
 
 ** Org modern
 
-
 #+begin_src emacs-lisp
 (use-package org-modern
   :after org
@@ -4676,9 +4675,13 @@ I automatically backup my org files using git after idle for a while. The mode i
                       :inherit 'fixed-pitch
                       :height 'unspecified)
 
+  ;; do not replace checkbox
+  (setq org-modern-checkbox nil)
+
   ;; the original level-2 star doesn't look good in my font.
   (setq org-modern-star '("◉" " ○" "  ◆" "   ◇" "    ▶" "     ▷"))
   )
+
 #+end_src
 
 * Email
