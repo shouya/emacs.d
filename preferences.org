@@ -506,10 +506,10 @@ In order for the icons to work it is very important that you install the Resourc
 
 ** Theme
 
-I use =dichromacy= theme because it's high contrast, colorful, and looks pristine.
+I use =modus-operandi= theme because it's high contrast, colorful, and looks pristine.
 
 #+BEGIN_SRC emacs-lisp
-(setq shou/current-theme 'dichromacy)
+(setq shou/current-theme 'modus-operandi)
 (setq custom--inhibit-theme-enable nil)
 
 (load-theme shou/current-theme t)
