@@ -3166,7 +3166,16 @@ Reformatting JSON.
   (defun cargo-process-run-release ()
     (interactive)
     (let ((cargo-process--command-run "run --release"))
-      (cargo-process-run))))
+      (cargo-process-run)))
+
+  ;; I want to see any println output when running individual test
+  (defun shou/cargo-process-current-test-patch (orig-fun &rest args)
+    "Patch cargo-process-current-test to allow --nocapture flag"
+    (let ((cargo-process--command-test--additional-args
+           (concat " -- --nocapture " cargo-process--command-test--additional-args)))
+      (apply orig-fun args)))
+  (advice-add 'cargo-process-current-test :around #'shou/cargo-process-current-test-patch)
+  )
 
 ;; avoid conflict with cargo mode
 (with-eval-after-load 'conf-mode
