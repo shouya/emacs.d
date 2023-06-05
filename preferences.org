@@ -3145,7 +3145,7 @@ Reformatting JSON.
 #+begin_src emacs-lisp
 (use-package cargo
   :bind
-  (:map cargo-minor-mode
+  (:map cargo-mode-map
         ("C-c C-c r" . cargo-process-run-release)
         ("C-c C-c C-r" . cargo-process-run)
         ("C-c C-c C-c" . cargo-process-check)
