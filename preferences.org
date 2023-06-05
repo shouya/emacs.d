@@ -4703,6 +4703,10 @@ I automatically backup my org files using git after idle for a while. The mode i
   (setq org-modern-list '((?+ . "◦")
                           (?- . "•")
                           (?* . "‣")))
+
+  ;; make inactive date appear less contrastive than active date
+  (set-face-attribute 'org-modern-date-inactive nil
+                      :foreground "gray60")
   )
 #+end_src
 
