@@ -654,7 +654,7 @@ Doom modeline
 #+BEGIN_SRC emacs-lisp
 (use-package doom-modeline
   :custom
-  (doom-modeline-height 20)
+  (doom-modeline-height 30)
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-env-version nil)
   (doom-modeline-lsp t)
@@ -668,8 +668,8 @@ Doom modeline
 
   :config
   (doom-modeline-mode 1)
-  (set-face-attribute 'mode-line nil :height 0.8)
-  (set-face-attribute 'mode-line-inactive nil :height 0.8)
+  (set-face-attribute 'mode-line nil :height 130)
+  (set-face-attribute 'mode-line-inactive nil :height 130)
   )
 #+END_SRC
 
