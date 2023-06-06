@@ -2106,6 +2106,16 @@ This helper function finds the marker files (Cargo.toml, mix.exs, etc) for the c
       (yank)))
 
   (defun shou/eshell-customization ()
+    ;; use the cape's file completion instead of the default
+    ;; pcomplete's.
+    (make-local-variable 'completion-at-point-functions)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+
+    ;; colorize command line tool outputs
+    ;; stolen from https://old.reddit.com/r/emacs/comments/b6n3t8/what_would_it_take_to_get_terminal_colors_in/
+    (setenv "TERM" "xterm-256color")
+
+    ;; bash-like history search
     (bind-key "M-r" #'shou/eshell-insert-history-element eshell-mode-map)
     (bind-key "M-r" #'shou/eshell-insert-history-element eshell-hist-mode-map)
     (bind-key "M-." #'shou/eshell-insert-arguments-from-previous-command eshell-mode-map)
@@ -2126,11 +2136,14 @@ This helper function finds the marker files (Cargo.toml, mix.exs, etc) for the c
     (if (not regexp)
         (eshell/cd "=")
       (eshell/cd (format "=%s" regexp))))
-
-  ;; colorize command line tool outputs
-  ;; stolen from https://old.reddit.com/r/emacs/comments/b6n3t8/what_would_it_take_to_get_terminal_colors_in/
-  (add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm-256color")))
   )
+#+end_src
+
+** pcompl-args for eshell
+
+#+begin_src emacs-lisp
+(use-package pcmpl-args
+  :after eshell)
 #+end_src
 
 ** EAT
@@ -3704,11 +3717,6 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
 
   ;; turn on abbrev mode
   (add-hook 'org-mode-hook 'abbrev-mode)
-
-  ;; add company completion backend
-  ;; (defun add-org-completion-backend ()
-  ;; (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
-  ;; (add-hook 'org-mode-hook 'add-org-completion-backend)
 
   ;; do not insert blank line after new list items on M-Ret
   (setcdr (assoc 'plain-list-item org-blank-before-new-entry) nil)
