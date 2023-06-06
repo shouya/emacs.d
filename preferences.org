@@ -509,10 +509,18 @@ In order for the icons to work it is very important that you install the Resourc
 I use =modus-operandi= theme because it's high contrast, colorful, and looks pristine.
 
 #+BEGIN_SRC emacs-lisp
-(setq shou/current-theme 'modus-operandi)
-(setq custom--inhibit-theme-enable nil)
+(use-package modus-themes
+  :custom
+  ;; make src block stand out
+  (modus-themes-org-blocks 'gray-background)
+  ;; allow italic constructs such as comments and helper messages
+  (modus-themes-italic-constructs t)
 
-(load-theme shou/current-theme t)
+  :config
+  (setq shou/current-theme 'modus-operandi)
+  (setq custom--inhibit-theme-enable nil)
+
+  (load-theme shou/current-theme t))
 #+END_SRC
 
 ** Set font families
