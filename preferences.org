@@ -2592,8 +2592,11 @@ Templating engine that allows me to quickly enter some text.
   (:map lsp-mode-map
         ("C-c C-f" . lsp-format-buffer)
         ("M-," . xref-find-definitions)
-        ("M-." . xref-find-definitions-other-window)
-        )
+        ("M-." . xref-find-definitions-other-window))
+
+  :bind
+  (:map lsp-command-map
+        ("l" . lsp-inlay-hints-mode))
 
   :bind-keymap
   ("M-l" . lsp-command-map)
@@ -2624,6 +2627,9 @@ Templating engine that allows me to quickly enter some text.
   ;; do not auto configure dap-mode unless I explicitly asked for it.
   ;; otherwise it starts dap-tooltip-mode which interfere with the corfu popup.
   (lsp-enable-dap-auto-configure nil)
+
+  ;; make inlay hint ready for toggle with lsp-inlay-hint-mode
+  (lsp-inlay-hint-enable t)
 
   ;; only load clients that I actually need
   (lsp-client-packages
@@ -3130,7 +3136,7 @@ Reformatting JSON.
   (lsp-rust-clippy-preference "on")
 
   ;; show variable types as inlay hints
-  (lsp-rust-analyzer-server-display-inlay-hints nil)
+  (lsp-rust-analyzer-server-display-inlay-hints t)
 
   :bind
   (:map rust-mode-map
