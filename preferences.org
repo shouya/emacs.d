@@ -3642,7 +3642,10 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
   :custom
   (chatgpt-shell-chatgpt-streaming t)
   :config
-  (setq chatgpt-shell-openai-key (shou/get-pass-entry "openai/api-key")))
+  (setq chatgpt-shell-openai-key (shou/get-pass-entry "openai/api-key"))
+
+  (require 'ob-chatgpt-shell)
+  )
 #+end_src
 
 * Org mode
@@ -3849,7 +3852,9 @@ See [[https://emacs.stackexchange.com/questions/18877/how-to-indent-without-the-
 (use-package org
   :config
   (dolist (shortcut (list '("el" . "src emacs-lisp")
-                          '("sc" . "src scheme :session :results list")))
+                          '("sc" . "src scheme :session :results list")
+                          '("gpt" . "src chatgpt-shell :context t")
+                          ))
     (add-to-list 'org-structure-template-alist shortcut))
 
   (require 'org-tempo))
