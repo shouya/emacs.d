@@ -3165,7 +3165,9 @@ Reformatting JSON.
         ("C-c C-c C-c" . cargo-process-check)
         ("C-c C-c C-k" . cargo-process-clippy)
         ("C-c C-c C-a" . cargo-process-add)
-        ("C-c C-c C-f" . cargo-process-fmt))
+        ("C-c C-c C-f" . cargo-process-fmt)
+        ("C-c C-c C-l" . cargo-process-current-test)
+        )
 
   :hook
   (rust-mode . cargo-minor-mode)
