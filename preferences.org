@@ -4737,8 +4737,11 @@ I automatically backup my org files using git after idle for a while. The mode i
   ;; task completion progress indicator
   (setq org-modern-progress '("○" "◔" "◑" "◕" "●"))
 
-  ;; dot not prettify block names
+  ;; do not prettify block names
   (setq org-modern-block-name nil)
+
+  ;; do not prettify keywords like (title, result, etc)
+  (setq org-modern-keyword nil)
 
   ;; customize the list bullets
   (setq org-modern-list '((?+ . "◦")
