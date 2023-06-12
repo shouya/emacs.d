@@ -2642,7 +2642,7 @@ Templating engine that allows me to quickly enter some text.
   (lsp-enable-dap-auto-configure nil)
 
   ;; make inlay hint ready for toggle with lsp-inlay-hint-mode
-  (lsp-inlay-hint-enable t)
+  (lsp-inlay-hint-enable nil)
 
   ;; only load clients that I actually need
   (lsp-client-packages
