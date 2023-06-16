@@ -3612,6 +3612,19 @@ WGSL:
   )
 #+end_src
 
+** Tools
+*** Activity watch
+
+Record my activity to activitywatch.
+
+#+begin_src emacs-lisp
+(use-package activity-watch-mode
+  :custom
+  (activity-watch-api-host "https://activity-watch.lain.li")
+  :hook
+  (emacs-startup . global-activity-watch-mode))
+#+end_src
+
 * AI
 
 ** copilot.el
