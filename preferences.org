@@ -2146,6 +2146,30 @@ This helper function finds the marker files (Cargo.toml, mix.exs, etc) for the c
   :after eshell)
 #+end_src
 
+** Make =eshell= command jump to the instance in current directory
+
+If there is already an eshell buffer in the current directory, jump to it instead of the default instance.
+
+#+begin_src emacs-lisp
+(defun shou/advice-eshell (orig-fun &rest args)
+  "Advice to make `eshell' reuse existing eshell for the same directory."
+  (let* ((eshell-buffers (seq-filter
+                          (lambda (b)
+                            (eq (buffer-local-value 'major-mode b) 'eshell-mode))
+                          (buffer-list)))
+         (eshell-buffer (seq-find
+                         (lambda (b)
+                           (string= (buffer-local-value 'default-directory b)
+                                    default-directory))
+                         eshell-buffers)))
+    (if eshell-buffer
+        (let ((eshell-buffer-name (buffer-name eshell-buffer)))
+          (apply orig-fun args))
+      (apply orig-fun args))))
+
+(advice-add 'eshell :around #'shou/advice-eshell)
+#+end_src
+
 ** EAT
 
 Emulate A Terminal (EAT) is a terminal emulator for Emacs written in native Elisp. Cheatsheet:
