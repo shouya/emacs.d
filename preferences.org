@@ -1313,59 +1313,29 @@ entered.
       (apply orig-fun args)))
   (advice-add 'er/mark-next-accessor :around #'shou/er/mark-next-accessor-advice)
 
-  ;; mark outside double quotation mark. region may or may not be active.
-  ;;
-  ;; case 1: region not active
-  ;; if current char is quote, find the matchig one.
-  ;; if current char is not a quote, look outwards (both backwards and forwards)
-  ;; to find the enclosing quotation mark.
-  ;;
-  ;; case 2: region active
-  ;; if the region is already quoted, return nil
-  ;; if the region is not quoted, search backward (from the start) to find open quote and forward (from the end) to find close quote
-  ;;
-  ;; mark the region from the open quote to close quote (inclusive)
+  ;; mark outside double quotation mark.
   ;;
   ;; advantage of this function over er/mark-outside-pairs is that it
   ;; works not based on syntax but based on the actual text. Thus it
   ;; works for texts that are not syntax highlighted (e.g. inside
-  ;; comment)
+  ;; comment).
   (defun shou/er/mark-outside-quotes ()
     "Mark the region outside the quotation marks."
     (interactive)
     (let ((region-active (region-active-p))
           (region-start (region-beginning))
-          (region-end (region-end)))
+          (region-end (region-end))
+          open-quote-pos
+          close-quote-pos)
       (if region-active
-          (if (string-match-p
-               "^\".+\"$"
-               (buffer-substring-no-properties region-start region-end))
-              nil
-            (let ((open-quote-pos (save-excursion
-                                    (goto-char region-start)
-                                    (search-backward "\"")
-                                    (point)))
-                  (close-quote-pos (save-excursion
-                                     (goto-char region-end)
-                                     (search-forward "\"")
-                                     (point))))
-              (set-mark close-quote-pos)
-              (goto-char open-quote-pos)))
-        (if (looking-at "\"")
-            (let ((open-quote-pos (point))
-                  (close-quote-pos (save-excursion
-                                     (search-forward "\"")
-                                     (point))))
-              (set-mark close-quote-pos)
-              (goto-char open-quote-pos))
-          (let ((open-quote-pos (save-excursion
-                                  (search-backward "\"")
-                                  (point)))
-                (close-quote-pos (save-excursion
-                                   (search-forward "\"")
-                                   (point))))
-            (set-mark close-quote-pos)
-            (goto-char open-quote-pos))))))
+          (unless (string-match-p "^\".+\"$" (buffer-substring-no-properties region-start region-end))
+            (setq open-quote-pos (save-excursion (goto-char region-start) (search-backward "\"") (point)))
+            (setq close-quote-pos (save-excursion (goto-char region-end) (search-forward "\"") (point))))
+        (setq open-quote-pos (if (looking-at "\"") (point) (save-excursion (search-backward "\"") (point))))
+        (setq close-quote-pos (save-excursion (search-forward "\"") (point))))
+      (when (and open-quote-pos close-quote-pos)
+        (set-mark close-quote-pos)
+        (goto-char open-quote-pos))))
   (add-to-list 'er/try-expand-list #'shou/er/mark-outside-quotes))
 #+END_SRC
 
