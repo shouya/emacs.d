@@ -1300,45 +1300,18 @@ entered.
         (set-mark node-end)
         (goto-char node-start))))
 
-  (add-to-list 'er/try-expand-list
-               #'tree-sitter-mark-bigger-node
-               'append)
-  )
-;; :custom
-;;
-;; (expand-region-skip-whitespace t)
-;; (expand-region-smart-cursor nil)
+  (add-to-list 'er/try-expand-list #'tree-sitter-mark-bigger-node 'append)
 
-;; :config
-;; (defun shou/er/mark-org-heading ()
-;;   (when (org-at-heading-p)
-;;     (end-of-line)
-;;     (push-mark nil t t)
-;;     (beginning-of-line)))
-
-;; (require 'the-org-mode-expansions)
-;; (defun shou/er/add-org-mode-expansions ()
-;;   (set (make-local-variable 'er/try-expand-list)
-;;        (append
-;;         (remove #'er/mark-defun er/try-expand-list)
-;;         '(org-mark-subtree
-;;           er/mark-org-element
-;;           er/mark-org-element-parent
-;;           er/mark-org-code-block
-;;           er/mark-sentence
-;;           er/mark-org-parent
-;;           er/mark-paragraph
-;;           shou/er/mark-org-heading
-;;           )))
-;;   (set (make-local-variable 'er/save-mode-excursion)
-;;        #'er/save-org-mode-excursion))
-
-;; (er/enable-mode-expansions 'org-mode 'shou/er/add-org-mode-expansions)
-
-;; ;; mainly for qualified names like "Struct::method".
-;; (require 'cc-mode-expansions)
-;; (er/enable-mode-expansions 'rust-mode 'er/add-cc-mode-expansions)
-;; )
+  ;; run mark-next-accessor only if the region is a full symbol.
+  ;; this is to prevent the cases of "very_long_[symbol].method(xx)"
+  ;; expand into "very_long_[symbol.method](xx)" instead of
+  ;; "[very_long_symbol].method(xx)".
+  (defun shou/er/mark-next-accessor-advice (orig-fun &rest args)
+    (when (< (point) (mark))
+      (exchange-point-and-mark))
+    (when (looking-at "\\_<.+\\_>")
+      (apply orig-fun args)))
+  (advice-add 'er/mark-next-accessor :around #'shou/er/mark-next-accessor-advice))
 #+END_SRC
 
 ** Writing prose
