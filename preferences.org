@@ -3708,6 +3708,7 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
      ("Book" . "The user is reading a book. The user will send you the portions he's reading. You help the user 1. summarize and 2. explain what the author is talking. Keep your response short (2-3 sentences). You may use markdown to structure your response")
      ))
   (chatgpt-shell-welcome-function #'shou/chatgpt-shell-welcome-function)
+
   :config
   (setq chatgpt-shell-openai-key (shou/get-pass-entry "openai/api-key"))
   (defun shou/chatgpt-shell-welcome-function (config)
@@ -3718,9 +3719,9 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
             (propertize "C-c C-v" 'font-lock-face 'font-lock-string-face)
             (propertize "chatgpt-shell-swap-model-version" 'font-lock-face 'font-lock-doc-face)
             (propertize "C-c C-s" 'font-lock-face 'font-lock-string-face)
-            (propertize "chatgpt-shell-swap-system-prompt" 'font-lock-face 'font-lock-doc-face)
-    )
-  ))
+            (propertize "chatgpt-shell-swap-system-prompt" 'font-lock-face 'font-lock-doc-face)))
+
+  (bind-key "S-<return>" #'newline 'chatgpt-shell-mode-map))
 
 (use-package ob-chatgpt-shell
   :straight (:host github :repo "xenodium/chatgpt-shell"
