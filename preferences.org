@@ -3705,9 +3705,22 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
   (chatgpt-shell-system-prompts
    '(("General" . "You treat your user's time as precious. Be succinct in responses. You do not repeat obvious things, including his query. You never apologize for confusions to waste his time. You use markdown liberally to structure responses.")
      ("Programming" . "The user is a hacker-programmer. You treat his time as precious. Be succinct in responses. You do not repeat obvious things, including his query. You never apologize for confusions to waste his time. The user knows how to read manuals. Use markdown to structure your responses.")
+     ("Book" . "The user is reading a book. The user will send you the portions he's reading. You help the user 1. summarize and 2. explain what the author is talking. Keep your response short (2-3 sentences). You may use markdown to structure your response")
      ))
+  (chatgpt-shell-welcome-function #'shou/chatgpt-shell-welcome-function)
   :config
-  (setq chatgpt-shell-openai-key (shou/get-pass-entry "openai/api-key")))
+  (setq chatgpt-shell-openai-key (shou/get-pass-entry "openai/api-key"))
+  (defun shou/chatgpt-shell-welcome-function (config)
+    "Return a string to be displayed when the chatgpt-shell starts."
+    (format "Commands: %s, %s\n\nKeys:\n- %s\t\t%s\n- %s\t\t%s\n\n"
+            (propertize "clear" 'font-lock-face 'italic)
+            (propertize "help" 'font-lock-face 'italic)
+            (propertize "C-c C-v" 'font-lock-face 'font-lock-string-face)
+            (propertize "chatgpt-shell-swap-model-version" 'font-lock-face 'font-lock-doc-face)
+            (propertize "C-c C-s" 'font-lock-face 'font-lock-string-face)
+            (propertize "chatgpt-shell-swap-system-prompt" 'font-lock-face 'font-lock-doc-face)
+    )
+  ))
 
 (use-package ob-chatgpt-shell
   :straight (:host github :repo "xenodium/chatgpt-shell"
