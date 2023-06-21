@@ -4535,7 +4535,6 @@ Make plain lists folded by default:
 
 ** Exporting
 
-
 #+BEGIN_SRC emacs-lisp
 (with-eval-after-load 'ox
   ;; code highlight in html export
@@ -4551,8 +4550,29 @@ Make plain lists folded by default:
        ))
     (org-pandoc-options-for-mediawiki '((shift-heading-level-by . "1")))
     (org-pandoc-options-for-gfm '((shift-heading-level-by . "1")
-                                  (wrap . "none")
-                                  )))
+                                  (wrap . "none")))
+    :config
+    (defun shou/ox-mediawiki-transform ()
+      "Transform the current buffer to meet my ideal mediawiki format."
+      ;; 1. remove the inserted <span id=xxx></span>
+      (goto-char (point-min))
+      (while (re-search-forward "<span id=\"[0-9a-z-]+\"></span>" nil t)
+        (replace-match ""))
+
+      ;; 2. convert org dates like [2023-06-21 Wed] into [[Jun 21, 2023]]
+      (goto-char (point-min))
+      (while (re-search-forward org-ts-regexp-inactive nil t)
+        (let* ((ts (match-string 0))
+               (parsed (save-match-data (org-parse-time-string ts)))
+               (encoded (encode-time parsed))
+               (formatted (format-time-string "[[%b %d, %Y]]" encoded)))
+          (replace-match formatted)))
+
+      ;; restore cursor
+      (goto-char (point-min)))
+
+    (add-hook 'org-pandoc-after-processing-mediawiki-hook
+              'shou/ox-mediawiki-transform))
 
   (setq org-export-with-broken-links 'mark)
 
