@@ -4853,6 +4853,9 @@ I automatically backup my org files using git after idle for a while. The mode i
   ;; do not prettify keywords like (title, result, etc)
   (setq org-modern-keyword nil)
 
+  ;; do not prettify tables
+  (setq org-modern-table nil)
+
   ;; customize the list bullets
   (setq org-modern-list '((?+ . "◦")
                           (?- . "•")
