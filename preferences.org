@@ -605,14 +605,21 @@ Ensure non-latin scripts font are rendered in a consistent font.
 
 ** Fonts for special codepoints
 
+Browse the blocks at https://www.compart.com/en/unicode/block.
 
 #+begin_src emacs-lisp
-;; IPA symbols and diacritic marks
+;; IPA symbols and diacritic marks (https://www.compart.com/en/unicode/block/U+0250)
 (set-fontset-font t '(#x0250 . #x036F) (font-spec :family "DejaVu Sans Mono"))
 
-;; gemoetric shapes
+;; gemoetric shapes (https://www.compart.com/en/unicode/block/U+25A0)
 (set-fontset-font t '(#x25A0 . #x25FF)
                   (font-spec :family "Noto Sans Mono"))
+
+;; general punctuation (https://www.compart.com/en/unicode/block/U+2000)
+;; to ensure a uniform look for punctuations (especially bullets like ◦•‣)
+(set-fontset-font t '(#x2000 . #x206F)
+                  (font-spec :family "Noto Sans Mono"))
+
 ;; symbols cannot be overriden by fontset by default. Turning off this setting.
 (setq use-default-font-for-symbols nil)
 #+end_src
