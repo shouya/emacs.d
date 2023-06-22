@@ -1565,7 +1565,17 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
          ("C-<" . mc/unmark-next-like-this)
          ("C-M->" . mc/skip-to-next-like-this)
          ("C-M-<" . mc/skip-to-previous-like-this))
-  :config (define-key mc/keymap (kbd "<return>") nil))
+
+  :config
+  (define-key mc/keymap (kbd "<return>") nil)
+
+  ;; multiple-cursors.el doesn't support isearch (or ctrlf), so we
+  ;; need to use phi-search instead.
+  (use-package phi-search
+    :bind
+    (:map mc/keymap
+          ("C-s" . phi-search)
+          ("C-r" . phi-search-backward))))
 #+END_SRC
 
 ** Visual query replace
