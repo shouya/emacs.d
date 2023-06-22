@@ -1775,6 +1775,29 @@ Stolen from https://stackoverflow.com/a/45363946/1232832.
 #+end_src
 
 
+** God mode
+
+I'm interested in modal editing but I don't want to learn a new set of keybindings. God mode is a good compromise.
+
+#+begin_src emacs-lisp
+(use-package god-mode
+  :bind
+  ("<escape>" . god-local-mode)
+  (:map god-local-mode-map
+        ("z" . repeat)
+        ;; switch to insert mode
+        ("i" . god-local-mode))
+
+  :config
+  (defun shou/god-mode-update-cursor ()
+    (setq cursor-type (if (or god-local-mode buffer-read-only)
+                          'hbar
+                        'box)))
+  (add-hook 'god-mode-enabled-hook 'shou/god-mode-update-cursor)
+  (add-hook 'god-mode-disabled-hook 'shou/god-mode-update-cursor)
+  )
+#+end_src
+
 * Programming
 ** Show column number
 
