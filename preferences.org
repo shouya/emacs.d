@@ -4062,19 +4062,58 @@ Make todos respect blocking state.
       (anki-editor-push-notes)
       (progress-reporter-done progress-reporter))))
 
+(autoload 'xml-substitute-special "xml")
+
+(defun shou/anki-front-from-calibre-clipboard ()
+  "Copy a sentence from Calibre, call this function to convert it to Anki front in org syntax."
+  (interactive)
+  (let* ((shell-file-name "/bin/sh")
+         (html (shell-command-to-string
+                "xclip -t text/html -o -sel clipboard 2>/dev/null || true"))
+         (no-tags (replace-regexp-in-string "<span\\b[^>]*text-decoration-line:\\s-*underline[^>]*>\\([^<]*\\)</span>" "*/\\1/*" html)))
+    (xml-substitute-special (replace-regexp-in-string "<[^>]+?>" "" no-tags))))
+
+(defun shou/anki-extract-focus (text)
+  "Get the focus part of the text (delimited by */ and /*)."
+  (when (and text (stringp text))
+    (let ((first-split (split-string text "\\*/")))
+      (when (> (length first-split) 1)
+        (let ((second-split (split-string (cadr first-split) "/\\*")))
+          (when (car second-split)
+            (car second-split)))))))
+
+;; (defun shou/insert-note ()
+;;   (interactive)
+;;   (tempel-insert 'anki/note))
+;; (bind-key "<f7>" 'shou/insert-note)
+
 (use-package anki-editor
-  :disabled
+  :straight (:fork "orgtre")
   :after org
   :commands (anki-editor-push-notes
              anki-editor-map-note-entries
              anki-editor-insert-note
              anki-editor-mode)
-  :hook (before-save . shou/interactive-push-anki-notes)
   :custom
   (anki-editor-org-tags-as-anki-tags t)
   (anki-editor-protected-tags '("marked" "leech" "relearn-experiment"))
   :config
-  (setq anki-editor--ox-anki-html-backend 'ascii))
+  (defun shou/anki-editor--export-filter-output (contents backend info)
+    (string-trim contents))
+
+  (org-export-define-derived-backend 'shou-anki 'ascii
+    :filters-alist
+    '((:filter-final-output . shou/anki-editor--export-filter-output))
+    :translate-alist
+    '((bold . (lambda (bold contents _info)
+                (format "<b>%s</b>" contents)))
+      (italic . (lambda (italic contents _info)
+                  (format "<i>%s</i>" contents)))
+      (paragraph . (lambda (paragraph contents _info)
+                     (replace-regexp-in-string "\n\n" "<br>" contents)))))
+
+
+  (setq anki-editor--ox-anki-html-backend 'shou-anki))
 #+END_SRC
 
 ** Agenda
