@@ -1803,12 +1803,19 @@ I'm interested in modal editing but I don't want to learn a new set of keybindin
   (:map god-local-mode-map
         ("z" . repeat)
         ;; switch to insert mode
-        ("i" . god-local-mode))
+        ("i" . god-local-mode)
+        )
 
   :config
+  (defun shou/enter-insert-mode-for-god-mode ()
+    "advice this after commands you want to switch in insert mode"
+    (when (bound-and-true-p god-local-mode)
+      (god-local-mode -1)))
+  (advice-add 'open-line :after #'shou/enter-insert-mode-for-god-mode)
+
   (defun shou/god-mode-update-cursor ()
     (setq cursor-type (if (or god-local-mode buffer-read-only)
-                          'hbar
+                          'hollow
                         'box)))
   (add-hook 'god-mode-enabled-hook 'shou/god-mode-update-cursor)
   (add-hook 'god-mode-disabled-hook 'shou/god-mode-update-cursor)
