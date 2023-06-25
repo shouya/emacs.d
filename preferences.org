@@ -1807,7 +1807,7 @@ I'm interested in modal editing but I don't want to learn a new set of keybindin
         )
 
   :config
-  (defun shou/enter-insert-mode-for-god-mode ()
+  (defun shou/enter-insert-mode-for-god-mode (&rest args)
     "advice this after commands you want to switch in insert mode"
     (when (bound-and-true-p god-local-mode)
       (god-local-mode -1)))
