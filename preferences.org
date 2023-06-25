@@ -3670,6 +3670,15 @@ Record my activity to activitywatch.
   (emacs-startup . global-activity-watch-mode))
 #+end_src
 
+*** Keyfreq.el
+
+#+begin_src emacs-lisp
+(use-package keyfreq
+  :config
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1))
+#+end_src
+
 * AI
 
 ** copilot.el
