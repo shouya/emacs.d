@@ -3749,9 +3749,7 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
   :custom
   (chatgpt-shell-chatgpt-streaming t)
   (chatgpt-shell-transmitted-context-length 5)
-  (chatgpt-shell-model-versions
-   '("gpt-3.5-turbo-0613"
-     "gpt-4-0613"))
+  (chatgpt-shell-model-versions '("gpt-3.5-turbo" "gpt-4"))
   (chatgpt-shell-system-prompts
    '(("General" . "You treat your user's time as precious. Be succinct in responses. You do not repeat obvious things, including his query. You never apologize for confusions to waste his time. You use markdown liberally to structure responses.")
      ("Programming" . "The user is a hacker-programmer. You treat his time as precious. Be succinct in responses. You do not repeat obvious things, including his query. You never apologize for confusions to waste his time. The user knows how to read manuals. Use markdown to structure your responses.")
@@ -3763,15 +3761,14 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
   (setq chatgpt-shell-openai-key (shou/get-pass-entry "openai/api-key"))
   (defun shou/chatgpt-shell-welcome-function (config)
     "Return a string to be displayed when the chatgpt-shell starts."
-    (format "Commands: %s, %s\n\nKeys:\n- %s\t\t%s\n- %s\t\t%s\n\n"
+    (format "Commands: %s, %s, S-<return> (newline)\n\nKeys:\n- %s\t\t%s\n- %s\t\t%s\n\n"
             (propertize "clear" 'font-lock-face 'italic)
             (propertize "help" 'font-lock-face 'italic)
             (propertize "C-c C-v" 'font-lock-face 'font-lock-string-face)
             (propertize "chatgpt-shell-swap-model-version" 'font-lock-face 'font-lock-doc-face)
             (propertize "C-c C-s" 'font-lock-face 'font-lock-string-face)
             (propertize "chatgpt-shell-swap-system-prompt" 'font-lock-face 'font-lock-doc-face)))
-
-  (bind-key "S-<return>" #'newline 'chatgpt-shell-mode-map))
+  )
 
 (use-package ob-chatgpt-shell
   :straight (:host github :repo "xenodium/chatgpt-shell"
