@@ -2715,6 +2715,9 @@ Templating engine that allows me to quickly enter some text.
      lsp-javascript
      lsp-json))
 
+  ;; do not execute single action automatically. let me see what actions are available.
+  (lsp-auto-execute-action nil)
+
   :hook
   (lsp-completion-mode . shou/lsp-mode-setup-completion)
 
