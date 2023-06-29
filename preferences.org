@@ -3609,7 +3609,7 @@ WGSL:
 
 #+begin_src emacs-lisp
 (use-package wgsl-mode
-  :straight (:host github :repo "acowley/wgsl-mode")
+  :straight (:host github :repo "KeenS/wgsl-mode.el")
   :mode ("\\.wgsl\\'"))
 #+end_src
 
