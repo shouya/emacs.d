@@ -3448,6 +3448,13 @@ project related functionalities.
   )
 #+end_src
 
+Setup virtualenv environment:
+
+#+begin_src emacs-lisp
+(use-package pyvenv
+  :commands (pyvenv-activate))
+#+end_src
+
 *** Kubernetes
 
 K8s mode for editing yaml files.
