@@ -1662,10 +1662,12 @@ other buffers by default. See [[https://stackoverflow.com/questions/22724087/dab
   (unbind-key "S-<iso-lefttab>" mediawiki-mode-map)
   (unbind-key "<backtab>" mediawiki-mode-map)
   (unbind-key "C-<backslash>" mediawiki-mode-map)
+  (unbind-key "C-c a" mediawiki-mode-map)
 
   (bind-key "<tab>" #'completion-at-point mediawiki-mode-map)
   (bind-key "C-c !" #'shou/insert-wiki-date-link mediawiki-mode-map)
   (bind-key "C-c ." #'shou/insert-wiki-date-link mediawiki-mode-map)
+
   (bind-key "M-<return>" 'mediawiki-terminate-paragraph mediawiki-mode-map)
 
   (defun shou/default-date-from-firefox ()
