@@ -3445,15 +3445,29 @@ project related functionalities.
 (use-package python
   :straight (:type built-in)
   :commands (python-fill-paragraph)
+  :hook (python-mode . shou/python-mode-hook)
   :custom
   (python-shell-completion-native-enable nil)
-  )
+  :config
+  (defun shou/python-mode-hook ()
+    ;; step 1: start pye3nv if pyvenv-virtual-env is unbound or empty, and "venv" dir exists
+    (when (and (or (not (boundp 'pyvenv-virtual-env))
+                   (null pyvenv-virtual-env)
+                   (string-empty-p pyvenv-virtual-env))
+               (locate-dominating-file "venv" "."))
+      (pyvenv-activate (locate-dominating-file "venv" ".")))
+
+    ;; step 2: enable lsp
+    (lsp-deferred)))
 #+end_src
 
 Setup virtualenv environment:
 
 #+begin_src emacs-lisp
 (use-package pyvenv
+  :after python
+  :custom
+  (pyvenv-default-virtual-env-name "venv")
   :commands (pyvenv-activate))
 #+end_src
 
