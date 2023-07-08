@@ -3628,7 +3628,7 @@ GLSL:
 
 #+begin_src emacs-lisp
 (use-package glsl-mode
-  :mode ("\\.glsl\\'" "\\.vert\\'" "\\.frag\\'"))
+  :mode ("\\.glsl\\'" "\\.vert\\'" "\\.frag\\'" "\\.comp\\'"))
 #+end_src
 
 WGSL:
