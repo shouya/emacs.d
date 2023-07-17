@@ -807,6 +807,9 @@ This allows the currently focusing window to expand to occupy a decent portion o
   :custom
   (golden-ratio-exclude-buffer-name
    '("*Ediff Control Panel*"))
+  (golden-ratio-exclude-modes
+   '(treemacs-mode
+     ediff-mode))
   :config
   ;; Instead of each window occupies 0.618 of the screen, makes it
   ;; occupy half of the screen. This prevents unnecessary resizing
@@ -1112,7 +1115,6 @@ Some modes set this variable automatically, so we need to override them.
 (defalias 'detect-indentation 'dtrt-indent-mode)
 (defalias 'detect-tab-size 'dtrt-indent-mode)
 #+END_SRC
-
 
 ** Undo tree with vundo
 
@@ -2388,8 +2390,15 @@ Hotkey to remember:
   :custom
   (ediff-window-setup-function 'ediff-setup-windows-plain)
   (ediff-split-window-function 'split-window-horizontally)
-)
+  (ediff-keep-variants nil)
+  :config
+  ;; quit immediately without asking
+  ;; https://emacs.stackexchange.com/questions/9322/how-can-i-quit-ediff-immediately-without-having-to-type-y
+  (defun disable-y-or-n-p (orig-fun &rest args)
+    (cl-letf (((symbol-function 'y-or-n-p) (lambda (prompt) t)))
+      (apply orig-fun args)))
 
+  (advice-add 'ediff-quit :around #'disable-y-or-n-p))
 #+end_src
 
 *** Browse current file on GitHub
