@@ -929,12 +929,10 @@ It render =^L= as a page break line, which is nicer to look at.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dired
-  :defer t
   :straight (:type built-in)
   :commands (dired dired-jump)
   :bind (:map dired-mode-map
-              ("." . dired-hide-dotfiles-mode)
-              )
+              ("." . dired-hide-dotfiles-mode))
   :custom
   ;; Copy file to split window
   (dired-dwim-target t)
@@ -943,10 +941,10 @@ It render =^L= as a page break line, which is nicer to look at.
   ;; Ask once before deleting
   (dired-recursive-deletes 'top)
 
+  :config
   ;; used for deft
   (unbind-key "C-M-n" dired-mode-map)
 
-  :config
   (use-package dired-x :straight (:type built-in)))
 #+END_SRC
 
