@@ -1113,13 +1113,6 @@ Some modes set this variable automatically, so we need to override them.
 (defalias 'detect-tab-size 'dtrt-indent-mode)
 #+END_SRC
 
-** Cursor movement
-*** Use subword mode everywhere
-
-#+BEGIN_SRC emacs-lisp
-; (use-package syntax-subword
-;   :hook (emacs-startup . global-syntax-subword-mode))
-#+END_SRC
 
 ** Undo tree with vundo
 
