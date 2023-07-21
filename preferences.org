@@ -1963,6 +1963,8 @@ Few shortcuts:
   :custom
   ;; find when use
   (wgrep-auto-save-buffer t)
+  ;; trade parallelism for determinism in the ordering
+  (rg-command-line-flags '("-j1"))
 
   :config
   (defun shou/switch-to-rg-buffer (&rest args)
