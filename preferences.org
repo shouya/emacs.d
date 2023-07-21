@@ -3732,7 +3732,32 @@ Record my activity to activitywatch.
      (derived-mode-p 'mediawiki-mode)
      ;; do not enable copilot on files that may contain secrets
      (string-match-p "\\(?:secret\\|cred\\|hidden\\|private\\)" (buffer-name))))
-  (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate))
+  (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
+
+  ;; cached copilot slur regexp, computed on first invocation
+  (defvar shou/copilot-slur-regexp nil)
+  (defun shou/copilot-slur-regexp nil
+    (or (bound-and-true-p shou/copilot-slur-regexp)
+        (setq shou/copilot-slur-regexp
+              ;; the list comes from https://moyix.net/~moyix/copilot_slurs_rot13.txt
+              (let* ((words (->> (f-read "~/.emacs.d/assets/copilot_slurs_rot13.txt")
+                                 (rot13)
+                                 (s-split "\n")
+                                 (-remove (lambda (s)
+                                            (or (s-starts-with-p "#" s)
+                                                (s-starts-with-p "<" s)
+                                                (s-blank-p s)))))))
+                (eval `(rx word-start (or ,@words) word-end))))))
+
+  (defun shou/toggle-highlight-copilot-slurs nil
+    "Toggle highlight of copilot slurs."
+    (interactive)
+    (if (bound-and-true-p shou/copilot-slur-on)
+        (progn
+          (setq-local shou/copilot-slur-on nil)
+          (unhighlight-regexp (shou/copilot-slur-regexp)))
+      (setq-local shou/copilot-slur-on t)
+      (highlight-regexp (shou/copilot-slur-regexp)))))
 #+end_src
 
 ** Ancilla
