@@ -2086,7 +2086,6 @@ This helper function finds the marker files (Cargo.toml, mix.exs, etc) for the c
 
 (defun shou/run-command-recipe ()
   (list
-   (shou/run-command/titan-release)
    (shou/run-command/submit-exercism)
    (shou/run-command/yarn)
    (shou/run-command/custom)
@@ -5065,7 +5064,7 @@ I automatically backup my org files using git after idle for a while. The mode i
   :straight (:host github :repo "xzz53/mu4e-alert")
   :custom
   (mu4e-alert-interesting-mail-query
-   "flag:unread maildir:/tubi/INBOX")
+   "flag:unread maildir:/private/INBOX")
   (mu4e-alert-set-default-style 'libnotify)
 
   :config
