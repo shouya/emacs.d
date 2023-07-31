@@ -3750,14 +3750,21 @@ Record my activity to activitywatch.
   (prog-mode . copilot-mode)
 
   :config
-  (defun shou/copilot-disable-predicate nil
+  (defun shou/buffer-file-name ()
+    (or (buffer-file-name)
+        (and (buffer-base-buffer)
+             (buffer-file-name (buffer-base-buffer)))
+        (buffer-name)
+        ""))
+  (defun shou/copilot-disable-predicate ()
     (or
      ;; do not enable copilot when i'm editing wiki
      (derived-mode-p 'mediawiki-mode)
      ;; do not enable copilot on files that may contain secrets
-     (string-match-p "\\(?:secret\\|cred\\|hidden\\|private\\)" (buffer-file-name))
+     (string-match-p "\\(?:secret\\|cred\\|hidden\\|private\\)"
+                     (shou/buffer-file-name))
      ;; do not enable copilot on files in tmp/cu
-     (string-match-p "tmp/cu" (buffer-file-name))
+     (string-match-p "tmp/cu" (shou/buffer-file-name))
      ))
   (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
 
@@ -4926,9 +4933,7 @@ I automatically backup my org files using git after idle for a while. The mode i
 ** Open file with apps
 
 #+begin_src emacs-lisp
-(setf
- (alist-get "\\.pdf\\'" org-file-apps) "atril %s"
- )
+(setf (alist-get "\\.pdf\\'" org-file-apps) "atril %s")
 #+end_src
 
 ** Org latex
