@@ -2567,23 +2567,18 @@ Add more completions to capf for corfu to consume:
 (use-package cape
   :commands (shou/text-mode-completions)
   :demand t
-  :bind
-  ("M-/" . cape-dabbrev)
 
   :hook
   (text-mode . shou/text-mode-completions)
 
   :config
-  ;; dabbrev is disabled because it's too noisy. Invoke with M-/ instead.
-  ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
 
   (defun shou/text-mode-completions ()
     (make-local-variable 'completion-at-point-functions)
     ;; add to the end
-    (add-to-list 'completion-at-point-functions #'cape-ispell t)
-    )
+    (add-to-list 'completion-at-point-functions #'cape-dict t))
 
   ;; c.f. https://github.com/minad/corfu#completing-in-the-eshell-or-shell
   (when (version< emacs-version "29")
