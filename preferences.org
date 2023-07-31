@@ -1456,7 +1456,30 @@ Run =apt install libenchant-2-dev libhunspell-dev hunspell hunspell-en-us= to in
       (message "Abbrev: %s -> %s" word choice)
       (define-abbrev global-abbrev-table word choice)))
 
-  (advice-add 'jinx--correct-replace :before #'shou/jinx--add-to-abbrev))
+  (advice-add 'jinx--correct-replace :before #'shou/jinx--add-to-abbrev)
+
+  (defun shou/jinx-suggestions-from-session-words (orig-f word)
+    "Return suggestions for WORD from session words."
+    (nconc
+     (funcall orig-f word)
+     (cl-loop
+      for w in jinx--session-words
+      if (<= (string-distance word w) 4)
+      collect (propertize w 'jinx--group "Suggestions from session words"))))
+
+  (advice-add 'jinx--correct-suggestions
+              :around 'shou/jinx-suggestions-from-session-words)
+
+  (defun shou/jinx-valid-english-possive-p (start)
+    (let ((word (buffer-substring-no-properties start (point))))
+      (and (string-suffix-p "'s" word)
+           (cl-loop
+            with word-stripped = (substring word 0 -2)
+            for w in jinx--session-words
+            thereis (and (string-equal-ignore-case word-stripped w)
+                         (string-match-p "\\`[[:lower:]]+\\'" w))))))
+
+  (add-to-list 'jinx--predicates #'shou/jinx-valid-english-possive-p))
 #+end_src
 
 *** Visual line mode for text modes
