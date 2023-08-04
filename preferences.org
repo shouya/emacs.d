@@ -1679,6 +1679,7 @@ other buffers by default. See [[https://stackoverflow.com/questions/22724087/dab
   (unbind-key "<backtab>" mediawiki-mode-map)
   (unbind-key "C-<backslash>" mediawiki-mode-map)
   (unbind-key "C-c a" mediawiki-mode-map)
+  (unbind-key "C-x C-s" mediawiki-mode-map)
 
   (bind-key "<tab>" #'completion-at-point mediawiki-mode-map)
   (bind-key "C-c !" #'shou/insert-wiki-date-link mediawiki-mode-map)
