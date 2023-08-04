@@ -3728,9 +3728,10 @@ Record my activity to activitywatch.
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
   :commands (copilot-mode copilot-clear-overlay copilot-complete)
   :custom
-  ;; enable logging (max size: 1000)
-  (copilot-log-max 1000)
+  ;; enable logging (max size: 10000)
+  (copilot-log-max 10000)
   (copilot-idle-delay 0.3)
+  ;; (copilot-network-proxy '(:host "127.0.0.1" :port 8888))
 
   :bind
   ;; C-S-tab
@@ -3762,6 +3763,7 @@ Record my activity to activitywatch.
      ;; do not enable copilot on files in tmp/cu
      (string-match-p "tmp/cu" (shou/buffer-file-name))
      ))
+
   (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
 
   ;; cached copilot slur regexp, computed on first invocation
@@ -3787,7 +3789,16 @@ Record my activity to activitywatch.
           (setq-local shou/copilot-slur-on nil)
           (unhighlight-regexp (shou/copilot-slur-regexp)))
       (setq-local shou/copilot-slur-on t)
-      (highlight-regexp (shou/copilot-slur-regexp)))))
+      (highlight-regexp (shou/copilot-slur-regexp))))
+
+  (defun shou/neuter-copilot-slur-words (text)
+    (let ((slur-regexp (shou/copilot-slur-regexp))
+          ;; replace the last char with a placeholder, e.g. "hello" => "hell@"
+          (censor (lambda (s) (concat (substring s 0 -1) "@"))))
+      (s-replace-regexp slur-regexp censor text)))
+
+  ;; (advice-add 'copilot--get-source :filter-return #'shou/neuter-copilot-slur-words)
+  )
 #+end_src
 
 ** Ancilla
