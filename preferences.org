@@ -1432,9 +1432,12 @@ Run =apt install libenchant-2-dev libhunspell-dev hunspell hunspell-en-us= to in
 
 #+begin_src emacs-lisp
 (use-package jinx
-  :hook (emacs-startup . global-jinx-mode)
   :bind (:map jinx-mode-map
               ("C-;" . jinx-correct))
+  :hook
+  (text-mode . jinx-mode)
+  (prog-mode . jinx-mode)
+
   :custom
   (jinx-languages "en_US")
   (jinx-camel-modes '(prog-mode org-mode))
