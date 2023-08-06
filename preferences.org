@@ -2885,14 +2885,20 @@ Templating engine that allows me to quickly enter some text.
 ** Tree sitter
 
 #+begin_src emacs-lisp
-(use-package tree-sitter
-  :config
-  (use-package tree-sitter-langs)
-  (global-tree-sitter-mode +1)
-  ;; tree-sitter-hl-mode doesn't work good with rust-mode on some new
-  ;; syntax (e.g. let..else), disabling for now.
+(use-package treesit
+  :when (version<= "29.1" emacs-version)
+  :straight nil
+  :custom
+  (major-mode-remap-alist
+   '((rust-mode . rust-ts-mode)
+     (toml-mode . toml-ts-mode))))
+#+end_src
 
-  ;; (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+Syntax tree manipulation tool:
+
+#+begin_src emacs-lisp
+(use-package combobulate
+  :when (version<= "29.1" emacs-version)
   )
 #+end_src
 
@@ -3260,6 +3266,33 @@ Reformatting JSON.
   (setf (cdr (assoc 'cargo compilation-error-regexp-alist-alist)) error_stack-regexps))
 #+END_SRC
 
+**** Rust TS mode
+
+#+begin_src emacs-lisp
+(use-package rust-ts-mode
+  :when (fboundp 'rust-ts-mode)
+  :straight nil
+  :custom
+  (rust-ts-mode-indent-offset 2)
+
+  ;; enable proc macro expansion for rust-analyzer (used by lsp mode)
+  (lsp-rust-analyzer-proc-macro-enable t)
+
+  ;; default: "check".
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+
+  ;; enable clippy by default
+  (lsp-rust-clippy-preference "on")
+
+  ;; show variable types as inlay hints
+  (lsp-rust-analyzer-server-display-inlay-hints t)
+
+  :config
+  ;; enable LSP for type info and more
+  (add-hook 'rust-ts-mode-hook #'lsp)
+  )
+#+end_src
+
 **** Cargo commands
 
 #+begin_src emacs-lisp
@@ -3277,7 +3310,9 @@ Reformatting JSON.
 
   :hook
   (rust-mode . cargo-minor-mode)
+  (rust-ts-mode . cargo-minor-mode)
   (conf-toml-mode . cargo-minor-mode)
+  (toml-ts-mode . cargo-minor-mode)
 
   :custom
   ;; show backtrace in cargo-run
