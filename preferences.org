@@ -1625,7 +1625,7 @@ By default =visual-line-mode= wraps around at the edge of the frames. Which make
 
 #+BEGIN_SRC emacs-lisp
 (use-package tramp
-  :straight nil
+  :straight (:type built-in)
   :custom
   (tramp-default-method "scp")
   ;; cache file names for 10 seconds
@@ -2887,7 +2887,7 @@ Templating engine that allows me to quickly enter some text.
 #+begin_src emacs-lisp
 (use-package treesit
   :when (version<= "29.1" emacs-version)
-  :straight nil
+  :straight (:type built-in)
   :custom
   (major-mode-remap-alist
    '((rust-mode . rust-ts-mode)
@@ -3271,7 +3271,7 @@ Reformatting JSON.
 #+begin_src emacs-lisp
 (use-package rust-ts-mode
   :when (fboundp 'rust-ts-mode)
-  :straight nil
+  :straight (:type built-in)
   :custom
   (rust-ts-mode-indent-offset 2)
 
@@ -3721,7 +3721,7 @@ WGSL:
 #+begin_src emacs-lisp
 (use-package lisp-mode
   :ensure nil
-  :straight nil
+  :straight (:type built-in)
   :mode ("\\.yuck\\'"))
 #+end_src
 
@@ -3729,7 +3729,7 @@ WGSL:
 
 #+begin_src emacs-lisp
 (use-package python-mode
-  :straight nil
+  :straight (:type built-in)
   :mode ("\\.py\\'" . python-mode)
   :custom
   (python-shell-interpreter "ipython")
@@ -5055,7 +5055,7 @@ I automatically backup my org files using git after idle for a while. The mode i
     (when mu4e-src-dir
       (add-to-list 'load-path mu4e-src-dir)))
 
-  :straight nil
+  :straight (:type built-in)
   :ensure nil
   :commands mu4e
   :custom
