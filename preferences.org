@@ -1648,7 +1648,9 @@ Run =M-x sudo-edit= to edit current file as root.
 
 #+begin_src emacs-lisp
 (use-package kubernetes-tramp
-  :when (f-exists-p "~/.kube/config")
+  :when (and (f-exists-p "~/.kube/config")
+             ;; emacs 29 natively supports kubernetes
+             (version< emacs-version "29.1"))
   :custom
   (tramp-remote-shell-executable "sh")
   :config
