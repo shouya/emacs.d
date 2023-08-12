@@ -3233,6 +3233,7 @@ Reformatting JSON.
 #+BEGIN_SRC emacs-lisp
 (use-package rust-mode
   :mode ("\\.rs\\'" . rust-mode)
+  :hook (rust-mode . lsp)
   :custom
   ;; do not show a buffer for format errors
   (rust-format-show-buffer nil)
@@ -3254,11 +3255,7 @@ Reformatting JSON.
 
   :bind
   (:map rust-mode-map
-        ("C-c C-c C-e" . lsp-rust-analyzer-open-cargo-toml))
-
-  :config
-  ;; enable LSP for type info and more
-  (add-hook 'rust-mode-hook #'lsp)
+        ("C-c C-c C-e" . lsp-rust-analyzer-open-cargo-toml)))
 #+END_SRC
 
 **** Rust TS mode
@@ -3267,6 +3264,7 @@ Reformatting JSON.
 (use-package rust-ts-mode
   :when (fboundp 'rust-ts-mode)
   :straight (:type built-in)
+  :hook (rust-ts-mode . lsp)
   :custom
   (rust-ts-mode-indent-offset 2)
 
