@@ -3306,6 +3306,7 @@ Reformatting JSON.
   (rust-ts-mode . cargo-minor-mode)
   (conf-toml-mode . cargo-minor-mode)
   (toml-ts-mode . cargo-minor-mode)
+  (cargo-process-mode . cargo-minor-mode)
 
   :custom
   ;; show backtrace in cargo-run
