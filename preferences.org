@@ -3281,8 +3281,8 @@ Reformatting JSON.
   (lsp-rust-analyzer-server-display-inlay-hints t)
 
   :config
-  ;; enable LSP for type info and more
-  (add-hook 'rust-ts-mode-hook #'lsp)
+  ;; rust-related compile mode regexp alist, etc.
+  (require 'rust-compile)
   )
 #+end_src
 
