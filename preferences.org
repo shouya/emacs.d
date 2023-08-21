@@ -3299,7 +3299,7 @@ Reformatting JSON.
   :custom
   ;; show backtrace in cargo-run
   (cargo-process--enable-rust-backtrace t)
-  (cargo-process--command-watch "watch -q --clear -x run")
+  (cargo-process--command-watch "watch --why -q -x run")
 
   :config
   (defun cargo-process-run-release ()
