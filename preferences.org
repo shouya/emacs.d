@@ -1463,18 +1463,6 @@ Run =apt install libenchant-2-dev libhunspell-dev hunspell hunspell-en-us= to in
 
   (advice-add 'jinx--correct-replace :before #'shou/jinx--add-to-abbrev)
 
-  (defun shou/jinx-suggestions-from-session-words (orig-f word)
-    "Return suggestions for WORD from session words."
-    (nconc
-     (cl-loop
-      for w in jinx--session-words
-      if (<= (string-distance word w) 4)
-      collect (propertize w 'jinx--group "Suggestions from session words"))
-     (funcall orig-f word)))
-
-  (advice-add 'jinx--correct-suggestions
-              :around 'shou/jinx-suggestions-from-session-words)
-
   (defun shou/jinx-valid-english-possive-p (start)
     (let ((word (buffer-substring-no-properties start (point))))
       (and (string-suffix-p "'s" word)
