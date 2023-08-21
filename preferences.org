@@ -447,6 +447,20 @@ Refer to [[https://200ok.ch/posts/2020-09-29_comprehensive_guide_on_handling_lon
   (bind-key "W" #'shou/copy-full-path dired-mode-map))
 #+end_src
 
+** Sandbox mode
+
+Execute this function to disable any history and backups.
+
+#+begin_src emacs-lisp
+(defun shou/enable-sandbox ()
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
+  (setq transient-save-history nil)
+  (setq org-clock-persist nil)
+  (setq projectile-auto-update-cache nil)
+  (setq save-place-file "/tmp/emacs-sandbox/save-place")
+  (add-to-list 'native-comp-eln-load-path "/tmp/emacs-sandbox/eln-cache"))
+#+end_src
 
 * UI
 ** Tweak main UI
