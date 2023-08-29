@@ -3267,6 +3267,9 @@ Reformatting JSON.
   :when (fboundp 'rust-ts-mode)
   :straight (:type built-in)
   :hook (rust-ts-mode . lsp)
+  :bind
+  (:map rust-ts-mode-map
+        ("C-c C-d" . rust-dbg-wrap-or-unwrap))
   :custom
   (rust-ts-mode-indent-offset 2)
 
