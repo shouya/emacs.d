@@ -3776,7 +3776,7 @@ WGSL:
    )
 
   :hook
-  (text-mode . copilot-mode)
+  ;; (text-mode . copilot-mode)
   (prog-mode . copilot-mode)
 
   :config
