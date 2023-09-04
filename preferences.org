@@ -1259,6 +1259,11 @@ Make operations more interactive with =consult.el=.
   (use-package consult-lsp
     :bind (:map lsp-mode-map
                 ("C-c C-j" . consult-lsp-symbols))))
+
+(with-eval-after-load 'eglot
+  (use-package consult-eglot
+    :bind (:map eglot-mode-map
+                ("C-c C-j" . consult-eglot-symbols))))
 #+end_src
 
 ** Use CtrlF to replace isearch
@@ -2683,7 +2688,6 @@ Templating engine that allows me to quickly enter some text.
 #+begin_src emacs-lisp
 (use-package lsp-mode
   :straight (:host github :repo "emacs-lsp/lsp-mode")
-
   :init
   ;; to fix a weird bug
   (setq lsp-keymap-prefix "M-l")
@@ -2798,28 +2802,6 @@ Templating engine that allows me to quickly enter some text.
   (defun shou/add-lsp-next-checker (checker)
     (setq shou/flycheck-local-cache
           `((lsp . ((next-checkers . (,checker)))))))
-  )
-#+end_src
-
-*** Debugger support (dap-mode)
-
-#+begin_src emacs-lisp
-(use-package dap-mode
-  :commands (dap-debug dap-hydra)
-  :config
-  (dap-ui-mode)
-  (dap-ui-controls-mode 1)
-
-  (require 'dap-lldb)
-  (require 'dap-gdb-lldb)
-  (require 'dap-elixir)
-
-  (dap-gdb-lldb-setup)
-
-  (add-hook 'dap-stopped-hook
-            (lambda (arg) (call-interactively #'dap-hydra)))
-
-  (dap-tooltip-mode -1)
   )
 #+end_src
 
@@ -3023,7 +3005,6 @@ Use pretty eval expression by default because it prints the full output when ove
   ;; Format with C-c C-f
   :bind (:map elixir-mode-map
               ("M-q" . python-fill-paragraph))
-  :hook (elixir-mode . lsp)
 
   :config
   ;; we don't enable eglot's auto completion functionality
@@ -3235,7 +3216,6 @@ Reformatting JSON.
 #+BEGIN_SRC emacs-lisp
 (use-package rust-mode
   :mode ("\\.rs\\'" . rust-mode)
-  :hook (rust-mode . lsp)
   :custom
   ;; do not show a buffer for format errors
   (rust-format-show-buffer nil)
@@ -3266,7 +3246,6 @@ Reformatting JSON.
 (use-package rust-ts-mode
   :when (fboundp 'rust-ts-mode)
   :straight (:type built-in)
-  :hook (rust-ts-mode . lsp)
   :bind
   (:map rust-ts-mode-map
         ("C-c C-d" . rust-dbg-wrap-or-unwrap))
@@ -3466,15 +3445,6 @@ project related functionalities.
 )
 #+END_SRC
 
-**** LSP
-
-#+begin_src emacs-lisp
-(use-package lsp-haskell
-  :disabled
-  :hook (haskell-mode . lsp)
-  :hook (haskell-literate-mode . lsp))
-#+end_src
-
 *** Idris
 
 #+BEGIN_SRC emacs-lisp
@@ -3564,7 +3534,6 @@ Kubernetes.el for managing k8s cluster.
 #+begin_src emacs-lisp
 (use-package js2-mode
   :mode "\\.js\\'"
-  :hook (js2-mode . lsp)
   :config
   (setq-default js2-indent-level 2)
   (setq-default js2-basic-offset 2)
@@ -3683,10 +3652,8 @@ Kubernetes.el for managing k8s cluster.
 
 (use-package racket-mode
   :mode ("\\.rkt\\'" . racket-mode)
-  :hook (racket-mode . lsp)
   :config
   ;; not sure why but this module doesn't autoload
-  (require 'lsp-racket)
   )
 #+end_src
 
