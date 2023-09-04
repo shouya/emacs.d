@@ -2821,15 +2821,36 @@ various rust-analyzer extensions
   :straight (:host github :repo "nemethf/eglot-x")
   :after (eglot rust-ts-mode)
   :config
-  (eglot-x-setup)
-  )
+  (eglot-x-setup))
 #+end_src
 
 ***** sideline
 
 #+begin_src emacs-lisp
-(use-package sideline :commands sideline-mode)
-(use-package sideline-flycheck :after flycheck-mode)
+(use-package sideline
+  :commands sideline-mode
+  :custom
+  (sideline-delay 0)
+  :init
+  (setq sideline-backends-right '(sideline-flycheck sideline-flymake)))
+
+(use-package sideline-flycheck
+  :after flycheck-mode
+  :after sideline
+  :hook (flycheck-mode . sideline-flycheck-setup))
+
+(use-package sideline-flymake
+  :after sideline
+  :autoload (sideline-flymake)
+  :custom
+  (sideline-flymake-display-mode 'line)
+  :config
+  ;; inhibit eldoc for flymake when sideline-flymake is enabled
+  (defun shou/advice-flymake-eldoc-function (orig-fun &rest args)
+    (if (memq 'sideline-flymake sideline-backends-right)
+        nil
+      (apply orig-fun args)))
+  (advice-add #'flymake-eldoc-function :around 'shou/advice-flymake-eldoc-function))
 #+end_src
 
 *** Formatting code with apheleia
