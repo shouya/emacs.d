@@ -2805,6 +2805,33 @@ Templating engine that allows me to quickly enter some text.
   )
 #+end_src
 
+**** eglot
+
+#+begin_src emacs-lisp
+(use-package eglot
+  :commands (eglot eglot-ensure))
+#+end_src
+
+***** eglot-x
+
+various rust-analyzer extensions
+
+#+begin_src emacs-lisp
+(use-package eglot-x
+  :straight (:host github :repo "nemethf/eglot-x")
+  :after (eglot rust-ts-mode)
+  :config
+  (eglot-x-setup)
+  )
+#+end_src
+
+***** sideline
+
+#+begin_src emacs-lisp
+(use-package sideline :commands sideline-mode)
+(use-package sideline-flycheck :after flycheck-mode)
+#+end_src
+
 *** Formatting code with apheleia
 
 #+BEGIN_SRC emacs-lisp
@@ -3246,6 +3273,9 @@ Reformatting JSON.
 (use-package rust-ts-mode
   :when (fboundp 'rust-ts-mode)
   :straight (:type built-in)
+  :hook
+  (rust-ts-mode . eglot-ensure)
+  (rust-ts-mode . sideline-mode)
   :bind
   (:map rust-ts-mode-map
         ("C-c C-d" . rust-dbg-wrap-or-unwrap))
