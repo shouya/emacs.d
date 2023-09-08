@@ -1913,19 +1913,9 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
   (dumb-jump-rg-search-args "--auto-hybrid-regex")
   )
 
-(defun shou/xref ()
-  (let ((loc (and lsp-mode
-                  (lsp-request "textDocument/definition"
-                               (lsp--text-document-position-params)))))
-    (if (seq-empty-p loc)
-        (dumb-jump-xref-activate)
-      (lsp--xref-backend))))
-
-
-(defun insert-dumb-jump-to-xref ()
-  (setq-local xref-backend-functions '(shou/xref t)))
-
-(add-hook 'prog-mode-hook 'insert-dumb-jump-to-xref)
+(with-eval-after-load 'xref
+  (bind-key "M-," #'xref-find-definitions)
+  (bind-key "M-." #'xref-find-definitions-other-window))
 #+END_SRC
 
 ** Enable flycheck
@@ -2809,7 +2799,12 @@ Templating engine that allows me to quickly enter some text.
 
 #+begin_src emacs-lisp
 (use-package eglot
-  :commands (eglot eglot-ensure))
+  :commands (eglot eglot-ensure)
+  :bind
+  (:map eglot-mode-map
+        ("M-l a a" . eglot-code-actions)
+        ("M-," . xref-find-definitions)
+        ))
 #+end_src
 
 ***** eglot-x
