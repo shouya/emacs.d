@@ -3807,6 +3807,7 @@ WGSL:
 
   :hook
   (text-mode . copilot-mode)
+  (conf-mode . copilot-mode)
   (prog-mode . copilot-mode)
 
   :config
@@ -3824,9 +3825,16 @@ WGSL:
      (string-match-p "\\(?:secret\\|cred\\|hidden\\|private\\)"
                      (shou/buffer-file-name))
      ;; do not enable copilot on files in tmp/cu
-     (string-match-p "tmp/cu" (shou/buffer-file-name))))
+     (string-match-p "tmp/cu" (shou/buffer-file-name))
+     ;; do not enable on org-mode
+     (derived-mode-p 'org-mode)))
 
   (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
+
+  (defun shou/advice-copilot-mode (orig-fn &rest args)
+    (when (not (shou/copilot-disable-predicate))
+      (apply orig-fn args)))
+  (advice-add 'copilot-mode :around #'shou/advice-copilot-mode)
 
   ;; cached copilot slur regexp, computed on first invocation
   (defvar shou/copilot-slur-regexp nil)
