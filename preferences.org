@@ -2801,10 +2801,18 @@ Templating engine that allows me to quickly enter some text.
 #+begin_src emacs-lisp
 (use-package eglot
   :commands (eglot eglot-ensure)
+  :custom
+  ;; auto shutdown a language server when the last buffer it manages
+  ;; is closed.
+  (eglot-autoshutdown t)
+  ;; allow eglot to enable on definition found by xref outside project
+  (eglot-extend-to-xref t)
+
   :bind
   (:map eglot-mode-map
         ("M-l a a" . eglot-code-actions)
         ("M-," . xref-find-definitions)
+        ("M-l l" . eglot-inlay-hints-mode)
         ))
 #+end_src
 
@@ -2815,6 +2823,9 @@ various rust-analyzer extensions
 #+begin_src emacs-lisp
 (use-package eglot-x
   :straight (:host github :repo "nemethf/eglot-x")
+  :custom
+  ;; buggy
+  (eglot-x-enable-snippet-text-edit nil)
   :after (eglot rust-ts-mode)
   :config
   (eglot-x-setup))
