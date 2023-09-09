@@ -1797,12 +1797,13 @@ Add extra shortcuts for symbols I frequently use to the TeX input method.
 (use-package embark
   :bind ("M-m" . embark-act)
   :config
-  (embark-define-keymap embark-identifier-map
-    "Actions on symbol"
-    ("," xref-find-definitions)
-    ("." xref-find-definitions-other-window)
-    ("R" lsp-rename)
-    ("g" rg-dwim)
+  (defvar-keymap embark-identifier-map
+    :doc "Actions on symbol"
+    :parent embark-identifier-map
+    "," 'xref-find-definitions
+    "." 'xref-find-definitions-other-window
+    ;; ("R" lsp-rename)
+    "g" 'rg-dwim
     )
   )
 #+end_src
