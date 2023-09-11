@@ -3826,6 +3826,8 @@ WGSL:
                      (shou/buffer-file-name))
      ;; do not enable copilot on files in tmp/cu
      (string-match-p "tmp/cu" (shou/buffer-file-name))
+     ;; do not match server files
+     (string-match-p "examples/server" (shou/buffer-file-name))
      ;; do not enable on org-mode
      (derived-mode-p 'org-mode)))
 
