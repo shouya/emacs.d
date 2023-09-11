@@ -2525,6 +2525,9 @@ I now use corfu as my completion engine. Comparing to company, it's more modular
     (when (where-is-internal #'completion-at-point (list (current-local-map)))
       (corfu-mode 1)))
   (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
+
+  ;; used by copilot.el to accept completion
+  (unbind-key "<remap> <move-end-of-line>" 'corfu-map)
   )
 
 ;;
@@ -3791,14 +3794,16 @@ WGSL:
   (copilot-idle-delay 0.3)
   ;; (copilot-network-proxy '(:host "127.0.0.1" :port 8888))
 
+  :init
+  ;; keys bind to copilot-completion-map
+  (setq shou/copilot-keymap
+   '(("C-e" . copilot-accept-completion)
+     ("M-f" . copilot-accept-completion-by-word)
+     ("C-g" . copilot-clear-overlay)))
+
   :bind
   ;; C-S-tab
-  (("C-<iso-lefttab>" . copilot-complete)
-   :map copilot-completion-map
-   ("C-e" . copilot-accept-completion)
-   ("M-f" . copilot-accept-completion-by-word)
-   ("C-g" . copilot-clear-overlay)
-   )
+  (("C-<iso-lefttab>" . copilot-complete))
 
   :hook
   (text-mode . copilot-mode)
@@ -3862,8 +3867,27 @@ WGSL:
           (censor (lambda (s) (concat (substring s 0 -1) "@"))))
       (s-replace-regexp slur-regexp censor text)))
 
-  ;; (advice-add 'copilot--get-source :filter-return #'shou/neuter-copilot-slur-words)
-  )
+
+
+  ;; copilot-completion-map doesn't always trigger when flymake
+  ;; overlay is present at the same position. So I wrote this
+  ;; workaround to bind the keys to copilot-map and only trigger
+  ;; copilot-functions when the overlay is visible.
+  (defun shou/copilot-override-key (key f)
+    "Only execute copilot f key if copilot overlay is visible"
+    (if (copilot--overlay-visible)
+        (funcall f)
+      (let ((copilot-mode nil))
+        ;; fallback to default behavior
+        (call-interactively (key-binding key)))))
+
+  (cl-loop for (key . f) in shou/copilot-keymap
+           do
+           (message "binding %s to %s" key f)
+           (bind-key key f copilot-completion-map)
+           (bind-key key `(lambda () (interactive)
+                            (shou/copilot-override-key ,(kbd key) (quote ,f)))
+                     copilot-mode-map)))
 #+end_src
 
 ** Ancilla
