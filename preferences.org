@@ -315,6 +315,8 @@ Copied from [[https://github.com/hrs/sensible-defaults.el/blob/master/sensible-d
 #+BEGIN_SRC emacs-lisp
 ;; Don't ask `yes/no?', ask `y/n?'.
 (fset 'yes-or-no-p 'y-or-n-p)
+;; y-or-n-p option for Emacs 29.
+(setq use-short-answers t)
 
 ;; If some text is selected, and you type some text, delete the selected text and start inserting your typed text
 (delete-selection-mode t)
