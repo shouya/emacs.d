@@ -2800,7 +2800,13 @@ Templating engine that allows me to quickly enter some text.
         ("M-l a a" . eglot-code-actions)
         ("M-," . xref-find-definitions)
         ("M-l l" . eglot-inlay-hints-mode)
-        ))
+        )
+
+  :config
+  (defun shou/disable-eglot-inlay-mode ()
+    (eglot-inlay-hints-mode -1))
+  ;; disable inlay hint by default, toggle with "M-l l"
+  (add-hook 'eglot-managed-mode-hook #'shou/disable-eglot-inlay-mode))
 #+end_src
 
 ***** eglot-x
@@ -3773,8 +3779,8 @@ WGSL:
 
 #+begin_src emacs-lisp
 (use-package copilot
-  ;; :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :straight (:host github :repo "raymond-w-ko/copilot.el" :files ("dist" "*.el"))
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  ;; :straight (:host github :repo "raymond-w-ko/copilot.el" :files ("dist" "*.el"))
   ;; :straight (:local-repo "~/tmp/copilot.el" :files ("dist" "*.el"))
   :commands (copilot-mode copilot-clear-overlay copilot-complete)
   :custom
