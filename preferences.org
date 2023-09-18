@@ -461,6 +461,7 @@ Execute this function to disable any history and backups.
   (setq org-clock-persist nil)
   (setq projectile-auto-update-cache nil)
   (setq save-place-file "/tmp/emacs-sandbox/save-place")
+  (setq savehist-file "/tmp/emacs-sandbox/history")
   (add-to-list 'native-comp-eln-load-path "/tmp/emacs-sandbox/eln-cache"))
 #+end_src
 
@@ -2811,7 +2812,8 @@ Templating engine that allows me to quickly enter some text.
   (defun shou/disable-eglot-inlay-mode ()
     (eglot-inlay-hints-mode -1))
   ;; disable inlay hint by default, toggle with "M-l l"
-  (add-hook 'eglot-managed-mode-hook #'shou/disable-eglot-inlay-mode))
+  (add-hook 'eglot-managed-mode-hook #'shou/disable-eglot-inlay-mode)
+  )
 #+end_src
 
 ***** eglot-x
