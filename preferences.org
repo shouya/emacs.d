@@ -2806,6 +2806,7 @@ Templating engine that allows me to quickly enter some text.
         ("M-l a a" . eglot-code-actions)
         ("M-," . xref-find-definitions)
         ("M-l l" . eglot-inlay-hints-mode)
+        ("M-l r" . eglot-rename)
         )
 
   :config
