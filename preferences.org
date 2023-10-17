@@ -1916,6 +1916,7 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
   :commands flycheck-mode
+  :disabled t
   :hook (prog-mode . flycheck-mode)
 
   :preface
@@ -2825,6 +2826,7 @@ various rust-analyzer extensions
 
 #+begin_src emacs-lisp
 (use-package eglot-x
+  :disabled t
   :straight (:host github :repo "nemethf/eglot-x")
   :custom
   ;; buggy
