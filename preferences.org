@@ -3835,10 +3835,15 @@ WGSL:
      (string-match-p "tmp/cu" (shou/buffer-file-name))
      ;; do not match server files
      (string-match-p "examples/server" (shou/buffer-file-name))
-     ;; do not enable on org-mode
-     (derived-mode-p 'org-mode)))
+     ))
 
   (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
+
+  (defun shou/advice-mask-copilot (orig-fn &rest args)
+    (cl-letf (((symbol-function 'copilot--on-doc-change)
+               (lambda (&rest args) nil)))
+      (apply orig-fn args)))
+  (advice-add 'org-todo :around #'shou/advice-mask-copilot)
 
   (defun shou/advice-copilot-mode (orig-fn &rest args)
     (when (not (shou/copilot-disable-predicate))
