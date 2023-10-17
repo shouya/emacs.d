@@ -1902,6 +1902,8 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
   (dumb-jump-force-searcher 'rg)
   ;; Defaults to --pcre2. ripgrep's pcre is an opt-in feature that's not enabled by default.
   (dumb-jump-rg-search-args "--auto-hybrid-regex")
+  :config
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
   )
 
 (with-eval-after-load 'xref
