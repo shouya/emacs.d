@@ -3791,8 +3791,8 @@ WGSL:
 
 #+begin_src emacs-lisp
 (use-package copilot
-  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  ;; :straight (:host github :repo "raymond-w-ko/copilot.el" :files ("dist" "*.el"))
+  ;; :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :straight (:host github :repo "raymond-w-ko/copilot.el" :files ("dist" "*.el"))
   ;; :straight (:local-repo "~/tmp/copilot.el" :files ("dist" "*.el"))
   :commands (copilot-mode copilot-clear-overlay copilot-complete)
   :custom
@@ -3840,12 +3840,6 @@ WGSL:
      ))
 
   (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
-
-  (defun shou/advice-mask-copilot (orig-fn &rest args)
-    (cl-letf (((symbol-function 'copilot--on-doc-change)
-               (lambda (&rest args) nil)))
-      (apply orig-fn args)))
-  (advice-add 'org-todo :around #'shou/advice-mask-copilot)
 
   (defun shou/advice-copilot-mode (orig-fn &rest args)
     (when (not (shou/copilot-disable-predicate))
