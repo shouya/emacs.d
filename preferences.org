@@ -3800,6 +3800,8 @@ WGSL:
   (copilot-log-max 10000)
   (copilot-idle-delay 0.3)
   ;; (copilot-network-proxy '(:host "127.0.0.1" :port 8888))
+  ;; no warning if mode-specific offset cannot be found
+  (copilot-indent-warning-suppress t)
 
   :init
   ;; keys bind to copilot-completion-map
