@@ -3940,11 +3940,11 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
   :custom
   (chatgpt-shell-chatgpt-streaming t)
   (chatgpt-shell-transmitted-context-length 5)
-  (chatgpt-shell-model-versions '("gpt-3.5-turbo" "gpt-4"))
+  (chatgpt-shell-model-versions '("gpt-3.5-turbo-0613" "gpt-4-0314"))
   (chatgpt-shell-system-prompts
-   '(("General" . "You treat your user's time as precious. Be succinct in responses. You do not repeat obvious things, including his query. You never apologize for confusions to waste his time. You use markdown liberally to structure responses.")
-     ("Programming" . "The user is a hacker-programmer. You treat his time as precious. Be succinct in responses. You do not repeat obvious things, including his query. You never apologize for confusions to waste his time. The user knows how to read manuals. Use markdown to structure your responses.")
-     ("Book" . "The user is reading a book. The user will send you the portions he's reading. You help the user 1. summarize and 2. explain what the author is talking. Keep your response short (2-3 sentences). You may use markdown to structure your response")
+   '(("General" . "Do not give answer promptly unless it's straightforward. Analyze carefully and try to be as accurate as you can. If you don't know the answer or need more information, you should ask for more details. This is very important to my career. You'd better be sure.")
+     ("Programming" . "I am an expert in programming. I need you help to answer programming related questions. Do not give answer promptly unless it's straightforward. Analyze the problem carefully and be as accurate as you can. If you don't know the answer or need more information, you should ask for more details. This is very important to my career. You'd better be sure.")
+     ("Book" . "I am reading a book. I will send you the portions I'm reading. You help the me 1. summarize and 2. explain what the author is talking. Keep your response short (2-3 sentences). You may use markdown to structure your response. This is very important to my career. You'd better be sure.")
      ))
   (chatgpt-shell-welcome-function #'shou/chatgpt-shell-welcome-function)
 
