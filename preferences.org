@@ -2836,6 +2836,17 @@ various rust-analyzer extensions
   (eglot-x-setup))
 #+end_src
 
+***** eglot with flycheck
+
+By default, eglot uses the built-in flymake for displaying errors. However, I found flycheck more customization in various ways. The author of eglot has refused the idea of adding flycheck support, which is understandable. Fortunately some people have written a package to add flycheck support to eglot.
+
+#+begin_src emacs-lisp
+(use-package flycheck-eglot
+  :after (flycheck eglot)
+  :config
+  (global-flycheck-eglot-mode 1))
+#+end_src
+
 ***** sideline
 
 #+begin_src emacs-lisp
@@ -2847,12 +2858,12 @@ various rust-analyzer extensions
   (setq sideline-backends-right '(sideline-flycheck sideline-flymake)))
 
 (use-package sideline-flycheck
-  :after flycheck-mode
-  :after sideline
+  :after (flycheck sideline)
+  :autoload (sideline-flycheck-setup)
   :hook (flycheck-mode . sideline-flycheck-setup))
 
 (use-package sideline-flymake
-  :after sideline
+  :after (sideline flymake)
   :autoload (sideline-flymake)
   :custom
   (sideline-flymake-display-mode 'line)
@@ -3935,12 +3946,12 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
 (use-package chatgpt-shell
   :straight (:host github :repo "xenodium/chatgpt-shell"
                    :files ("chatgpt-shell.el"))
-  :after shell-maker
+  :after shell-makera
   :commands (chatgpt-shell-explain-code chatgpt-shell)
   :custom
   (chatgpt-shell-chatgpt-streaming t)
   (chatgpt-shell-transmitted-context-length 5)
-  (chatgpt-shell-model-versions '("gpt-3.5-turbo-0613" "gpt-4-0314"))
+  (chatgpt-shell-model-versions '("gpt-4-0314" "gpt-3.5-turbo-0613"))
   (chatgpt-shell-system-prompts
    '(("General" . "Do not give answer promptly unless it's straightforward. Analyze carefully and try to be as accurate as you can. If you don't know the answer or need more information, you should ask for more details. This is very important to my career. You'd better be sure.")
      ("Programming" . "I am an expert in programming. I need you help to answer programming related questions. Do not give answer promptly unless it's straightforward. Analyze the problem carefully and be as accurate as you can. If you don't know the answer or need more information, you should ask for more details. This is very important to my career. You'd better be sure.")
