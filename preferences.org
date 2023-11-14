@@ -3946,7 +3946,7 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
 (use-package chatgpt-shell
   :straight (:host github :repo "xenodium/chatgpt-shell"
                    :files ("chatgpt-shell.el"))
-  :after shell-makera
+  :after shell-maker
   :commands (chatgpt-shell-explain-code chatgpt-shell)
   :custom
   (chatgpt-shell-chatgpt-streaming t)
