@@ -2826,7 +2826,6 @@ various rust-analyzer extensions
 
 #+begin_src emacs-lisp
 (use-package eglot-x
-  :disabled t
   :straight (:host github :repo "nemethf/eglot-x")
   :custom
   ;; buggy
