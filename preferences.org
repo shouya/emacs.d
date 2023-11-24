@@ -5217,6 +5217,23 @@ I automatically backup my org files using git after idle for a while. The mode i
   )
 #+end_src
 
+* Accounting
+
+#+begin_src emacs-lisp
+(use-package beancount
+  ;; https://github.com/beancount/beancount-mode
+  :straight (beancount :type git :host github :repo "beancount/beancount-mode")
+  :mode ("\\.bean\\'" . beancount-mode)
+  :hook (beancount-mode . flymake-bean-check-enable)
+  ;; enable outline folding
+  :hook (beancount-mode . outline-minor-mode)
+  :hook (beancount-mode . shou/beancount-customization)
+  :config
+  (defun shou/beancount-customization ()
+    (setq-local electric-indent-chars nil))
+  )
+#+end_src
+
 * Debugging cheatsheet
 
 ** Trace function argument/return value
