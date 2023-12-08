@@ -1038,8 +1038,7 @@ So it doesn't block the main UI when copying large files.
 (defun shou/kill-buffer-name ()
   (interactive)
   (kill-new (buffer-file-name))
-  (message (format "Copied \"%s\"" (buffer-file-name)))
-  )
+  (message (format "Copied \"%s\"" (buffer-file-name))))
 (bind-key "C-x w" 'shou/kill-buffer-name)
 #+end_src
 
@@ -3419,6 +3418,16 @@ Rusty Object Notation (RON) mode:
             (setq sh-basic-offset 2
                   sh-indentation 2)))
 #+END_SRC
+
+*** Fish shell
+
+#+begin_src emacs-lisp
+(use-package fish-mode
+  :mode "\\.fish\\'"
+  :custom
+  ;; to match the same indentation as fish_indent
+  (fish-indent-offset 4))
+#+end_src
 
 *** Dockerfile
 
