@@ -1906,8 +1906,8 @@ I use =dumb-jump=, which works out of the box for many languages. I prioritize l
   )
 
 (with-eval-after-load 'xref
-  (bind-key "M-," #'xref-find-definitions)
-  (bind-key "M-." #'xref-find-definitions-other-window))
+  (bind-key* "M-," #'xref-find-definitions)
+  (bind-key* "M-." #'xref-find-definitions-other-window))
 #+END_SRC
 
 ** Enable flycheck
