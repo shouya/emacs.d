@@ -810,8 +810,10 @@ This allows the currently focusing window to expand to occupy a decent portion o
   :straight (:host github :repo "shouya/golden-ratio.el")
   :hook (emacs-startup . golden-ratio-mode)
   :custom
-  (golden-ratio-exclude-buffer-name
+  (golden-ratio-exclude-buffer-names
    '("*Ediff Control Panel*"))
+  (golden-ratio-exclude-buffer-regexp
+    '("^\\*dape-"))
   (golden-ratio-exclude-modes
    '(treemacs-mode
      ediff-mode))
@@ -2882,6 +2884,34 @@ By default, eglot uses the built-in flymake for displaying errors. However, I fo
   (advice-add #'flymake-eldoc-function :around 'shou/advice-flymake-eldoc-function))
 #+end_src
 
+*** Debug Adapter Protocol (DAP)
+
+See https://github.com/svaante/dape#c-c-and-rust---codelldb for more setup instructions.
+
+Keys (Prefix =C-x C-a=):
+
+- =d=: =dap= (start dap)
+- =q=: =dap-quit=
+- =r=: =dap-restart=
+- =b=: =dap-breakpoint-toggle=
+- =n=: =dap-next=
+- =s=: =dap-step-in=
+- =o=: =dap-step-out=
+- =w=: =dap-watch-dwim=
+- =R=: =dap-repl=
+
+#+begin_src emacs-lisp
+(use-package dape
+  :straight (:host github :repo "svaante/dape")
+  :custom
+  ;; GUD gdb like
+  (dape-buffer-window-arrangment 'gud) ; default: 'left
+  :config
+  ;; Do not show REPL by default
+  (remove-hook 'dape-on-start-hooks 'dape-repl)
+  )
+#+end_src
+
 *** Formatting code with apheleia
 
 #+BEGIN_SRC emacs-lisp
@@ -3194,37 +3224,6 @@ Press 'g' in compile mode to rerun last command (original 'r').
               (lambda (ret) (append
                              (list "env" (concat "MIX_ENV=" alchemist-mix-env))
                              ret)))
-  )
-#+end_src
-
-**** DAP debugger for exunit tests
-
-#+begin_src emacs-lisp
-(use-package dap-mode
-  :commands (dap-exunit-here)
-  :config
-  (require 'dap-elixir)
-
-  (defun shou/exunit-test-at-point ()
-    (let* ((root (shou/elixir-project-root))
-           (filename (buffer-file-name))
-           (line (line-number-at-pos))
-           (rel-filename (f-relative filename root)))
-      (format "%s:%d" rel-filename line)))
-
-  (defun shou/add-dap-template-this-exunit-test ()
-    (interactive)
-    (dap-register-debug-template
-     (format "Elixir::Test at %s" (shou/exunit-test-at-point))
-     (list :type "Elixir"
-           :cwd nil
-           :request "launch"
-           :program nil
-           :projectDir (f-expand (shou/elixir-project-root))
-           :task "test"
-           :taskArgs (list (shou/exunit-test-at-point))
-           :name "Elixir::Test at point"))
-    )
   )
 #+end_src
 
