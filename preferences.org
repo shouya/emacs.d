@@ -820,6 +820,13 @@ This allows the currently focusing window to expand to occupy a decent portion o
   ;; occupy half of the screen. This prevents unnecessary resizing
   ;; when two side-by-side windows are open.
   (setq golden-ratio--value 2.0)
+
+  ;; avoid resizing which-key buffer
+  (with-eval-after-load 'which-key
+    (add-to-list 'golden-ratio-inhibit-functions
+                 (lambda ()
+                   (and which-key--buffer
+                        (window-live-p (get-buffer-window which-key--buffer))))))
   )
 #+end_src
 
