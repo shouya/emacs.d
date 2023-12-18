@@ -1757,7 +1757,7 @@ Add extra shortcuts for symbols I frequently use to the TeX input method.
 #+begin_src emacs-lisp
 (use-package avy
   :bind
-  ("M-j" . avy-goto-char-timer)
+  ("M-j" . avy-goto-char)
   ("M-J" . avy-pop-mark)
 
   :custom
