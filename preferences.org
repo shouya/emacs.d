@@ -598,7 +598,8 @@ I use "Input" as my default font face.
         ("Fira Code Light" :height 130)
         ("Dejavu Sans Mono" :height 130)))
 
-(auto-set-fonts)
+(when (display-graphic-p)
+  (auto-set-fonts))
 #+END_SRC
 
 ** Font for non-latin scripts
