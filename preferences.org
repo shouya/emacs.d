@@ -1357,6 +1357,7 @@ entered.
       (when (and open-quote-pos close-quote-pos)
         (set-mark close-quote-pos)
         (goto-char open-quote-pos))))
+  ;; \" ; trick smartparen that there is no mismatch quotation mark
   (add-to-list 'er/try-expand-list #'shou/er/mark-outside-quotes))
 #+END_SRC
 
@@ -2314,29 +2315,21 @@ I didn't use =origami.el= because it handles languages like js/json terribly. =y
   )
 #+end_src
 
-** Auto complete parentheses
+** Parenthesis manipulation
 
-I use =smartparens= package for the purpose.
+I use =smartparens= package for (automatic) pair management.
 
 #+BEGIN_SRC emacs-lisp
 (use-package smartparens
-  :hook (lisp-data-mode . smartparens-mode)
-  :bind (("M-r" . sp-rewrap-sexp)
-         :map smartparens-mode-map
-              ;; ((a|) b) => ((a| b))
-              ("M-L" . sp-forward-slurp-sexp)
-              ;; ((a| b)) => ((a|) b)
-              ("M-H" . sp-forward-barf-sexp)
-              ;; (a (|b)) => ((a |b))
-              ("M-S-h" . sp-backward-slurp-sexp)
-              ;; ((a |b)) => (a (|b))
-              ("M-S-l" . sp-backward-barf-sexp)
-              ;; ((a|) b) => (a| b)
-              ("M-j" . sp-splice-sexp)
-              ;;
-              ("M-<right>" . sp-next-sexp)
-              ;;
-              ("M-<left>" . sp-previous-sexp))
+  :bind (:map smartparens-mode-map
+              ("M-r" . sp-rewrap-sexp)
+              ("M-<down>" . sp-splice-sexp)
+              ("M-S-<right>" . sp-forward-slurp-sexp)
+              ("M-S-<left>" . sp-backward-barf-sexp)
+              ("M-<right>" . sp-forward-sexp)
+              ("M-<left>" . sp-backward-sexp)
+              )
+  :hook (emacs-lisp-mode . smartparens-global-mode)
   :config
   (require 'smartparens-config)
   (sp-local-pair 'haskell-mode "'" nil :actions nil))
@@ -3020,8 +3013,11 @@ The default C style determines the style of a number of modes.
 I customized several bindings because "C-<left>/<right>" is bound to
 "previous/next desktop" on my macOS.
 
+This package was disabled because it's overly strict. I mostly switch over to smartparens.
+
 #+BEGIN_SRC emacs-lisp
 (use-package paredit
+  :disabled t
   :commands paredit-mode
   :hook (lisp-mode-map-hook . paredit-mode)
   :bind (:map paredit-mode-map
