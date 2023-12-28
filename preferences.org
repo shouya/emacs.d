@@ -2320,19 +2320,21 @@ I didn't use =origami.el= because it handles languages like js/json terribly. =y
 I use =smartparens= package for (automatic) pair management.
 
 #+BEGIN_SRC emacs-lisp
-(use-package smartparens
+(use-package smartparens-mode
+  :straight (smartparens)
   :bind (:map smartparens-mode-map
               ("M-r" . sp-rewrap-sexp)
               ("M-<down>" . sp-splice-sexp)
               ("M-S-<right>" . sp-forward-slurp-sexp)
               ("M-S-<left>" . sp-backward-barf-sexp)
               ("M-<right>" . sp-forward-sexp)
-              ("M-<left>" . sp-backward-sexp)
-              )
+              ("M-<left>" . sp-backward-sexp))
   :hook (prog-mode text-mode)
+  :custom
+  (sp-autodelete-pair nil)
+  (sp-autoinsert-pair nil)
   :config
-  (require 'smartparens-config)
-  (sp-local-pair 'haskell-mode "'" nil :actions nil))
+  (require 'smartparens-config))
 #+END_SRC
 
 ** Git
