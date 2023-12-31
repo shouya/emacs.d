@@ -2329,7 +2329,7 @@ I use =smartparens= package for (automatic) pair management.
               ("M-S-<left>" . sp-backward-barf-sexp)
               ("M-<right>" . sp-forward-sexp)
               ("M-<left>" . sp-backward-sexp))
-  :hook (prog-mode text-mode)
+  :hook (prog-mode)
   :custom
   (sp-autodelete-pair nil)
   (sp-autoinsert-pair nil)
