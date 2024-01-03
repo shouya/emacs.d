@@ -4050,6 +4050,9 @@ With a prefix argument (C-u), use GPT-4. Otherwise, use GPT-3.5-turbo."
   ;; use cookies like <width> to define width for columns
   (org-startup-shrink-all-tables t)
 
+  ;; put footnote under the current heading instead of a "footnotes" section
+  (org-footnote-section nil)
+
   :config
   ;; We enable org-indent-mode to make contents align with their settings
   (add-hook 'org-mode-hook 'org-indent-mode)
