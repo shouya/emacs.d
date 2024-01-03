@@ -3021,7 +3021,6 @@ This package was disabled because it's overly strict. I mostly switch over to sm
 (use-package paredit
   :disabled t
   :commands paredit-mode
-  :hook (lisp-mode-map-hook . paredit-mode)
   :bind (:map paredit-mode-map
               ;; ((a|) b) => ((a| b))
               ("M-<right>" . paredit-forward-slurp-sexp)
