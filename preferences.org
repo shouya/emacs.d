@@ -3731,6 +3731,13 @@ Kubernetes.el for managing k8s cluster.
     (company-coq-live-on-the-edge t)))
 #+end_src
 
+*** Lean
+
+#+begin_src emacs-lisp
+(use-package lean4-mode
+  :straight (:host github :repo "leanprover/lean4-mode" :files ("*.el" "data")))
+#+end_src
+
 *** Racket
 
 #+begin_src emacs-lisp
