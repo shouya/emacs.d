@@ -3054,7 +3054,6 @@ This package was disabled because it's overly strict. I mostly switch over to sm
                 racket-mode-hook
                 cider-repl-mode-hook
                 lisp-mode-hook))
-  (add-hook hook 'paredit-mode)
   (add-hook hook 'rainbow-delimiters-mode))
 #+END_SRC
 
@@ -3735,7 +3734,11 @@ Kubernetes.el for managing k8s cluster.
 
 #+begin_src emacs-lisp
 (use-package lean4-mode
-  :straight (:host github :repo "leanprover/lean4-mode" :files ("*.el" "data")))
+  :straight (:host github :repo "leanprover/lean4-mode" :files ("*.el" "data"))
+  :config
+  (with-eval-after-load 'lsp-mode
+    (add-to-list 'lsp-file-watch-ignored-directories "\\.lean\\'"))
+  )
 #+end_src
 
 *** Racket
