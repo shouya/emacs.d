@@ -3596,6 +3596,35 @@ Setup virtualenv environment:
   :commands (pyvenv-activate))
 #+end_src
 
+*** Jupyter
+
+It's a little difficult to set up. Here's the instructions:
+
+1. launch jupyter server (=jupyter lab=)
+2. =M-x jupyter-connect-server-repl=
+3. =M-x jupyter-server-launch-kernel=
+4. =M-x jupyter-connect-server-repl= (again, select kernel this time)
+5. close the repl but do not shut down kernel
+6. =C-c C-c= on a =BEGIN_SRC jupyter= block
+
+#+begin_src emacs-lisp
+(use-package jupyter
+  :commands (org-babel-execute:jupyter
+             jupyter-connect-server-repl
+             jupyter-server-launch-kernel)
+  :config
+  (with-eval-after-load 'ob-jupyter
+    (setq org-babel-default-header-args:jupyter
+          '((:async . "yes") ;; do not block emacs while executing
+            (:session . "py") ;; give a common name to the shared session
+            (:kernel . "python") ;; use python kernel
+            (:display . "image plain html") ;; fallback in this order
+            (:pandoc . t) ;; convert html back to org mode
+            ))
+    (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
+  )
+#+end_src
+
 *** Kubernetes
 
 K8s mode for editing yaml files.
@@ -5036,13 +5065,14 @@ text and copying to the killring."
 (use-package org
   :custom
   (org-babel-load-languages '((ditaa . t)
-                              (gnuplot .t)
+                              (gnuplot . t)
                               (python . t)
                               (haskell . t)
                               (scheme . t)
                               (js . t)
                               (restclient . t)
                               (shell . t)
+                              (jupyter . t)
                               ))
 
   (python-shell-completion-native-enable nil)
