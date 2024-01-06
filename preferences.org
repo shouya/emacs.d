@@ -5081,6 +5081,13 @@ text and copying to the killring."
   (haskell-program-name "ghci")
 
   :config
+  (with-eval-after-load 'python
+    (setq python-shell-completion-native-enable nil))
+
+  (with-eval-after-load 'haskell-mode
+    (setq haskell-process-type 'stack-ghci)
+    (setq haskell-program-name "ghci"))
+
   (use-package gnuplot :commands gnuplot-mode)
   )
 #+end_src
