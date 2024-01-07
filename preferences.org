@@ -1181,11 +1181,122 @@ National Velocity-like experience with =deft=.
   )
 #+end_src
 
+** Capture templates
+
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :bind ("C-c c" . org-capture)
+  :init
+  (defun shou/org-select-project ()
+    "Prompt for a location to select a headline"
+    (interactive)
+    (let* ((all-headings (-map 'car (org-refile-get-targets "projects.org")))
+           (filtered-headings (--remove (member it '("Chore")) all-headings))
+           (choice (completing-read "Select project: " filtered-headings)))
+      (s-concat "::" choice)))
+
+  (defun shou/org-time-stamp-string ()
+    (s-with (with-temp-buffer (org-time-stamp nil)) (s-chop-prefix "<") (s-chop-suffix ">")))
+
+  :custom
+  (org-capture-templates
+   `(("w" "Work" entry (file+headline "projects.org" "Work")
+      "* TODO %^{Task (Work)}\n:PROPERTIES:\n:ADDED: %U\n:END:\n%?")
+     ("p" "Personal" entry (file+headline "projects.org" "Personal")
+      "* TODO %^{Task (Personal)}\n:PROPERTIES:\n:ADDED: %U\n:END:\n%?")
+     ("v" "Video (<15 min)" entry (file+headline "mencti.org" "Videos (Short)")
+      "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:ADDED: %U\n:END:\n%?")
+     ("V" "Video (>15 min)" entry (file+headline "mencti.org" "Videos (Long)")
+      "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:ADDED: %U\n:END:\n%?")
+     ("a" "Article" entry (file+headline "mencti.org" "Articles")
+      "* TODO %(org-cliplink-capture) %^g\n:PROPERTIES:\n:Effort: %^{prompt|0:10|0:30|1:00|2:00}\n:Added: %U\n:END:\n\n\n%?"
+      )
+     ("c" "Literature" entry (file+headline "mencti.org" "Literature")
+      "* TODO %^{Literature name}\n:PROPERTIES:\n:Added: %U\n:END:\n\n\n%?"
+      )
+     ("l" "Log" entry (file "inbox.org")
+      "* %(shou/org-time-stamp-string)\n:PROPERTIES:\n:Added: %U\n:END:\n\n\n%?"
+      :jump-to-captured t
+      )
+
+     ("d" "Day planning" plain (file+olp+datetree "plan.org")
+      ,(concat ":PROPERTIES:\n:ADDED: %U\n:END:\n"
+               "gunka:\n- [ ]%?\n- [ ]\n"
+               "cilre:\n- [ ]\n- [ ]\n"
+               "chore:\n- [ ] vocab\n- [ ] diary\n"
+               "sevzi:\n- [ ]\n"
+               )
+      :time-prompt t
+      :immediate-finish t
+      :jump-to-captured t
+      )
+
+     ("n" "News" item (file+olp+datetree "nuzba.org")
+      "%^{News item}"
+      :immediate-finish t)
+
+     ("L" "Org protocol link" entry (file+headline "mencti.org" "Captures")
+      "* TODO %:description\n:PROPERTIES:\n:ADDED: %U\n:END:\nSCHEDULED: %t\n%:link\n"
+      :immediate-finish t)
+     )))
+#+END_SRC
+
+** Org-modern
+
+#+begin_src emacs-lisp
+(use-package org-modern
+  :elpaca t
+  :after org
+  :hook (emacs-startup . global-org-modern-mode)
+  :config
+  ;; do not put label to the right
+  (setq org-tags-column 0)
+
+  ;; align agenda tags to the right at 80 column
+  (setq org-agenda-tags-column -80
+        org-agenda-block-separator ?─)
+
+  ;; label should have the same size as normal text
+  ;; as not to screw up table alignment.
+  (set-face-attribute 'org-modern-label nil
+                      :inherit 'fixed-pitch
+                      :height 'unspecified)
+
+  ;; do not replace checkbox
+  (setq org-modern-checkbox nil)
+
+  ;; the original level-2 star doesn't look good in my font.
+  (setq org-modern-star '("◉" " ○" "  ◆" "   ◇" "    ▶" "     ▷"))
+
+  ;; task completion progress indicator
+  ;; or "●"
+  (setq org-modern-progress '("○" "◔" "◑" "◕" "✓"))
+
+  ;; do not prettify block names
+  (setq org-modern-block-name nil)
+
+  ;; do not prettify keywords like (title, result, etc)
+  (setq org-modern-keyword nil)
+
+  ;; do not prettify tables
+  (setq org-modern-table nil)
+
+  ;; customize the list bullets
+  (setq org-modern-list '((?+ . "◦")
+                          (?- . "•")
+                          (?* . "‣")))
+
+  ;; make inactive date appear less contrastive than active date
+  (set-face-attribute 'org-modern-date-inactive nil
+                      :foreground "gray60"))
+#+end_src
+
 * Programming features
 
 ** Source control
 
 *** Magit
+
 #+begin_src emacs-lisp
 (use-package magit
   :elpaca t
@@ -2068,7 +2179,6 @@ Configure the built-in tree sit modes.
   (add-hook 'csv-mode-hook 'csv-align-mode))
 #+end_src
 
-
 ** Declarative formats
 
 *** Dockerfile
@@ -2228,10 +2338,40 @@ Built-in rust mode:
   (haskell-process-auto-import-modules t)
 )
 #+end_src
+
 * Troubleshooting
 
-Startup benchmarking:
+** Startup benchmarking
 
-#+begin_src emacs-lisp
-(use-package esup :elpaca t :disabled)
+#+begin_src emacs-lisp :tangle no
+(use-package esup :elpaca t)
+#+end_src
+
+** Scrolling benchmarking
+
+#+begin_src emacs-lisp :tangle no
+(defun scroll-up-benchmark ()
+  (interactive)
+  (end-of-buffer)
+  (redisplay)
+  (let ((oldgc gcs-done)
+        (oldtime (float-time)))
+    (condition-case nil (while t (previous-line) (redisplay))
+      (error (message "GCs: %d Elapsed time: %f seconds"
+                      (- gcs-done oldgc) (- (float-time) oldtime))))))
+
+(defun scroll-up-profile ()
+  (interactive)
+  (end-of-buffer)
+  (redisplay)
+  (when (fboundp 'profiler-stop)
+    (profiler-stop))
+  (profiler-start 'cpu)
+  (let ((oldgc gcs-done)
+        (oldtime (float-time)))
+    (condition-case nil (while t (previous-line) (redisplay))
+      (error (message "GCs: %d Elapsed time: %f seconds"
+                        (- gcs-done oldgc) (- (float-time) oldtime))))
+    (profiler-report)
+    (profiler-stop)))
 #+end_src
