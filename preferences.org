@@ -2223,7 +2223,7 @@ Configure the built-in tree sit modes.
      ;; do not enable copilot when i'm editing wiki
      (derived-mode-p 'mediawiki-mode)
      ;; do not enable copilot on files that may contain secrets
-     (string-match-p "\\(?:secret\\|cred\\|hidden\\|private\\)"
+     (string-match-p "\\(?:secret\\|cred\\|hidden\\|private|auth\\)"
                      (shou/buffer-file-name))
      ;; do not enable copilot on files in tmp/cu
      (string-match-p "tmp/cu" (shou/buffer-file-name))
@@ -2293,6 +2293,24 @@ Configure the built-in tree sit modes.
   (defun shou/ignore-copilot-indent-warning ()
     (setq-local copilot--indent-warning-printed-p t))
   (add-hook 'copilot-mode-hook #'shou/ignore-copilot-indent-warning))
+#+end_src
+
+** gptel
+
+Press =C-c <RET>= to send your input.
+
+#+begin_src emacs-lisp
+(use-package gptel
+  :elpaca t
+  :commands (gptel-send gptel gptel-menu gptel-set-topic)
+  :custom
+  (gptel-default-mode 'org-mode)
+  :config
+  ;; auto scroll as the response comes in
+  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
+  ;; move cursor to the end of response
+  (add-hook 'gptel-post-response-hook 'gptel-end-of-response)
+  )
 #+end_src
 
 * Languages and modes
