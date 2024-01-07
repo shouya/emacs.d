@@ -699,12 +699,13 @@ Show icon for completion:
 (use-package kind-icon
   :after corfu
   :elpaca t
-  :config
+  :functions (kind-icon-margin-formatter)
+  :init
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-  (setq kind-icon-default-face 'corfu-default)
-  (setq kind-icon-default-style
-        '(:padding -1.1 :stroke 0 :margin 0 :radius 0 :height 0.4 :scale 1))
-  )
+  :custom
+  (kind-icon-default-face 'corfu-default)
+  (kind-icon-default-style
+   '(:padding -1.1 :stroke 0 :margin 0 :radius 0 :height 0.4 :scale 1)))
 #+end_src
 
 Extra completion:
