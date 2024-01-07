@@ -252,8 +252,6 @@ Also, do not show splash screen.
   (savehist-mode 1))
 #+end_src
 
-* General behavior
-
 ** Sandbox mode
 
 #+begin_src emacs-lisp
@@ -271,13 +269,203 @@ Also, do not show splash screen.
   )
 #+end_src
 
+* UI
+
+** Tweak main UI
+
+Show a simpler title.
+
+#+begin_src emacs-lisp
+(setq frame-title-format '("%b - %m @ Emacs"))
+#+end_src
+
+Never show graphical dialog box.
+
+#+begin_src emacs-lisp
+(setq use-dialog-box nil)
+#+end_src
+
+** Color theme
+
+#+begin_src emacs-lisp
+;; make src block stand out
+(setq modus-themes-org-blocks 'gray-background)
+;; allow italic constructs such as comments and helper messages
+(setq modus-themes-italic-constructs t)
+
+(load-theme 'modus-operandi t nil)
+(add-hook 'emacs-startup-hook
+	  (lambda () (enable-theme 'modus-operandi)))
+#+end_src
+
+** Fonts
+
+#+begin_src emacs-lisp
+(add-hook 'emacs-startup-hook
+	  (lambda () (set-frame-font "JetBrains Mono ExtraLight")))
+(set-face-attribute 'default nil :family "JetBrains Mono ExtraLight" :height 130)
+#+end_src
+
+** Icon fonts
+
+In order for the icons to work it is very important that you install
+the Resource Fonts included in this package, they are available in the
+fonts directory. You can also install the latest fonts for this
+package in the (guessed?) based on the OS by calling the following
+command:
+
+=M-x all-the-icons-install-fonts=
+
+#+begin_src emacs-lisp
+(use-package all-the-icons
+  :elpaca t
+  :commands all-the-icons-install-fonts)
+#+end_src
+
+** Modeline
+
+#+begin_src emacs-lisp
+(use-package doom-modeline
+  :elpaca t
+  :hook (emacs-startup . doom-modeline-mode)
+  :custom
+  (doom-modeline-height 30)
+  (doom-modeline-buffer-encoding nil)
+  (doom-modeline-env-version nil)
+  (doom-modeline-lsp t)
+  (doom-modeline-modal-icon nil)
+  (doom-modeline-buffer-state-icon t)
+  (doom-modeline-project-detection 'projectile)
+  (doom-modeline-persp-name nil)
+  (doom-modeline-mu4e t)
+  ;; do not use project relative path
+  (doom-modeline-buffer-file-name-style 'buffer-name)
+
+  :config
+  (doom-modeline-mode 1)
+  (set-face-attribute 'mode-line nil :height 130)
+  (set-face-attribute 'mode-line-inactive nil :height 130))
+#+end_src
+
+** Highlight uncommitted changes
+
+#+begin_src emacs-lisp
+(use-package diff-hl
+  :elpaca t
+  :hook (emacs-startup . global-diff-hl-mode))
+#+end_src
+
+** Show matching parenthesis
+
+The default setting highlights only the parenthesis. =mix= makes it
+highlight the entired expression enclosed by the parenthesis if the
+other parenthesis is beyond visible area.
+
+#+begin_src emacs-lisp
+(setq show-paren-style 'mixed)
+#+end_src
+
+** Automatic window reisizing
+
+#+begin_src emacs-lisp
+(use-package golden-ratio
+  :elpaca (:host github :repo "shouya/golden-ratio.el")
+  :hook (emacs-startup . golden-ratio-mode)
+  :custom
+  (golden-ratio-exclude-buffer-names '("*Ediff Control Panel*"))
+  (golden-ratio-exclude-buffer-regexp '("^\\*dape-"))
+  (golden-ratio-exclude-modes '(treemacs-mode ediff-mode))
+  :config
+  ;; Instead of each window occupies 0.618 of the screen, makes it
+  ;; occupy half of the screen. This prevents unnecessary resizing
+  ;; when two side-by-side windows are open.
+  (setq golden-ratio--value 2.0)
+
+  ;; avoid resizing which-key buffer
+  (with-eval-after-load 'which-key
+    (add-to-list 'golden-ratio-inhibit-functions
+                 (lambda ()
+                   (and which-key--buffer
+                        (window-live-p (get-buffer-window which-key--buffer))))))
+  )
+#+end_src
+
+** Transpose window layout
+
+#+begin_src emacs-lisp
+(use-package transpose-frame
+  :elpaca t
+  :init
+  ;; window-redisplay-end-trigger was obsolete and removed from latest
+  ;; emacs 29 snapshot.
+  ;;
+  ;; I fset these functions to ignore so transpose-frame doesn't break.
+  (when (not (fboundp 'window-redisplay-end-trigger))
+    (fset 'window-redisplay-end-trigger 'ignore)
+    (fset 'set-window-redisplay-end-trigger 'ignore))
+
+  :commands (transpose-frame flip-frame)
+  :bind ("C-x C-t" . transpose-frame)
+  )
+#+end_src
+
+** Popup window
+
+Show popup window in desired styles.
+
+#+begin_src emacs-lisp
+(use-package popwin
+  :elpaca t
+  :hook (emacs-startup . popwin-mode)
+  :config
+  (push '("*elixir-format-errors*" :noselect t) popwin:special-display-config)
+  (push "*idris-repl*" popwin:special-display-config)
+  (push '("*idris-holes*" :noselect t) popwin:special-display-config)
+  (push '("*Help*" :stick t) popwin:special-display-config)
+  (push "*Warnings*" popwin:special-display-config)
+  (push "*rustfmt*" popwin:special-display-config)
+  (push "*explain-pause-log*" popwin:special-display-config)
+  (push "*explain-pause-profiles*" popwin:special-display-config)
+  (push '("*Flycheck errors*" :position bottom :stick t) popwin:special-display-config)
+  (push '(cargo-process-mode :position bottom :stick t :height 10) popwin:special-display-config)
+)
+#+end_src
+
+** Show page break line (=^L=)
+
+#+begin_src emacs-lisp
+(use-package page-break-lines
+  :elpaca t
+  :hook (emacs-startup . global-page-break-lines-mode))
+#+end_src
+
+** Line wrap
+
+Enable line wrap by default:
+
+#+begin_src emacs-lisp
+(add-hook 'text-mode-hook 'visual-line-mode)
+#+end_src
+
 * Editing
-** Remove trailing whitespace on save
+
+** Behavior tweaks
+*** Remove trailing whitespace on save
 
 #+begin_src emacs-lisp
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+end_src
 
+*** Scroll other window with M-up/down
+
+Stolen from https://stackoverflow.com/a/45363946/1232832.
+
+#+begin_src emacs-lisp
+(bind-key "M-<up>"
+  #'(lambda() (interactive) (scroll-other-window -1)))
+(bind-key "M-<down>"
+  #'(lambda() (interactive) (scroll-other-window 1)))
+#+end_src
 ** Minibuffer completion
 
 Show vertical completion for minibuffer options:
@@ -698,192 +886,26 @@ Pure keyboard context menu.
   )
 #+end_src
 
-** Scroll other window with M-up/down
+** Pair management
 
-Stolen from https://stackoverflow.com/a/45363946/1232832.
-
-#+begin_src emacs-lisp
-(bind-key "M-<up>"
-  #'(lambda() (interactive) (scroll-other-window -1)))
-(bind-key "M-<down>"
-  #'(lambda() (interactive) (scroll-other-window 1)))
-#+end_src
-* UI
-
-** Tweak main UI
-
-Show a simpler title.
+I use =smartparens= package for (automatic) pair management.
 
 #+begin_src emacs-lisp
-(setq frame-title-format '("%b - %m @ Emacs"))
-#+end_src
-
-Never show graphical dialog box.
-
-#+begin_src emacs-lisp
-(setq use-dialog-box nil)
-#+end_src
-
-** Color theme
-
-#+begin_src emacs-lisp
-;; make src block stand out
-(setq modus-themes-org-blocks 'gray-background)
-;; allow italic constructs such as comments and helper messages
-(setq modus-themes-italic-constructs t)
-
-(load-theme 'modus-operandi t nil)
-(add-hook 'emacs-startup-hook
-	  (lambda () (enable-theme 'modus-operandi)))
-#+end_src
-
-** Fonts
-
-#+begin_src emacs-lisp
-(add-hook 'emacs-startup-hook
-	  (lambda () (set-frame-font "JetBrains Mono ExtraLight")))
-(set-face-attribute 'default nil :family "JetBrains Mono ExtraLight" :height 130)
-#+end_src
-
-** Icon fonts
-
-In order for the icons to work it is very important that you install
-the Resource Fonts included in this package, they are available in the
-fonts directory. You can also install the latest fonts for this
-package in the (guessed?) based on the OS by calling the following
-command:
-
-=M-x all-the-icons-install-fonts=
-
-#+begin_src emacs-lisp
-(use-package all-the-icons
-  :elpaca t
-  :commands all-the-icons-install-fonts)
-#+end_src
-
-** Modeline
-
-#+begin_src emacs-lisp
-(use-package doom-modeline
-  :elpaca t
-  :hook (emacs-startup . doom-modeline-mode)
+(use-package smartparens-mode
+  :elpaca smartparens
+  :bind (:map smartparens-mode-map
+              ("M-r" . sp-rewrap-sexp)
+              ("M-<down>" . sp-splice-sexp)
+              ("M-S-<right>" . sp-forward-slurp-sexp)
+              ("M-S-<left>" . sp-backward-barf-sexp)
+              ("M-<right>" . sp-forward-sexp)
+              ("M-<left>" . sp-backward-sexp))
+  :hook prog-mode
   :custom
-  (doom-modeline-height 30)
-  (doom-modeline-buffer-encoding nil)
-  (doom-modeline-env-version nil)
-  (doom-modeline-lsp t)
-  (doom-modeline-modal-icon nil)
-  (doom-modeline-buffer-state-icon t)
-  (doom-modeline-project-detection 'projectile)
-  (doom-modeline-persp-name nil)
-  (doom-modeline-mu4e t)
-  ;; do not use project relative path
-  (doom-modeline-buffer-file-name-style 'buffer-name)
-
+  (sp-autodelete-pair nil)
+  (sp-autoinsert-pair nil)
   :config
-  (doom-modeline-mode 1)
-  (set-face-attribute 'mode-line nil :height 130)
-  (set-face-attribute 'mode-line-inactive nil :height 130))
-#+end_src
-
-** Highlight uncommitted changes
-
-#+begin_src emacs-lisp
-(use-package diff-hl
-  :elpaca t
-  :hook (emacs-startup . global-diff-hl-mode))
-#+end_src
-
-** Show matching parenthesis
-
-The default setting highlights only the parenthesis. =mix= makes it
-highlight the entired expression enclosed by the parenthesis if the
-other parenthesis is beyond visible area.
-
-#+begin_src emacs-lisp
-(setq show-paren-style 'mixed)
-#+end_src
-
-** Automatic window reisizing
-
-#+begin_src emacs-lisp
-(use-package golden-ratio
-  :elpaca (:host github :repo "shouya/golden-ratio.el")
-  :hook (emacs-startup . golden-ratio-mode)
-  :custom
-  (golden-ratio-exclude-buffer-names '("*Ediff Control Panel*"))
-  (golden-ratio-exclude-buffer-regexp '("^\\*dape-"))
-  (golden-ratio-exclude-modes '(treemacs-mode ediff-mode))
-  :config
-  ;; Instead of each window occupies 0.618 of the screen, makes it
-  ;; occupy half of the screen. This prevents unnecessary resizing
-  ;; when two side-by-side windows are open.
-  (setq golden-ratio--value 2.0)
-
-  ;; avoid resizing which-key buffer
-  (with-eval-after-load 'which-key
-    (add-to-list 'golden-ratio-inhibit-functions
-                 (lambda ()
-                   (and which-key--buffer
-                        (window-live-p (get-buffer-window which-key--buffer))))))
-  )
-#+end_src
-
-** Transpose window layout
-
-#+begin_src emacs-lisp
-(use-package transpose-frame
-  :elpaca t
-  :init
-  ;; window-redisplay-end-trigger was obsolete and removed from latest
-  ;; emacs 29 snapshot.
-  ;;
-  ;; I fset these functions to ignore so transpose-frame doesn't break.
-  (when (not (fboundp 'window-redisplay-end-trigger))
-    (fset 'window-redisplay-end-trigger 'ignore)
-    (fset 'set-window-redisplay-end-trigger 'ignore))
-
-  :commands (transpose-frame flip-frame)
-  :bind ("C-x C-t" . transpose-frame)
-  )
-#+end_src
-
-** Popup window
-
-Show popup window in desired styles.
-
-#+begin_src emacs-lisp
-(use-package popwin
-  :elpaca t
-  :hook (emacs-startup . popwin-mode)
-  :config
-  (push '("*elixir-format-errors*" :noselect t) popwin:special-display-config)
-  (push "*idris-repl*" popwin:special-display-config)
-  (push '("*idris-holes*" :noselect t) popwin:special-display-config)
-  (push '("*Help*" :stick t) popwin:special-display-config)
-  (push "*Warnings*" popwin:special-display-config)
-  (push "*rustfmt*" popwin:special-display-config)
-  (push "*explain-pause-log*" popwin:special-display-config)
-  (push "*explain-pause-profiles*" popwin:special-display-config)
-  (push '("*Flycheck errors*" :position bottom :stick t) popwin:special-display-config)
-  (push '(cargo-process-mode :position bottom :stick t :height 10) popwin:special-display-config)
-)
-#+end_src
-
-** Show page break line (=^L=)
-
-#+begin_src emacs-lisp
-(use-package page-break-lines
-  :elpaca t
-  :hook (emacs-startup . global-page-break-lines-mode))
-#+end_src
-
-** Line wrap
-
-Enable line wrap by default:
-
-#+begin_src emacs-lisp
-(add-hook 'text-mode-hook 'visual-line-mode)
+  (require 'smartparens-config))
 #+end_src
 
 * File management
@@ -1232,10 +1254,665 @@ Delta supports highlighting language-syntax, within-line diff, etc.
 ** Project management
 
 #+begin_src emacs-lisp
+(use-package projectile
+  :elpaca t
+  :custom
+  (projectile-completion-system #'completing-read)
+  (projectile-enable-caching nil)
+  (projectile-indexing-method 'alien)
+  (projectile-globally-ignored-file-suffixes '("beam"))
+  (projectile-create-missing-test-files t)
+  ;; speed up tramp (https://emacs.stackexchange.com/questions/17543/tramp-mode-is-much-slower-than-using-terminal-to-ssh)
+  (projectile-mode-line "P")
+  (projectile-switch-project-action 'shou/action-after-switch-project)
+  (projectile-track-known-projects-automatically nil)
 
+  :hook (after-init . projectile-mode)
+
+  :bind-keymap
+  ("M-`" . projectile-command-map)
+
+  :config
+  (setq projectile-globally-ignored-directories
+        (append projectile-globally-ignored-directories
+                '(".elixir_ls" "_build")))
+
+  ;; Elixir: jump to *_test.exs instead of *_test.ex
+  (defun shou/fix-exs-test-file-name (name)
+    (cond
+     ((string-suffix-p "_test.ex" name) (concat name "s"))
+     (t name)))
+
+  (advice-add #'projectile--test-name-for-impl-name
+              :filter-return
+              #'shou/fix-exs-test-file-name)
+
+  (defun shou/action-after-switch-project ()
+    "open magit or prompt for find file"
+    (if (and (fboundp 'magit-git-repo-p)
+             (magit-git-repo-p default-directory))
+        (magit)
+        (projectile-find-file)))
+  )
 #+end_src
 
+*** Find marker file
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'projectile
+  (defun shou/projectile-find-marker-file ()
+    "Find the marker file (Cargo.toml, mix.exs, etc) for the current project."
+    (interactive)
+    (if-let* ((this-file (buffer-file-name))
+              (marker-files (projectile-project-type-attribute
+                             (projectile-project-type)
+                             'marker-files))
+              (get-target-marker-file
+               (lambda (f)
+		 (when-let* ((dir (locate-dominating-file default-directory f))
+                             (full-path (concat dir f))
+                             (_ (not (f-same-p this-file full-path))))
+                   full-path)))
+              (marker-file (seq-find get-target-marker-file marker-files))
+              (target-marker-file (funcall get-target-marker-file marker-file)))
+	(find-file target-marker-file)
+      (if-let* ((default-directory (f-dirname default-directory))
+		(parent-marker-file (seq-find get-target-marker-file marker-files))
+		(target-parent-marker-file (funcall get-target-marker-file parent-marker-file)))
+          (find-file target-parent-marker-file)
+	(message "No marker file found"))))
+
+  (bind-key "m" 'shou/projectile-find-marker-file projectile-command-map))
+#+end_src
+
+*** ripgrep (=rg=)
+
+I don’t use =deadgrep= any more. =rg= + =wgrep= is better in terms of speed and the display is nicer.
+
+Few shortcuts:
+
+- press =C-c s s= to search current word
+- on search window, =m= to bring up the menu (refine search, change dir, etc)
+- on search window, =C-x C-q= to enable =wgrep= editing mode
+
+#+begin_src emacs-lisp
+(use-package rg
+  :elpaca t
+  :bind (("C-c s s" . rg-dwim)
+         ("C-c s p" . rg-project)
+         ("C-c s r" . rg)
+         ("C-c s t" . rg-literal)
+         :map rg-mode-map
+         ("C-x C-q" . wgrep-change-to-wgrep-mode))
+  :custom
+  ;; find when use
+  (wgrep-auto-save-buffer t)
+  ;; trade parallelism for determinism in the ordering
+  (rg-command-line-flags '("-j1"))
+
+  :config
+  (defun shou/switch-to-rg-buffer (&rest args)
+    (switch-to-buffer-other-window "*rg*"))
+  (advice-add 'rg-run :after #'shou/switch-to-rg-buffer)
+  )
+#+end_src
+
+*** Load editor config
+
+Mostly to load indentation settings.
+
+#+begin_src emacs-lisp
+(use-package editorconfig
+  :hook (prog-mode . editorconfig-mode)
+  :elpaca t)
+#+end_src
+
+*** Guess tab size
+
+#+begin_src emacs-lisp
+(use-package dtrt-indent
+  :hook (prog-mode . dtrt-indent-mode)
+  :elpaca t
+  :config
+  ;; aliases that I sometimes type when I forget how to spell "dtrt"
+  (defalias 'detect-indentation 'dtrt-indent-mode)
+  (defalias 'detect-tab-size 'dtrt-indent-mode))
+#+end_src
+
+
 ** Language server protocol (LSP)
+
+#+begin_src emacs-lisp
+(use-package lsp-mode
+  :elpaca t
+  :init
+  ;; to fix a weird bug
+  (setq lsp-keymap-prefix "M-l")
+
+  :commands (lsp lsp-mode lsp-deferred)
+  :bind
+  (:map lsp-mode-map
+        ("C-c C-f" . lsp-format-buffer)
+        ("M-," . xref-find-definitions)
+        ("M-." . xref-find-definitions-other-window))
+
+  :bind
+  (:map lsp-command-map
+        ("l" . lsp-inlay-hints-mode))
+
+  :bind-keymap
+  ("M-l" . lsp-command-map)
+
+  :custom
+  ;; use Corfu!
+  (lsp-completion-provider :none)
+
+  ;; 1 sec or fail
+  (lsp-response-timeout 1.0)
+
+  ;; do not expect yasnippet is installed
+  (lsp-enable-snippet nil)
+
+  ;; place lens above a line instead at the end of a line
+  (lsp-lens-place-position 'above-line)
+
+  ;; performance tuning
+  (read-process-output-max (* 1 1024 1024)) ;; 20mb
+
+  ;; only sort by position
+  (lsp-imenu-sort-methods '(position kind name))
+  (lsp-imenu-show-container-name t)
+
+  ;; do not show breadcrumb
+  (lsp-headerline-breadcrumb-enable nil)
+
+  ;; do not auto configure dap-mode unless I explicitly asked for it.
+  ;; otherwise it starts dap-tooltip-mode which interfere with the corfu popup.
+  (lsp-enable-dap-auto-configure nil)
+
+  ;; make inlay hint ready for toggle with lsp-inlay-hint-mode
+  (lsp-inlay-hint-enable nil)
+
+  ;; only load clients that I actually need
+  (lsp-client-packages
+   '(lsp-elixir
+     lsp-rust
+     lsp-pylsp
+     lsp-javascript
+     lsp-json))
+
+  ;; do not execute single action automatically. let me see what actions are available.
+  (lsp-auto-execute-action nil)
+
+  :hook
+  (lsp-completion-mode . shou/lsp-mode-setup-completion)
+
+  :config
+  ;; see https://github.com/minad/corfu/wiki#basic-example-configuration-with-orderless
+  (defun shou/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless))) ;; Configure orderless
+
+  ;; exclude watch files for elixir projects
+  (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.elixir_ls")
+  (add-to-list 'lsp-file-watch-ignored "\\.beam\\'")
+  (add-to-list 'lsp-file-watch-ignored "[/\\\\]_build\\'")
+  (add-to-list 'lsp-file-watch-ignored "[/\\\\]deps\\'")
+
+  ;; override default lsp-xref backend
+  (add-hook 'lsp-mode-hook 'insert-dumb-jump-to-xref)
+
+  (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
+
+  ;; disable lsp-modeline-diagnostics-mode
+  (add-hook 'lsp-mode-hook (lambda () (lsp-modeline-diagnostics-mode -1)))
+
+  ;; conflict with projectile prefix
+  (unbind-key "M-p" lsp-signature-mode-map)
+  ;; unbind it as well as I never bother using it.
+  (unbind-key "M-n" lsp-signature-mode-map)
+
+  ;; fallback to dumb-jump if lsp can't find defn
+  ;; copied from https://github.com/hlissner/doom-emacs/issues/4662#issuecomment-780911875
+  (defun lsp-find-definition-or-dumb-jump ()
+    (interactive)
+    (let ((loc (lsp-request "textDocument/definition"
+                            (lsp--text-document-position-params))))
+      (if (seq-empty-p loc)
+          (lsp-show-xrefs (lsp--locations-to-xref-items loc) nil nil)
+        (dumb-jump-go))))
+
+  ;; See https://github.com/minad/corfu/issues/188#issuecomment-1148658471
+  (with-eval-after-load 'cape
+    (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible))
+
+  (defun shou/add-lsp-next-checker (checker)
+    (setq shou/flycheck-local-cache
+          `((lsp . ((next-checkers . (,checker)))))))
+  )
+#+end_src
+** Terminal and shell
+*** Eshell
+
+#+begin_src emacs-lisp
+(use-package eshell
+  :bind
+  ("C-x e" . eshell)
+
+  :custom
+  (eshell-history-size 10240)
+  (eshell-last-dir-ring-size 512)
+
+  :preface
+  (defun shou/def-eshell-alias (name def)
+    (when (not (equal (eshell-lookup-alias name)
+                      `(,name ,def)))
+      (eshell/alias name def)))
+
+  :config
+  (setenv "KUBECONFIG"
+          (s-join ":" (-map 'f-expand
+                            (cons "~/.kube/config" (f-glob "~/.kube/config.d/*")))))
+
+  (defun shou/eshell-insert-history-element ()
+    (interactive)
+    (insert (completing-read "Search history: " (ring-elements eshell-history-ring))))
+
+  (defun shou/eshell-insert-arguments-from-previous-command ()
+    "Bring up the arguments from the previous command. Similar to M-. in shell."
+    (interactive)
+    (let ((begin))
+      (save-excursion
+		    (eshell-previous-prompt 1)
+        ;; to ensure the cursor lands on the beginning of word
+        (eshell-forward-argument 1)
+        (eshell-forward-argument 1)
+        (eshell-backward-argument 1)
+		    (setq begin (point))
+        (end-of-line)
+        (kill-ring-save begin (point)))
+      (yank)))
+
+  (defun shou/eshell-customization ()
+    ;; use the cape's file completion instead of the default
+    ;; pcomplete's.
+    (make-local-variable 'completion-at-point-functions)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+
+    ;; colorize command line tool outputs
+    ;; stolen from https://old.reddit.com/r/emacs/comments/b6n3t8/what_would_it_take_to_get_terminal_colors_in/
+    (setenv "TERM" "xterm-256color")
+
+    ;; bash-like history search
+    (bind-key "M-r" #'shou/eshell-insert-history-element eshell-mode-map)
+    (bind-key "M-r" #'shou/eshell-insert-history-element eshell-hist-mode-map)
+    (bind-key "M-." #'shou/eshell-insert-arguments-from-previous-command eshell-mode-map)
+
+    ;; eshell-lookup-alias is defined buffer-locally
+    (shou/def-eshell-alias "ll" "ls -al $*")
+    (shou/def-eshell-alias "k" "kubectl $*")
+    (shou/def-eshell-alias "z" "kubectl $*"))
+
+  (add-hook 'eshell-mode-hook #'shou/eshell-customization)
+
+  ;; eshell aliases
+  (fset 'eshell/vi #'find-file)
+  (fset 'eshell/ff #'find-file)
+
+  (defun eshell/z (&optional regexp)
+    "fasd-like cd"
+    (if (not regexp)
+        (eshell/cd "=")
+      (eshell/cd (format "=%s" regexp))))
+  )
+#+end_src
+
+*** Enhanced shell command completion
+
+Add more command completions for various command line utilities.
+
+#+begin_src emacs-lisp
+(use-package pcmpl-args
+  :elpaca t
+  :after eshell)
+#+end_src
+
+*** Jump to current eshell instance
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'eshell
+  (defun shou/advice-eshell (orig-fun &rest args)
+    "Advice to make `eshell' reuse existing eshell for the same directory."
+    (let* ((eshell-buffers (seq-filter
+                            (lambda (b)
+                              (eq (buffer-local-value 'major-mode b) 'eshell-mode))
+                            (buffer-list)))
+           (eshell-buffer (seq-find
+                           (lambda (b)
+                             (string= (buffer-local-value 'default-directory b)
+                                      default-directory))
+                           eshell-buffers)))
+      (if eshell-buffer
+          (let ((eshell-buffer-name (buffer-name eshell-buffer)))
+            (apply orig-fun args))
+	(apply orig-fun args))))
+
+  (advice-add 'eshell :around #'shou/advice-eshell))
+#+end_src
+
+*** Terminal
+
+Some programs requires a more POSIX compatible terminal software. I use =eat= for this.
+
+#+begin_src emacs-lisp
+(use-package eat
+  :elpaca '(eat :type git
+                  :host codeberg
+                  :repo "akib/emacs-eat"
+                  :files ("*.el" ("term" "term/*.el") "*.texi"
+	                        "*.ti" ("terminfo/e" "terminfo/e/*")
+	                        ("terminfo/65" "terminfo/65/*")
+	                        ("integration" "integration/*")
+	                        (:exclude ".dir-locals.el" "*-tests.el")))
+  :commands (eat eat-eshell-mode eat-project)
+  :after projectile
+  :bind
+  ("C-x E" . eat)
+  (:map projectile-command-map
+   ("x E" . shou/eat-projectile))
+  :hook
+  (eshell-load . eat-eshell-mode)
+  (eshell-load . eat-eshell-visual-command-mode)
+  :custom
+  ;; unlimited scrollback
+  (eat-term-scrollback-size nil)
+  :config
+  (defun shou/eat-projectile (arg)
+    (interactive "P")
+    (require 'projectile)
+    (let ((project (projectile-acquire-root)))
+      (projectile-with-default-dir project
+        (let ((eat-buffer-name
+               (projectile-generate-process-name "eat" arg project)))
+          (eat nil arg)))))
+
+  ;; allow switching file via projectile (M-`)
+  (add-to-list 'eat-semi-char-non-bound-keys [?\e ?`])
+  (add-to-list 'eat-semi-char-non-bound-keys [C-n])
+  (add-to-list 'eat-semi-char-non-bound-keys [C-p])
+  (eat-update-semi-char-mode-map))
+#+end_src
+
+*** Send to external tmux session
+
+Use commands like =emamux:send-buffer=.
+
+#+begin_src emacs-lisp
+(use-package emamux
+  :elpaca t
+  :commands (emamux:send-buffer emamux:send-region))
+#+end_src
+
+** Jump to definition
+
+I use =dumb-jump=, which works out of the box for many languages. I
+prioritize =lsp-mode=’s find-definition function if it works,
+otherwise fallback to =dumb-jump=.
+
+#+begin_src emacs-lisp
+(use-package dumb-jump
+  :commands (dumb-jump-xref-activate)
+  :custom
+  (dumb-jump-selector 'completing-read)
+  (dumb-jump-force-searcher 'rg)
+  ;; Defaults to --pcre2. ripgrep's pcre is an opt-in feature that's not enabled by default.
+  (dumb-jump-rg-search-args "--auto-hybrid-regex")
+  :config
+  (remove-hook 'xref-backend-functions #'etags--xref-backend)
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+  )
+
+(with-eval-after-load 'xref
+  (bind-key* "M-," #'xref-find-definitions)
+  (bind-key* "M-." #'xref-find-definitions-other-window)
+  (bind-key* "M-?" #'xref-find-references))
+#+end_src
+
+** On-the-fly check
+
+#+begin_src emacs-lisp
+(use-package flycheck
+  :elpaca t
+  :commands flycheck-mode
+  :hook (prog-mode . flycheck-mode)
+
+  :preface
+  ;; adapted from
+  ;; https://github.com/flycheck/flycheck/issues/1762#issuecomment-750458442
+  (defvar-local shou/flycheck-local-cache nil)
+
+  (defun shou/flycheck-checker-get (fn checker property)
+    (or (alist-get property (alist-get checker shou/flycheck-local-cache))
+        (funcall fn checker property)))
+
+  (advice-add 'flycheck-checker-get :around 'shou/flycheck-checker-get)
+
+  :custom
+  ;; do not recheck syntax on newline or on save, which can result in
+  ;; perceivable lagging.
+  (flycheck-check-syntax-automatically '(mode-enable idle-change))
+  ;; only check syntax after 4 seconds of idling
+  (flycheck-idle-change-delay 4)
+
+  :config
+  ;; add frequent typo
+  (define-key flycheck-mode-map (kbd "C-c 1") flycheck-command-map))
+#+end_src
+
+** Sideline
+
+#+begin_src emacs-lisp
+(use-package sideline
+  :elpaca t
+  :custom
+  ;; show sideline immediately
+  (sideline-delay 0)
+  :hook
+  (flycheck-mode . sideline-mode)
+  (lsp-mode . sideline-mode)
+  :config
+  (setq sideline-backends-right '(sideline-lsp sideline-flycheck))
+  )
+
+(use-package sideline-flycheck
+  :elpaca t
+  :after (flycheck sideline)
+  :hook (flycheck-mode . sideline-flycheck-setup))
+(use-package sideline-lsp
+  :elpaca t
+  :after flycheck lsp-mode)
+#+end_src
+
+** Highlight all occurrences of word at point
+
+#+begin_src emacs-lisp
+(use-package idle-highlight-mode
+  :elpaca t
+  :hook (prog-mode . idle-highlight-mode)
+  :custom
+  (idle-highlight-idle-time 0.5))
+#+end_src
+
+** Compilation mode
+
+#+begin_src emacs-lisp
+(setq compilation-scroll-output 'first-error)
+
+;; colorize using ansi color
+(require 'ansi-color)
+(add-hook 'compilation-filter-hook
+          (lambda ()
+            (let ((inhibit-read-only t))
+              (ansi-color-apply-on-region compilation-filter-start (point)))))
+#+end_src
+
+** Code formatting
+
+#+begin_src emacs-lisp
+(use-package apheleia
+  :elpaca t
+  :config
+  (add-to-list 'apheleia-formatters '(mix . ("mix" "format" "-")))
+  (add-to-list 'apheleia-formatters '(prettier . (npx "prettier" "--stdin-filepath" filepath)))
+  (add-to-list 'apheleia-formatters '(rustfmt . ("rustfmt" "--quiet" "--emit" "stdout")))
+
+  (add-to-list 'apheleia-mode-alist '(elixir-mode . mix))
+
+  ;; See https://github.com/raxod502/apheleia/issues/30
+  (defun shou/fix-apheleia-project-dir (orig-fn &rest args)
+    (let ((project (project-current)))
+      (if (not (null project))
+          (let ((default-directory (projectile-project-root))) (apply orig-fn args))
+        (apply orig-fn args))))
+
+  (advice-add 'apheleia-format-buffer :around #'shou/fix-apheleia-project-dir)
+
+  ;; sometimes apheleia erase the whole buffer, which is pretty annoying.
+  ;; fix it by detecting this scenario and simply doing no-op
+  (defun shou/fix-apheleia-accidental-deletion
+      (orig-fn old-buffer new-buffer &rest rest)
+    (if (and (=  0 (buffer-size new-buffer))
+             (/= 0 (buffer-size old-buffer)))
+        ;; do not override anything
+        nil
+        (apply orig-fn old-buffer new-buffer rest)))
+
+  (advice-add 'apheleia--create-rcs-patch :around #'shou/fix-apheleia-accidental-deletion)
+
+  ;; used in hooks to turn off apheleia mode for some modes
+  (defun shou/disable-apheleia-mode nil (apheleia-mode -1))
+
+  (apheleia-global-mode 1))
+#+end_src
+
+* AI features
+
+** copilot.el
+
+#+begin_src emacs-lisp
+(use-package copilot
+  :elpaca (:host github :repo "raymond-w-ko/copilot.el" :files ("dist" "*.el"))
+  ;; :elpaca (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :commands (copilot-mode copilot-clear-overlay copilot-complete copilot-diagnose)
+  :custom
+  ;; enable logging (max size: 10000)
+  (copilot-log-max 10000)
+  (copilot-idle-delay 0.3)
+  ;; (copilot-network-proxy '(:host "127.0.0.1" :port 8888))
+  ;; no warning if mode-specific offset cannot be found
+  (copilot-indent-warning-suppress t)
+
+  :init
+  ;; keys bind to copilot-completion-map
+  (setq shou/copilot-keymap
+   '(("C-e" . copilot-accept-completion)
+     ("M-f" . copilot-accept-completion-by-word)
+     ("C-g" . copilot-clear-overlay)))
+
+  :bind
+  ;; C-S-tab
+  (("C-<iso-lefttab>" . copilot-complete))
+
+  :hook
+  (text-mode . copilot-mode)
+  (conf-mode . copilot-mode)
+  (prog-mode . copilot-mode)
+
+  :config
+  (defun shou/buffer-file-name ()
+    (or (buffer-file-name)
+        (and (buffer-base-buffer)
+             (buffer-file-name (buffer-base-buffer)))
+        (buffer-name)
+        ""))
+
+  (defun shou/copilot-disable-predicate ()
+    (or
+     ;; do not enable copilot when i'm editing wiki
+     (derived-mode-p 'mediawiki-mode)
+     ;; do not enable copilot on files that may contain secrets
+     (string-match-p "\\(?:secret\\|cred\\|hidden\\|private\\)"
+                     (shou/buffer-file-name))
+     ;; do not enable copilot on files in tmp/cu
+     (string-match-p "tmp/cu" (shou/buffer-file-name))
+     ;; do not match server files
+     (string-match-p "examples/server" (shou/buffer-file-name))
+     ))
+
+  (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
+
+  (defun shou/advice-copilot-mode (orig-fn &rest args)
+    (when (not (shou/copilot-disable-predicate))
+      (apply orig-fn args)))
+  (advice-add 'copilot-mode :around #'shou/advice-copilot-mode)
+
+  ;; cached copilot slur regexp, computed on first invocation
+  (defvar shou/copilot-slur-regexp nil)
+  (defun shou/copilot-slur-regexp nil
+    (or (bound-and-true-p shou/copilot-slur-regexp)
+        (setq shou/copilot-slur-regexp
+              ;; the list comes from https://moyix.net/~moyix/copilot_slurs_rot13.txt
+              (let* ((words (->> (f-read "~/.emacs.d/assets/copilot_slurs_rot13.txt")
+                                 (rot13)
+                                 (s-split "\n")
+                                 (-remove (lambda (s)
+                                            (or (s-starts-with-p "#" s)
+                                                (s-starts-with-p "<" s)
+                                                (s-blank-p s)))))))
+                (eval `(rx word-start (or ,@words) word-end))))))
+
+  (defun shou/toggle-highlight-copilot-slurs nil
+    "Toggle highlight of copilot slurs."
+    (interactive)
+    (if (bound-and-true-p shou/copilot-slur-on)
+        (progn
+          (setq-local shou/copilot-slur-on nil)
+          (unhighlight-regexp (shou/copilot-slur-regexp)))
+      (setq-local shou/copilot-slur-on t)
+      (highlight-regexp (shou/copilot-slur-regexp))))
+
+  (defun shou/neuter-copilot-slur-words (text)
+    (let ((slur-regexp (shou/copilot-slur-regexp))
+          ;; replace the last char with a placeholder, e.g. "hello" => "hell@"
+          (censor (lambda (s) (concat (substring s 0 -1) "@"))))
+      (s-replace-regexp slur-regexp censor text)))
+
+  ;; copilot-completion-map doesn't always trigger when flymake
+  ;; overlay is present at the same position. So I wrote this
+  ;; workaround to bind the keys to copilot-map and only trigger
+  ;; copilot-functions when the overlay is visible.
+  (defun shou/copilot-override-key (key f)
+    "Only execute copilot f key if copilot overlay is visible"
+    (if (copilot--overlay-visible)
+        (funcall f)
+      (let ((copilot-mode nil))
+        ;; fallback to default behavior
+        (call-interactively (key-binding key)))))
+
+  (cl-loop for (key . f) in shou/copilot-keymap
+           do
+           (message "binding %s to %s" key f)
+           (bind-key key f copilot-completion-map)
+           (bind-key key `(lambda () (interactive)
+                            (shou/copilot-override-key ,(kbd key) (quote ,f)))
+                     copilot-mode-map))
+
+  ;; silent the warning: https://github.com/copilot-emacs/copilot.el/issues/220
+  (defun shou/ignore-copilot-indent-warning ()
+    (setq-local copilot--indent-warning-printed-p t))
+  (add-hook 'copilot-mode-hook #'shou/ignore-copilot-indent-warning))
+#+end_src
+
 * Languages and modes
 ** Markup formats
 *** Markdown
@@ -1307,6 +1984,118 @@ Delta supports highlighting language-syntax, within-line diff, etc.
   (add-hook 'csv-mode-hook 'csv-align-mode))
 #+end_src
 
+** Declarative formats
+
+*** Dockerfile
+
+#+begin_src emacs-lisp
+(use-package dockerfile-mode
+  :elpaca t
+  :mode "Dockerfile")
+(use-package docker-compose-mode
+  :elpaca t
+  :mode "docker-compose\\.ya?ml"
+  :mode "fig\\.ya?ml")
+#+end_src
+
+*** Systemd unit files
+
+#+begin_src emacs-lisp
+(use-package systemd
+  :elpaca t
+  :if (eq system-type 'gnu/linux)
+  :mode (("\\.service\\'" . systemd-mode)
+         ("\\.timer\\'" . systemd-mode)
+         ("/etc/systemd/.*\\.conf\\'" . systemd-mode)))
+#+end_src
+
+** Rust
+
+*** Rust TS mode
+
+Built-in rust mode:
+
+#+begin_src emacs-lisp
+(use-package rust-ts-mode
+  :when (fboundp 'rust-ts-mode)
+  :bind (:map rust-ts-mode-map
+	        ("C-c C-d" . rust-dbg-wrap-or-unwrap))
+  :custom
+  (rust-ts-mode-indent-offset 2)
+
+  ;; enable proc macro expansion for rust-analyzer (used by lsp mode)
+  (lsp-rust-analyzer-proc-macro-enable t)
+
+  ;; default: "check".
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+
+  ;; enable clippy by default
+  (lsp-rust-clippy-preference "on")
+
+  ;; show variable types as inlay hints
+  (lsp-rust-analyzer-server-display-inlay-hints t)
+
+  :config
+  ;; rust-related compile mode regexp alist, etc.
+  (require 'rust-compile))
+#+end_src
+
+*** Cargo
+
+#+begin_src emacs-lisp
+(use-package cargo
+  :elpaca t
+  :bind
+  (:map cargo-mode-map
+        ("C-c C-c r" . cargo-process-run-release)
+        ("C-c C-c C-r" . cargo-process-run)
+        ("C-c C-c C-c" . cargo-process-check)
+        ("C-c C-c C-k" . cargo-process-clippy)
+        ("C-c C-c C-a" . cargo-process-add)
+        ("C-c C-c C-f" . cargo-process-fmt)
+        ("C-c C-c C-l" . cargo-process-current-test)
+        )
+
+  :hook
+  (rust-mode . cargo-minor-mode)
+  (rust-ts-mode . cargo-minor-mode)
+  (conf-toml-mode . cargo-minor-mode)
+  (toml-ts-mode . cargo-minor-mode)
+  (cargo-process-mode . cargo-minor-mode)
+
+  :custom
+  ;; show backtrace in cargo-run
+  (cargo-process--enable-rust-backtrace t)
+  (cargo-process--command-watch "watch --why -q -x run")
+
+  :config
+  (defun cargo-process-run-release ()
+    (interactive)
+    (let ((cargo-process--command-run "run --release"))
+      (cargo-process-run)))
+
+  ;; I want to see any println output when running individual test
+  (defun shou/cargo-process-current-test-patch (orig-fun &rest args)
+    "Patch cargo-process-current-test to allow --nocapture flag"
+    (let ((cargo-process--command-test--additional-args
+           (concat " -- --nocapture " cargo-process--command-test--additional-args)))
+      (apply orig-fun args)))
+  (advice-add 'cargo-process-current-test :around #'shou/cargo-process-current-test-patch)
+
+  ;; fix incorrect filename regexp in compilation mode
+  ;; See https://github.com/rust-lang/rust-mode/issues/452
+  (setq error_stack-regexps
+        '("\\(?:at\\|',\\) \\(\\([^:\s]+\\):\\([0-9]+\\)\\)"
+          2 3 nil nil 1))
+  (setf
+   (cdr (assoc 'cargo compilation-error-regexp-alist-alist))
+   error_stack-regexps)
+  )
+
+;; avoid conflict with cargo mode
+(with-eval-after-load 'conf-mode
+  (unbind-key "C-c C-c" conf-mode-map))
+#+end_src
 * Troubleshooting
 
 Startup benchmarking:
