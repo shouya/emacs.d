@@ -908,6 +908,18 @@ I use =smartparens= package for (automatic) pair management.
   (require 'smartparens-config))
 #+end_src
 
+** =keyfreq.el=
+
+Gather statistics for frequently used commands.
+
+#+begin_src emacs-lisp
+(use-package keyfreq
+  :elpaca t
+  :hook (emacs-startup . keyfreq-mode)
+  :config
+  (keyfreq-autosave-mode 1))
+#+end_src
+
 * File management
 
 ** Basic config
@@ -1378,7 +1390,6 @@ Mostly to load indentation settings.
   (defalias 'detect-indentation 'dtrt-indent-mode)
   (defalias 'detect-tab-size 'dtrt-indent-mode))
 #+end_src
-
 
 ** Language server protocol (LSP)
 
