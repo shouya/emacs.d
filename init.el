@@ -4,7 +4,7 @@
 (setq gc-cons-threshold most-positive-fixnum) ; 2^61 bytes
 (setq gc-cons-percentage 0.4)
 ;; reset it after load
-(add-hook 'emacs-startup-hook
+(add-hook 'after-init-hook
           (lambda () (setq gc-cons-threshold (* 10 1024 1024))))
 ;; force garbage collect when out of focus
 (add-hook 'focus-out-hook 'garbage-collect)
@@ -13,44 +13,70 @@
 (defvar cfg--file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
 (add-hook 'emacs-startup-hook
-          (lambda () (setq file-name-handler-alist cfg--file-name-handler-alist)))
+          (lambda ()
+	    (setq file-name-handler-alist cfg--file-name-handler-alist)))
 (add-hook 'emacs-startup-hook
           (lambda () (message "Emacs ready in %.2f seconds with %d garbage collections."
                          (float-time (time-subtract (current-time) before-init-time))
                          gcs-done)))
 
-;; ----- load straight.el first ----------
-(defvar bootstrap-version)
+;; ----------- initialize elpaca ---------------
+(defvar elpaca-installer-version 0.6)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (< emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (call-process "git" nil buffer t "clone"
+                                       (plist-get order :repo) repo)))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
 
-;; makes booting a lot faster by avoiding checking modifications made
-;; in package source codes, which I rarely do.
+;; -- enable use-package
+(elpaca elpaca-use-package
+  (elpaca-use-package-mode)
+  ;; I would like to manually specify :elpaca t for packages I want it to fetch
+  (setq elpaca-use-package-by-default nil))
+(elpaca-wait)
 
-(setq straight-check-for-modifications nil)
-;; prevent the unnecessary package-initialize by package.el which is
-;; very slow
-(setq package-activated-list nil)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+;; fix https://github.com/progfolio/elpaca/issues/216 (magit dep on seq)
+(defun elpaca--unload-seq (e)
+  (and (featurep 'seq) (unload-feature 'seq t))
+  (elpaca--continue-build e))
+(defun elpaca--seq-build-steps ()
+  (append (butlast (if (file-exists-p (expand-file-name "seq" elpaca-builds-directory))
+                       elpaca--pre-built-steps elpaca-build-steps))
+          (list 'elpaca--unload-seq 'elpaca--activate-package)))
+(elpaca `(seq :build ,(elpaca--seq-build-steps)))
 
-(setq straight-recipe-repositories
-      '(org-elpa
-        melpa
-        gnu-elpa-mirror
-        el-get
-        emacsmirror-mirror
-        nongnu-elpa))
-
-;; must load org before calling org-babel. Otherwise it tries to use system org
-(straight-use-package 'org)
+;; use package configuration
+(setq use-package-always-defer t)
 
 ;; ----------- load custom config --------------
 (setq vc-follow-symlinks t)

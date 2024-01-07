@@ -1,0 +1,1316 @@
+#+TITLE: My Emacs Preferences
+#+latex_compiler: xelatex
+#+latex_header: \usemintedstyle{emacs}
+
+* Boot up
+** Enable packages are loadable
+
+=lisp/= stores modules I copied from [[https://github.com/purcell/emacs.d][purcell/emacs.d]].
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+#+end_src
+
+=site-lisp/= stores downloaded modules that are not on MELPA.
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path (expand-file-name "site-lisp" user-emacs-directory))
+#+end_src
+
+** Start server automatically
+
+#+begin_src emacs-lisp
+(use-package server
+  :config
+  (defun shou/server-start ()
+    (when (not (server-running-p))
+      (server-start)))
+  (add-hook 'after-init-hook 'shou/server-start))
+#+end_src
+
+** Start edit server (for browser extensions)
+
+Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
+
+#+begin_src emacs-lisp
+(use-package atomic-chrome
+  :elpaca t
+  :hook (emacs-startup . atomic-chrome-start-server)
+  :if (display-graphic-p)
+  :custom
+  (atomic-chrome-url-major-mode-alist
+   '(("wiki\\.lain\\.li" . mediawiki-mode)
+     ("github\\.com" . gfm-mode))))
+#+end_src
+
+** Make window resizable by window manager
+
+#+begin_src emacs-lisp
+(setq-default frame-resize-pixelwise t)
+#+end_src
+
+** Load some basic libraries and packages
+
+#+begin_src emacs-lisp
+(use-package dash :elpaca t :demand t)
+(use-package f :elpaca t :demand t)
+(use-package s :elpaca t :demand t)
+
+(elpaca-wait)
+#+end_src
+
+* Basic behavior
+
+These are things that I expect to work all right even when the config contains error later at some point.
+
+The goal in this section is to cover the most critical editing features I need to effectively edit emacs config.
+
+** Hotkey to edit config
+
+** =C-c e= to edit current preferences
+
+#+begin_src emacs-lisp
+(defun shou/find-emacs-config nil
+  (interactive)
+  (find-file (expand-file-name "preferences.org" user-emacs-directory)))
+(bind-key "C-c e" 'shou/find-emacs-config)
+#+end_src
+
+** Always ask for short answers
+
+"yes/no" -> "y/n"
+
+#+begin_src emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; Emacs 29
+(when (boundp 'use-short-answers)
+  (setq use-short-answers t))
+#+end_src
+
+** Recursive minibuffer
+
+Allow performing actions in minibuffer that uses minibuffer.
+
+#+begin_src emacs-lisp
+(setq enable-recursive-minibuffers t)
+#+end_src
+
+** Window manipulation and navigation keys
+
+#+begin_src emacs-lisp
+(bind-key "C-x |" #'split-window-right)
+(bind-key "C-x -" #'split-window-below)
+(bind-key "M-o" #'other-window)
+
+;; prefer splitting window vertically (|)
+(setq split-width-threshold 140)
+(setq split-height-threshold nil)
+#+end_src
+
+** Kill current buffer by default
+
+Bound to =C-x k=.
+
+#+begin_src emacs-lisp
+(defun shou/kill-current-buffer nil
+  (interactive)
+  (kill-buffer (current-buffer)))
+(bind-key [remap kill-buffer] 'shou/kill-current-buffer)
+#+end_src
+
+** Basic editing
+*** Join line
+
+The default join line hotkey =C-j= join the current line with the previous line. Whereas I prefer to join current line with next line.
+
+#+begin_src emacs-lisp
+(defun shou/join-line () (interactive) (save-excursion (next-line) (delete-indentation)))
+
+;; C-j
+(bind-key* [remap join-line] 'shou/join-line)
+(bind-key* "C-j" 'shou/join-line)
+#+end_src
+*** Transpose char
+
+Likewise, I would like to transpose the current char with the next instead with the previous one.
+
+#+begin_src emacs-lisp
+(defun shou/transpose-next-char ()
+  (interactive)
+  (save-excursion
+    (forward-char)
+    (transpose-chars 1)))
+
+;; C-t
+(bind-key [remap transpose-chars] 'shou/transpose-next-char)
+#+end_src
+
+*** Newline
+
+Ensure the final newline in a text file.
+
+#+begin_src emacs-lisp
+(setq require-final-newline t)
+#+end_src
+
+*** Delete selection mode
+
+Delete current active region when I begin typing or pasting.
+
+#+begin_src emacs-lisp
+(delete-selection-mode 1)
+#+end_src
+
+*** Mark region
+
+#+begin_src emacs-lisp
+(use-package expand-region
+  :elpaca t
+  :bind (("C-=" . er/expand-region)
+         ("C--" . er/contract-region))
+  :custom
+  (expand-region-subword-enabled t))
+#+end_src
+
+** Save last position for each file
+
+#+begin_src emacs-lisp
+(add-hook 'emacs-startup-hook (lambda () (save-place-mode t)))
+#+end_src
+
+** Save recent file
+
+#+begin_src emacs-lisp
+(use-package recentf)
+#+end_src
+
+** Basic org mode behavior
+
+#+begin_src emacs-lisp
+(use-package org
+  :config
+  ;; enable quick input for blocks like "<s"
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (require 'org-tempo)
+
+  ;; do not automatically ident based on heading
+  (setq org-adapt-indentation nil)
+
+  ;; indent contents according to the heading level
+  (add-hook 'org-mode-hook #'org-indent-mode)
+
+  ;; do not add extra indentation to source blocks
+  (setq org-src-preserve-indentation t)
+
+  ;; use a single unicode character for folded
+  (setq org-ellipsis "…")
+
+  ;; additional key binding for quiting org source code edit (orig: C-c ')
+  (bind-key "C-c C-c" #'org-edit-src-exit 'org-src-mode-map)
+  )
+#+end_src
+
+** Hide UI elements
+
+#+begin_src emacs-lisp
+(defun shou/hide-ui-elements ()
+  (when (boundp 'tool-bar-mode) (tool-bar-mode -1))
+  (when (boundp 'menu-bar-mode) (menu-bar-mode -1))
+  (when (boundp 'scroll-bar-mode) (scroll-bar-mode -1)))
+(add-hook 'emacs-startup-hook #'shou/hide-ui-elements)
+#+end_src
+
+Also, do not show splash screen.
+
+#+begin_src emacs-lisp
+(setq inhibit-splash-screen t)
+#+end_src
+
+** Better help
+
+#+begin_src emacs-lisp
+(use-package helpful
+  :elpaca t
+  :bind
+  ("C-h k" . helpful-key)
+  ("C-h f" . helpful-callable)
+  ("C-h v" . helpful-variable)
+
+  :config
+  (add-hook 'helpful-mode-hook #'shou/set-tab-width-to-8)
+  (defun shou/set-tab-width-to-8 nil (setq-local tab-width 8))
+  )
+#+end_src
+
+** Save history across restarts
+
+#+begin_src emacs-lisp
+(use-package savehist
+  :demand t
+  :config
+  (savehist-mode 1))
+#+end_src
+
+* General behavior
+
+** Sandbox mode
+
+#+begin_src emacs-lisp
+(defun shou/enable-sandbox ()
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
+  (setq transient-save-history nil)
+  (setq org-clock-persist nil)
+  (setq projectile-auto-update-cache nil)
+  (setq save-place-file "/tmp/emacs-sandbox/save-place")
+  (setq savehist-file "/tmp/emacs-sandbox/history")
+  (add-to-list 'native-comp-eln-load-path "/tmp/emacs-sandbox/eln-cache")
+
+  (savehist-mode -1)
+  )
+#+end_src
+
+* Editing
+** Remove trailing whitespace on save
+
+#+begin_src emacs-lisp
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+end_src
+
+** Minibuffer completion
+
+Show vertical completion for minibuffer options:
+
+#+begin_src emacs-lisp
+(use-package vertico
+  :elpaca (:host github
+		 :repo "minad/vertico"
+		 :files (:defaults "extensions/*")
+		 :includes (vertico-repeat))
+  :hook
+  (emacs-startup . vertico-mode)
+
+  :custom
+  (vertico-cycle t)
+  )
+#+end_src
+
+And show rich info on the margin:
+
+#+begin_src emacs-lisp
+(use-package marginalia
+  :elpaca t
+  :init
+  (marginalia-mode)
+
+  :bind
+  (:map minibuffer-local-map
+        ("M-A" . marginalia-cycle))
+
+  :config
+  (setq marginalia-command-categories
+        (append '((projectile-find-file . file)
+                  (projectile-find-dir . file)
+                  (projectile-switch-project . file))
+                marginalia-command-categories))
+  )
+#+end_src
+
+Narrow down the selection using orderless style:
+
+#+begin_src emacs-lisp
+(use-package orderless
+  :elpaca t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides
+   '(
+     ;; TRAMP hostname completion requires "basic" style to work
+     (file (styles basic partial-completion)))
+   )
+  ;; ignore case for filenames
+  (read-file-name-completion-ignore-case t)
+  )
+#+end_src
+
+** Completion
+
+#+begin_src emacs-lisp
+(use-package corfu
+  :elpaca (corfu :files (:defaults "extensions/*")
+                 :includes (corfu-info
+                            corfu-directory
+                            corfu-history
+                            corfu-popupinfo))
+
+  :bind
+  (:map corfu-map
+        ("C-SPC" . corfu-insert-separator))
+
+  :hook
+  (emacs-startup . global-corfu-mode)
+
+  :custom
+  ;; if the line is already indented, try complete instead
+  (tab-always-indent 'complete)
+
+  ;; enable auto completion
+  (corfu-auto t)
+
+  :config
+  ;; enable corfu completion for eval-expession/shell-command
+  (defun corfu-enable-in-minibuffer ()
+    "Enable Corfu in the minibuffer if `completion-at-point' is bound."
+    (when (where-is-internal #'completion-at-point (list (current-local-map)))
+      (corfu-mode 1)))
+  (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
+
+  ;; used by copilot.el to accept completion
+  (unbind-key "<remap> <move-end-of-line>" 'corfu-map)
+  )
+#+end_src
+
+Show icon for completion:
+
+#+begin_src emacs-lisp
+(use-package kind-icon
+  :after corfu
+  :elpaca t
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+  (setq kind-icon-default-face 'corfu-default)
+  (setq kind-icon-default-style
+        '(:padding -1.1 :stroke 0 :margin 0 :radius 0 :height 0.4 :scale 1))
+  )
+#+end_src
+
+Extra completion:
+
+#+begin_src emacs-lisp
+(use-package cape
+  :elpaca t
+  :commands (shou/text-mode-completions)
+  :demand t
+
+  :hook
+  (text-mode . shou/text-mode-completions)
+
+  :config
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+
+  (defun shou/text-mode-completions ()
+    (make-local-variable 'completion-at-point-functions)
+    ;; add to the end
+    (add-to-list 'completion-at-point-functions #'cape-dict t))
+
+  ;; c.f. https://github.com/minad/corfu#completing-in-the-eshell-or-shell
+  (when (version< emacs-version "29")
+    ;; Silence the pcomplete capf, no errors or messages!
+    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
+    ;; Ensure that pcomplete does not write to the buffer
+    ;; and behaves as a pure `completion-at-point-function'.
+    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)))
+#+end_src
+
+Show docs beside completion
+
+#+begin_src emacs-lisp
+(use-package corfu-popupinfo
+  :after corfu
+  :hook (corfu-mode . corfu-popupinfo-mode)
+  :ensure nil
+  :bind (:map corfu-map
+              ;; Scroll in the documentation window
+              ("M-n" . #'corfu-popupinfo-scroll-up)
+              ("M-p" . #'corfu-popupinfo-scroll-down)
+              ))
+#+end_src
+
+** Consult
+
+#+begin_src emacs-lisp
+(use-package consult
+  :elpaca t
+  :bind
+  (("M-g g" . consult-goto-line)
+   ;; any org heading
+   ("C-c C-S-j" . consult-org-agenda)
+   ("C-x b" . consult-buffer)
+   ("M-s L" . consult-line-multi)
+   ("M-s m" . consult-global-mark)
+
+   :map org-mode-map
+   ;; org heading of this file
+   ("C-c C-j" . consult-org-heading)
+   )
+
+  :custom
+  ;; only show preview when pressing M-.
+  (consult-preview-key "M-.")
+
+  :config
+  ;; show preview automatically for some commands
+  (consult-customize
+   consult-goto-line
+   :preview-key '(:debounce 0.1 any))
+  )
+
+(with-eval-after-load 'lsp-mode
+  (use-package consult-lsp
+    :bind (:map lsp-mode-map
+                ("C-c C-j" . consult-lsp-symbols))))
+
+(with-eval-after-load 'eglot
+  (use-package consult-eglot
+    :bind (:map eglot-mode-map
+                ("C-c C-j" . consult-eglot-symbols))))
+#+end_src
+
+** CtrlF as isearch
+
+#+begin_src emacs-lisp
+(use-package ctrlf
+  :elpaca t
+  :bind
+  (("C-s" . ctrlf-forward-default)
+   ("C-r" . ctrlf-backward-default)
+   ("C-M-s" . ctrlf-forward-alternate)
+   ("C-M-r" . ctrlf-backward-alternate)
+   ("M-s _" . ctrlf-forward-symbol)
+   ("M-s ." . ctrlf-forward-symbol-at-point))
+)
+#+end_src
+
+** Comb key hints
+
+I use =which-key= to display a screen of hints when a key prefix is entered.
+
+#+begin_src emacs-lisp
+(use-package which-key
+  :elpaca t
+  :hook (emacs-startup . which-key-mode)
+  :custom
+  (which-key-idel-delay 1.5))
+#+end_src
+
+** Spell checker
+
+I use =jinx= for spell check.
+
+#+begin_src emacs-lisp
+(use-package jinx
+  :elpaca t
+  :bind (:map jinx-mode-map
+              ("C-;" . jinx-correct))
+  :hook
+  (text-mode . jinx-mode)
+  (prog-mode . jinx-mode)
+
+  :custom
+  (jinx-languages "en_US")
+  (jinx-camel-modes '(prog-mode org-mode))
+
+  :config
+  (when (not (f-exists? "~/.config/enchant/enchant.ordering"))
+    (f-mkdir-full-path "~/.config/enchant")
+    (f-write "en_US:hunspell,aspell\n" 'utf-8
+             "~/.config/enchant/enchant.ordering")
+    (f-symlink (f-expand "~/.emacs.d/user-dict")
+               "~/.config/enchant/en_US.dic"))
+
+  :config
+  (defun shou/jinx--add-to-abbrev (overlay choice)
+    "Add word -> CHOICE to abbrev table. (word is under OVERLAY.)"
+    (let ((word (buffer-substring-no-properties
+                 (overlay-start overlay)
+                 (overlay-end overlay))))
+      (message "Abbrev: %s -> %s" word choice)
+      (define-abbrev global-abbrev-table word choice)))
+
+  (advice-add 'jinx--correct-replace :before #'shou/jinx--add-to-abbrev)
+
+  (defun shou/jinx-valid-english-possive-p (start)
+    (let ((word (buffer-substring-no-properties start (point))))
+      (and (string-suffix-p "'s" word)
+           (cl-loop
+            with word-stripped = (substring word 0 -2)
+            for w in jinx--session-words
+            thereis (and (string-equal-ignore-case word-stripped w)
+                         (string-match-p "\\`[[:lower:]]+\\'" w))))))
+
+  (add-to-list 'jinx--predicates #'shou/jinx-valid-english-possive-p))
+#+end_src
+
+** Snippets
+
+I use =tempel= to quickly enter frequently used snippets.
+
+#+begin_src emacs-lisp
+(use-package tempel
+  :elpaca t
+  :hook
+  (text-mode . shou/add-tempel-to-capf)
+  (prog-mode . shou/add-tempel-to-capf)
+
+  :bind
+  ("C-<tab>" . shou/tempel-expand-or-complete)
+
+  (:map tempel-map
+        ("<tab>" . tempel-next)
+        ("<backtab>" . tempel-previous)
+        ("S-<tab>" . tempel-previous))
+
+  :custom
+  ;; cannot be symlinked file because otherwise the auto-reload doesn't work.
+  (tempel-path (f-canonical "~/.emacs.d/templates"))
+
+  :config
+  (defun shou/add-tempel-to-capf ()
+    (make-local-variable 'completion-at-point-functions)
+    (add-to-list 'completion-at-point-functions #'tempel-complete))
+
+
+  ;; expand directly if there is an exact match, otherwise show candidates
+  (defun shou/tempel-expand-or-complete ()
+    (interactive)
+    (if (tempel-expand)
+        (tempel-expand t)
+        (tempel-complete t)))
+
+  (setq tempel-snippet-path (f-canonical "~/.emacs.d/snippets"))
+  (defun shou/tempel-snippet (file)
+    (f-read-text (f-join tempel-snippet-path file)))
+  )
+#+end_src
+
+** Multi cursor support
+
+#+begin_src emacs-lisp
+(use-package multiple-cursors
+  :elpaca t
+  :bind (("C-x m" . mc/mark-all-dwim)
+         ("C-M-SPC" . mc/mark-next-lines)
+         ("C->" . mc/mark-next-like-this-symbol)
+         ("C-<" . mc/unmark-next-like-this)
+         ("C-M->" . mc/skip-to-next-like-this)
+         ("C-M-<" . mc/skip-to-previous-like-this))
+  :config
+  (define-key mc/keymap (kbd "<return>") nil))
+
+;; multiple-cursors.el doesn't support isearch (or ctrlf), so we
+;; need to use phi-search instead.
+(use-package phi-search
+  :elpaca t
+  :after multiple-cursors
+  :bind
+  (:map mc/keymap
+        ("C-s" . phi-search)
+        ("C-r" . phi-search-backward)))
+#+end_src
+
+** Visual query replace
+
+#+begin_src emacs-lisp
+(use-package visual-regexp
+  :elpaca t
+  :bind (("M-%" . vr/query-replace)))
+#+end_src
+
+** TRAMP
+
+#+begin_src emacs-lisp
+(use-package tramp
+  :custom
+  (tramp-default-method "scp")
+  ;; cache file names for 10 seconds
+  (remote-file-name-inhibit-cache 10)
+
+  ;; do not store remote command history over tramp
+  (tramp-histfile-override t))
+#+end_src
+
+** Sudo edit
+
+#+begin_src emacs-lisp
+(use-package sudo-edit
+  :elpaca t
+  :commands (sudo-edit sudo-edit-find-file))
+#+end_src
+
+** O(1) jump around
+
+#+begin_src emacs-lisp
+(use-package avy
+  :elpaca t
+  :bind
+  ("M-j" . avy-goto-char)
+  ("M-J" . avy-pop-mark)
+
+  :custom
+  (avy-style 'at-full)
+
+  :config
+  ;; https://karthinks.com/software/avy-can-do-anything/#avy-plus-embark-any-action-anywhere
+  (defun shou/def/avy-action-at-point (:key key :action f)
+    "define custom avy action"
+    (let ((avy-action-name
+           (intern (concat "avy-action-" (symbol-name f)))))
+      (progn
+        (eval `(defun ,avy-action-name (pt)
+                 (unwind-protect
+                     (save-excursion (goto-char pt) (funcall ',f))
+                   (select-window (cdr (ring-ref avy-ring 0))))
+                 t))
+        (eval `(setf (alist-get ,key avy-dispatch-alist) ',avy-action-name)))
+    ))
+
+  (shou/def/avy-action-at-point
+   :key ?L
+   :action 'shou/copy-idlink-to-clipboard)
+  (shou/def/avy-action-at-point
+   :key ?m
+   :action 'embark-act)
+  (shou/def/avy-action-at-point
+   :key ?K
+   :action 'kill-whole-line)
+  )
+#+end_src
+
+** Embark
+
+Pure keyboard context menu.
+
+#+begin_src emacs-lisp
+(use-package embark
+  :elpaca t
+  :bind ("M-m" . embark-act)
+  :config
+  (defvar-keymap embark-identifier-map
+    :doc "Actions on symbol"
+    :parent embark-identifier-map
+    "," 'xref-find-definitions
+    "." 'xref-find-definitions-other-window
+    ;; ("R" lsp-rename)
+    "g" 'rg-dwim
+    )
+  )
+#+end_src
+
+** Scroll other window with M-up/down
+
+Stolen from https://stackoverflow.com/a/45363946/1232832.
+
+#+begin_src emacs-lisp
+(bind-key "M-<up>"
+  #'(lambda() (interactive) (scroll-other-window -1)))
+(bind-key "M-<down>"
+  #'(lambda() (interactive) (scroll-other-window 1)))
+#+end_src
+* UI
+
+** Tweak main UI
+
+Show a simpler title.
+
+#+begin_src emacs-lisp
+(setq frame-title-format '("%b - %m @ Emacs"))
+#+end_src
+
+Never show graphical dialog box.
+
+#+begin_src emacs-lisp
+(setq use-dialog-box nil)
+#+end_src
+
+** Color theme
+
+#+begin_src emacs-lisp
+;; make src block stand out
+(setq modus-themes-org-blocks 'gray-background)
+;; allow italic constructs such as comments and helper messages
+(setq modus-themes-italic-constructs t)
+
+(load-theme 'modus-operandi t nil)
+(add-hook 'emacs-startup-hook
+	  (lambda () (enable-theme 'modus-operandi)))
+#+end_src
+
+** Fonts
+
+#+begin_src emacs-lisp
+(add-hook 'emacs-startup-hook
+	  (lambda () (set-frame-font "JetBrains Mono ExtraLight")))
+(set-face-attribute 'default nil :family "JetBrains Mono ExtraLight" :height 130)
+#+end_src
+
+** Icon fonts
+
+In order for the icons to work it is very important that you install
+the Resource Fonts included in this package, they are available in the
+fonts directory. You can also install the latest fonts for this
+package in the (guessed?) based on the OS by calling the following
+command:
+
+=M-x all-the-icons-install-fonts=
+
+#+begin_src emacs-lisp
+(use-package all-the-icons
+  :elpaca t
+  :commands all-the-icons-install-fonts)
+#+end_src
+
+** Modeline
+
+#+begin_src emacs-lisp
+(use-package doom-modeline
+  :elpaca t
+  :hook (emacs-startup . doom-modeline-mode)
+  :custom
+  (doom-modeline-height 30)
+  (doom-modeline-buffer-encoding nil)
+  (doom-modeline-env-version nil)
+  (doom-modeline-lsp t)
+  (doom-modeline-modal-icon nil)
+  (doom-modeline-buffer-state-icon t)
+  (doom-modeline-project-detection 'projectile)
+  (doom-modeline-persp-name nil)
+  (doom-modeline-mu4e t)
+  ;; do not use project relative path
+  (doom-modeline-buffer-file-name-style 'buffer-name)
+
+  :config
+  (doom-modeline-mode 1)
+  (set-face-attribute 'mode-line nil :height 130)
+  (set-face-attribute 'mode-line-inactive nil :height 130))
+#+end_src
+
+** Highlight uncommitted changes
+
+#+begin_src emacs-lisp
+(use-package diff-hl
+  :elpaca t
+  :hook (emacs-startup . global-diff-hl-mode))
+#+end_src
+
+** Show matching parenthesis
+
+The default setting highlights only the parenthesis. =mix= makes it
+highlight the entired expression enclosed by the parenthesis if the
+other parenthesis is beyond visible area.
+
+#+begin_src emacs-lisp
+(setq show-paren-style 'mixed)
+#+end_src
+
+** Automatic window reisizing
+
+#+begin_src emacs-lisp
+(use-package golden-ratio
+  :elpaca (:host github :repo "shouya/golden-ratio.el")
+  :hook (emacs-startup . golden-ratio-mode)
+  :custom
+  (golden-ratio-exclude-buffer-names '("*Ediff Control Panel*"))
+  (golden-ratio-exclude-buffer-regexp '("^\\*dape-"))
+  (golden-ratio-exclude-modes '(treemacs-mode ediff-mode))
+  :config
+  ;; Instead of each window occupies 0.618 of the screen, makes it
+  ;; occupy half of the screen. This prevents unnecessary resizing
+  ;; when two side-by-side windows are open.
+  (setq golden-ratio--value 2.0)
+
+  ;; avoid resizing which-key buffer
+  (with-eval-after-load 'which-key
+    (add-to-list 'golden-ratio-inhibit-functions
+                 (lambda ()
+                   (and which-key--buffer
+                        (window-live-p (get-buffer-window which-key--buffer))))))
+  )
+#+end_src
+
+** Transpose window layout
+
+#+begin_src emacs-lisp
+(use-package transpose-frame
+  :elpaca t
+  :init
+  ;; window-redisplay-end-trigger was obsolete and removed from latest
+  ;; emacs 29 snapshot.
+  ;;
+  ;; I fset these functions to ignore so transpose-frame doesn't break.
+  (when (not (fboundp 'window-redisplay-end-trigger))
+    (fset 'window-redisplay-end-trigger 'ignore)
+    (fset 'set-window-redisplay-end-trigger 'ignore))
+
+  :commands (transpose-frame flip-frame)
+  :bind ("C-x C-t" . transpose-frame)
+  )
+#+end_src
+
+** Popup window
+
+Show popup window in desired styles.
+
+#+begin_src emacs-lisp
+(use-package popwin
+  :elpaca t
+  :hook (emacs-startup . popwin-mode)
+  :config
+  (push '("*elixir-format-errors*" :noselect t) popwin:special-display-config)
+  (push "*idris-repl*" popwin:special-display-config)
+  (push '("*idris-holes*" :noselect t) popwin:special-display-config)
+  (push '("*Help*" :stick t) popwin:special-display-config)
+  (push "*Warnings*" popwin:special-display-config)
+  (push "*rustfmt*" popwin:special-display-config)
+  (push "*explain-pause-log*" popwin:special-display-config)
+  (push "*explain-pause-profiles*" popwin:special-display-config)
+  (push '("*Flycheck errors*" :position bottom :stick t) popwin:special-display-config)
+  (push '(cargo-process-mode :position bottom :stick t :height 10) popwin:special-display-config)
+)
+#+end_src
+
+** Show page break line (=^L=)
+
+#+begin_src emacs-lisp
+(use-package page-break-lines
+  :elpaca t
+  :hook (emacs-startup . global-page-break-lines-mode))
+#+end_src
+
+** Line wrap
+
+Enable line wrap by default:
+
+#+begin_src emacs-lisp
+(add-hook 'text-mode-hook 'visual-line-mode)
+#+end_src
+
+* File management
+
+** Basic config
+
+#+begin_src emacs-lisp
+(use-package dired
+  :commands (dired dired-jump)
+  :bind (:map dired-mode-map
+              ("." . dired-hide-dotfiles-mode))
+  :custom
+  ;; Copy file to split window
+  (dired-dwim-target t)
+  ;; Always copy recursively
+  (dired-recursive-copies 'always)
+  ;; Ask once before deleting
+  (dired-recursive-deletes 'top)
+
+  :config
+  ;; used for deft
+  (unbind-key "C-M-n" dired-mode-map)
+
+  ;; dired-x.el is found in site-lisp
+  (use-package dired-x))
+#+end_src
+
+** dired+.el
+
+#+begin_src emacs-lisp
+;; loaded from site-lisp
+(use-package dired+
+  :after dired
+  :demand t
+  :init
+  ;; do not show compressed files with face for ignored files
+  ;; this variable must be set before dired+ is loaded because it affects font-lock
+  (setq diredp-ignore-compressed-flag nil)
+
+  :config
+  ;; face customization
+  (set-face-attribute 'diredp-dir-name nil :foreground "blue" :weight 'bold :background 'unspecified)
+  (set-face-attribute 'diredp-ignored-file-name nil :foreground "darkgray")
+  (set-face-attribute 'diredp-compressed-file-suffix nil :foreground 'unspecified :inherit 'diredp-compressed-file-name)
+  (set-face-attribute 'diredp-file-suffix nil :foreground 'unspecified)
+  (set-face-attribute 'diredp-file-name nil :foreground 'unspecified)
+  (set-face-attribute 'diredp-write-priv nil :background 'unspecified)
+  (set-face-attribute 'diredp-read-priv nil :background 'unspecified)
+  (set-face-attribute 'diredp-exec-priv nil :background 'unspecified)
+  (set-face-attribute 'diredp-no-priv nil :background 'unspecified)
+  (set-face-attribute 'diredp-dir-priv nil :background 'unspecified :foreground "blue")
+  (set-face-attribute 'diredp-symlink nil :background 'unspecified :foreground "magenta")
+  (set-face-attribute 'diredp-date-time nil :background 'unspecified :foreground "RoyalBlue")
+  (set-face-attribute 'diredp-flag-mark-line nil :background "gray94" :weight 'bold)
+  (set-face-attribute 'diredp-flag-mark nil :background 'unspecified :foreground "orange")
+  (set-face-attribute 'diredp-omit-file-name nil :strike-through 'unspecified)
+
+  (defun shou/update-dired+ ()
+    "Download the latest version of dired+."
+    (interactive)
+    ;; download
+    (url-copy-file
+     "http://www.emacswiki.org/emacs/download/dired+.el"
+     "~/.emacs.d/site-lisp/dired+.el"
+     t)
+    ;; rebuild
+    (byte-compile-file "~/.emacs.d/site-lisp/dired+.el")
+    ;; reload
+    (unload-feature 'dired+ t)
+    (require 'dired+ nil t)))
+#+end_src
+
+** Hide dot files by default
+
+#+begin_src emacs-lisp
+(use-package dired-hide-dotfiles
+  :elpaca t
+  :after dired
+  :hook (dired-mode . dired-hide-dotfiles-mode))
+#+end_src
+
+* Org mode
+
+** Base directory for org files
+
+#+begin_src emacs-lisp
+(use-package org
+  :config
+  (setq org-directory "~/Documents/org")
+
+  (defun org-file-path (filename)
+    "Return the path of file inside org-directory"
+    (expand-file-name filename org-directory))
+  (setq org-default-notes-file (org-file-path "notes.org"))
+  )
+#+end_src
+
+** To-do
+
+#+begin_src emacs-lisp
+(use-package org
+  :bind ("C-c C-t" . org-todo)
+  :custom
+  ;; log todo done time
+  (org-log-done 'time)
+  ;; log toggle times into drawer
+  (org-log-into-drawer t)
+
+  ;; restore the red/green color
+  (org-todo-keyword-faces
+   '(("TODO" . "#a6b255")
+     ("IN-PROG" . "#f2f9c1")
+     ("TOREAD" . "#879434")
+     ("WAIT" . "#c07993")))
+  )
+#+end_src
+
+** Agenda
+
+#+begin_src emacs-lisp
+(use-package org
+  :bind ("C-c a" . org-agenda)
+  :custom
+  (org-agenda-files `(,(org-file-path "projects.org")
+                      ,(org-file-path "mencti.org")))
+
+  ;; extend today to 3AM into next morning
+  (org-extend-today-until 3)
+  (org-use-effective-time t)
+
+  ;; show agenda on the same window I launched it, otherwise it destroys my dedicated window setting
+  (org-agenda-window-setup 'current-window)
+  ;; do not start on weekdays
+  (org-agenda-start-on-weekday nil)
+  ;; do not show repeating items in future timeline
+  (org-agenda-show-future-repeats t)
+  ;; show today's agenda by default (instead of this week's)
+  (org-agenda-span 'day)
+
+  (org-agenda-sorting-strategy
+   '((agenda category-keep habit-up priority-down todo-state-up time-up)
+     (todo priority-down category-keep)
+     (tags priority-down category-keep)
+     (search priority-down category-keep)))
+
+  (org-agenda-compact-blocks t)
+
+
+  ;; skip filename as it takes up precious space and useless
+  (org-agenda-prefix-format '((agenda . " %i  %?-12t% s")
+                              (todo . " %i %-12:c")
+                              (tags . " %i %-12:c")
+                              (search . " %i %-12:c")))
+
+  (org-agenda-custom-commands
+   '(("d" "Daily agenda"
+      ((agenda "" ((org-agenda-span 'day)))
+       (todo "IN-PROG")))
+
+     ("w" "Today's work agenda"
+      ;; Please note that tags must go earlier than agenda, otherwise
+      ;; a weird bug would invalidate the effect of org-agenda-tag-filter-preset
+      ((tags "WORK/IN-PROG")
+       (agenda "" ((org-agenda-span 'day)
+                   (org-agenda-tag-filter-preset '("+WORK"))))))
+
+     ("p" "Today's personal agenda"
+      ((tags "PERSONAL/IN-PROG")
+       (agenda "" ((org-agenda-span 1)
+                   (org-agenda-tag-filter-preset '("+PERSONAL"))))))
+
+     ("s" "Schedule view"
+      ((tags "WORK/TODO"
+             ((org-agenda-overriding-header "Work")
+              (org-agenda-skip-function
+               '(org-agenda-skip-entry-if 'scheduled 'deadline))))
+       (tags "PERSONAL/TODO"
+             ((org-agenda-overriding-header "Personal")
+              (org-agenda-skip-function
+               '(org-agenda-skip-entry-if 'scheduled 'deadline))))
+
+       (tags "MENCTI/TODO"
+             ((org-agenda-overriding-header "Mencti")
+              (org-agenda-skip-function
+               '(org-agenda-skip-entry-if 'scheduled 'deadline))))
+       ))
+     )))
+#+end_src
+
+** Insert heading at cursor
+
+aka. disabling the feature that “smartly” insert heading after the current subtree.
+
+#+begin_src emacs-lisp
+(use-package org
+  :bind
+  (:map org-mode-map
+	("C-<return>" . org-insert-heading)))
+#+end_src
+
+** Note taking
+
+National Velocity-like experience with =deft=.
+
+#+begin_src emacs-lisp
+(use-package deft
+  :elpaca t
+  :bind ("C-M-n" . deft)
+  :commands (deft)
+  :custom
+  (deft-extensions '("org" "txt" "md" "markdown"))
+  (deft-directory (org-file-path "random"))
+  (deft-default-extension "org" "use org as default format")
+  (deft-recursive t "search recursively")
+  (deft-use-filename-as-title t)
+  (deft-use-filter-string-for-filename t "instead of some generated gibberish")
+  (deft-auto-save-interval 60
+    "don't auto save as it will reformat in middle of typing")
+  (deft-file-naming-rules
+    '((noslash . "-")
+      (nospace . "-")
+      (case-fn . downcase))
+    "apply certain rules when generating file name")
+  (deft-file-limit 40)
+  )
+#+end_src
+
+* Programming features
+
+** Source control
+
+*** Magit
+#+begin_src emacs-lisp
+(use-package magit
+  :elpaca t
+  :bind
+  ("C-x g" . magit)
+  ("C-x C-g" . magit-file-dispatch)
+
+  :custom
+  ;; https://twitter.com/iLemming/status/1243322552828571649
+  (magit-save-repository-buffers 'save-all-and-dont-ask)
+
+  ;; sort branches (or any refs) by creation date
+  (magit-list-refs-sortby "-creatordate")
+
+
+  :config
+  ;; so it don't close other windows
+  (fset 'magit-restore-window-configuration (lambda (x) (kill-buffer-and-window)))
+  ;; automatically refresh after saving a file
+  ;;
+  ;; Edit: I turned it off as it makes editing a bit laggy. Now please
+  ;; press 'g' manually to refresh.
+  ;;
+  ;; (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
+
+  ;; do not override projectile keys
+  (unbind-key "M-p" magit-status-mode-map)
+  (unbind-key "M-n" magit-status-mode-map)
+
+  ;; do not show list of tags to faster
+  (remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
+
+  ;; magit/transient uses some functions from emacs 28
+  (when (< emacs-major-version 28)
+    (defun length= (str n)
+      (= (length str) n))
+    (defun string-replace (old new s)
+      (s-replace old new s))
+    (defun string-search (needle haystack &optional start-pos)
+      (s-contains? needle haystack)))
+
+  ;; show exact date on revision page
+  (setq magit-revision-headers-format (->> magit-revision-headers-format
+                                           (s-replace "%ad" "%ad (%aD)")
+                                           (s-replace "%cd" "%cd (%cD)")))
+  )
+#+end_src
+
+*** Forge
+
+Online features, PR, issues, etc.
+
+Hotkey to remember:
+
+| =C-c C-o= | forge-browse-topic |
+
+#+begin_src emacs-lisp
+(use-package forge
+  :elpaca t
+  :after magit
+  :bind (:map magit-mode-map
+              ("M-W" . forge-copy-url-at-point-as-kill))
+  :config
+  ;; '(githost apihost id class)
+  (add-to-list 'forge-alist
+               '("git.lain.li"
+                 "git.lain.li/api/v1"
+                 "git.lain.li"
+                 forge-gitea-repository))
+  )
+#+end_src
+
+*** Ediff
+
+#+begin_src emacs-lisp
+(use-package ediff
+  :custom
+  (ediff-window-setup-function 'ediff-setup-windows-plain)
+  (ediff-split-window-function 'split-window-horizontally)
+  (ediff-keep-variants nil)
+  :config
+  ;; quit immediately without asking
+  ;; https://emacs.stackexchange.com/questions/9322/how-can-i-quit-ediff-immediately-without-having-to-type-y
+  (defun disable-y-or-n-p (orig-fun &rest args)
+    (cl-letf (((symbol-function 'y-or-n-p) (lambda (prompt) t)))
+      (apply orig-fun args)))
+
+  (advice-add 'ediff-quit :around #'disable-y-or-n-p))
+#+end_src
+
+*** Browse on GitHub
+
+#+begin_src emacs-lisp
+(use-package browse-at-remote
+  :elpaca t
+  :bind (("C-c g g" . browse-at-remote)
+         ("C-c g G" . browse-at-remote-kill)
+         ;; mimic "open-at-point" behaviour
+         :map prog-mode-map
+         ("C-c C-o" . browse-at-remote)))
+#+end_src
+
+*** Better diff with =delta=
+
+Delta supports highlighting language-syntax, within-line diff, etc.
+
+#+begin_src emacs-lisp
+(use-package magit-delta
+  :elpaca t
+  :if (executable-find "delta")
+  :hook (magit-mode . magit-delta-mode))
+#+end_src
+
+** Project management
+
+#+begin_src emacs-lisp
+
+#+end_src
+
+** Language server protocol (LSP)
+* Languages and modes
+** Markup formats
+*** Markdown
+#+begin_src emacs-lisp
+(use-package markdown-mode
+  :elpaca t
+  :commands gfm-mode
+  :mode (("\.md$" . gfm-mode)
+         ("\.markdown$" . gfm-mode))
+  :config
+  (when (executable-find "pando")
+    (setq markdown-command "pandoc --standalone --mathjax --from=markdown")))
+
+;; edit-indirect is required to edit code blocks in markdown
+;; summon with <C-c '>
+(use-package edit-indirect
+  :after markdown-mode
+  :commands edit-indirect-region)
+#+end_src
+
+*** MediaWiki
+
+#+begin_src emacs-lisp
+(use-package mediawiki
+  :elpaca t
+  :commands mediawiki-mode
+  :config
+  (unbind-key "<tab>" mediawiki-mode-map)
+  (unbind-key "S-<tab>" mediawiki-mode-map)
+  (unbind-key "S-<iso-lefttab>" mediawiki-mode-map)
+  (unbind-key "<backtab>" mediawiki-mode-map)
+  (unbind-key "C-<backslash>" mediawiki-mode-map)
+  (unbind-key "C-c a" mediawiki-mode-map)
+  (unbind-key "C-x C-s" mediawiki-mode-map)
+
+  (bind-key "<tab>" #'completion-at-point mediawiki-mode-map)
+  (bind-key "C-c !" #'shou/insert-wiki-date-link mediawiki-mode-map)
+  (bind-key "C-c ." #'shou/insert-wiki-date-link mediawiki-mode-map)
+
+  (bind-key "M-<return>" 'mediawiki-terminate-paragraph mediawiki-mode-map)
+
+  (defun shou/default-date-from-firefox ()
+    (let* ((line (shell-command-to-string "wmctrl -l -x | grep Firefox"))
+           ;; matching text like Sep 20, 2022
+           (regexp "[A-Z][a-z]\\{2\\} [0-9]\\{1,2\\}, [0-9]\\{4\\}")
+           (match (s-match regexp line)))
+      (pcase match
+        (`(,text) text)
+        (_ nil))))
+
+  (defun shou/insert-wiki-date-link (arg)
+    (interactive "P")
+    (let* ((format "<[%b %-d, %Y]>")
+           (org-time-stamp-formats (cons format format))
+           (org-read-date-prefer-future nil)
+           (default-date (shou/default-date-from-firefox))
+           (time (org-read-date arg 'totime nil nil nil default-date)))
+      (org-insert-time-stamp time t 'inactive)))
+  )
+#+end_src
+
+** Data formats
+
+#+begin_src emacs-lisp
+(use-package csv-mode
+  :commands csv-mode
+  :mode (("\\.csv\\'" . csv-mode))
+  :config
+  (add-hook 'csv-mode-hook 'csv-align-mode))
+#+end_src
+
+* Troubleshooting
+
+Startup benchmarking:
+
+#+begin_src emacs-lisp
+(use-package esup :elpaca t :disabled)
+#+end_src

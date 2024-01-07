@@ -50,8 +50,6 @@ site-lisp/package/
 .cache/
 /forge-database.sqlite
 /transient
-/preferences.*
-!/preferences.org
 /_minted-preferences
 projectile.cache
 /bookmarks
