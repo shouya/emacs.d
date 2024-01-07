@@ -278,6 +278,11 @@ Key bindings:
   ;; indent contents according to the heading level
   (add-hook 'org-mode-hook #'org-indent-mode)
 
+  ;; save to the file directly, no a temp file
+  (add-hook 'org-mode-hook 'auto-save-visited-mode)
+  ;; save and don't leave a message.
+  (setq auto-save-no-message t)
+
   ;; do not add extra indentation to source blocks
   (setq org-src-preserve-indentation t)
 
