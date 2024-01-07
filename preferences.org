@@ -494,7 +494,7 @@ other parenthesis is beyond visible area.
 (setq show-paren-style 'mixed)
 #+end_src
 
-** Automatic window reisizing
+** Automatic window resizing
 
 #+begin_src emacs-lisp
 (use-package golden-ratio
@@ -1037,6 +1037,14 @@ I use =smartparens= package for (automatic) pair management.
   (sp-autoinsert-pair nil)
   :config
   (require 'smartparens-config))
+#+end_src
+
+I'd also like to have a bit of visual hint for pair levels.
+
+#+begin_src emacs-lisp
+(use-package rainbow-delimiters
+  :elpaca t
+  :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 
 ** =keyfreq.el=
