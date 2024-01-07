@@ -395,6 +395,46 @@ Never show graphical dialog box.
 (set-face-attribute 'default nil :family "JetBrains Mono ExtraLight" :height 130)
 #+end_src
 
+** Fonts for special codepoints
+
+The default monospace font I use doesn't have much coverage for extensive codepoints. To avoid fallback to the system's default behavior, I need to specify the fonts to use for these codepoints.
+
+First, non-latin script should be displayed with the correct font variants:
+
+#+begin_src emacs-lisp
+(cl-loop for (script . font) in
+         '((han . "Noto Sans CJK TC DemiLight")
+           (kana . "Noto Sans CJK JP DemiLight")
+           (hangul . "Noto Sans CJK KR DemiLight")
+           (phonetic . "Noto Sans")
+           (greek . "Noto Sans Light")
+           )
+         do
+         (set-fontset-font t ;; font for 'default face
+                           script
+                           (font-spec :family font)))
+#+end_src
+
+Second, we set the font set for various types of special symbols:
+
+#+begin_src emacs-lisp
+;; IPA symbols and diacritic marks (https://www.compart.com/en/unicode/block/U+0250)
+(set-fontset-font t '(#x0250 . #x036F) (font-spec :family "DejaVu Sans Mono"))
+
+;; gemoetric shapes (https://www.compart.com/en/unicode/block/U+25A0)
+(set-fontset-font t '(#x25A0 . #x25FF)
+                  (font-spec :family "Noto Sans Mono"))
+
+;; general punctuation (https://www.compart.com/en/unicode/block/U+2000)
+;; to ensure a uniform look for punctuations (especially bullets like ◦•‣)
+(set-fontset-font t '(#x2000 . #x206F)
+                  (font-spec :family "Noto Sans Mono"))
+
+;; symbols cannot be overriden by fontset by default. Turning off this setting.
+(setq use-default-font-for-symbols nil)
+#+end_src
+
+
 ** Icon fonts
 
 In order for the icons to work it is very important that you install
