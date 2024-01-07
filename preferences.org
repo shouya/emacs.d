@@ -183,10 +183,30 @@ Delete current active region when I begin typing or pasting.
   (expand-region-subword-enabled t))
 #+end_src
 
+*** Disable bi-directional text support
+
+Myth says that turning off bi-directional text support can improve performance. I don't use bi-directional text anyway.
+
+#+begin_src emacs-lisp
+(setq bidi-inhibit-bpa t)
+#+end_src
+
+*** Disable unused mouse buttons
+
+By default, right mouse button is bound to set mark and middle mouse button is bound to paste. Those buttons are more often mistakenly pressed and messes up the buffer.
+
+#+begin_src emacs-lisp
+(global-unset-key [mouse-3])
+(global-unset-key [mouse-2])
+(global-unset-key (kbd "C-<mouse-1>"))
+(global-unset-key (kbd "C-<mouse-2>"))
+(global-unset-key (kbd "C-<mouse-3>"))
+#+end_src
+
 ** Save last position for each file
 
 #+begin_src emacs-lisp
-(add-hook 'emacs-startup-hook (lambda () (save-place-mode t)))
+(add-hook 'emacs-startup-hook (lambda () (save-place-mode 1)))
 #+end_src
 
 ** Save recent file
@@ -208,6 +228,38 @@ Built-in module:
     )
   (with-eval-after-load 'marginalia
     (add-to-list 'marginalia-prompt-categories '("Choose recent file:" . file)))
+  )
+#+end_src
+
+** Backup file
+
+Store backup files to an independent directory instead of the same directory as the original file.
+
+#+begin_src emacs-lisp
+(let* ((base-dir (cond
+                  ((f-directory? "~/.cache") "~/.cache")
+                  (t "/tmp")))
+       (backup-dir (f-join base-dir "emacs-backup")))
+  (when (not (f-directory? backup-dir))(f-mkdir backup-dir))
+  (setq backup-directory-alist `((".*" . ,backup-dir))
+        auto-save-file-name-transforms `((".*" ,backup-dir t))))
+#+end_src
+
+** Bookmarks
+
+I keep some frequently accessed files in emacs bookmark so I can quickly jump to them via C-x r b.
+
+Key bindings:
+
+- =C-x r m= (bookmark-set): add bookmark
+- =C-x r b= (bookmark-jump): jump to a bookmark, select interactively
+- =C-x r l= (list-bookmarks): list bookmarks for inspection (and deletion)
+
+#+begin_src emacs-lisp
+(use-package bookmark
+  :config
+  ;; save bookmark whenever a bookmark is set
+  (setq bookmark-save-flag 1)
   )
 #+end_src
 
@@ -965,7 +1017,7 @@ Gather statistics for frequently used commands.
 
 #+begin_src emacs-lisp
 (use-package dired
-  :commands (dired dired-jump)
+  :commands (dired dired-jump shou/copy-full-path)
   :bind (:map dired-mode-map
               ("." . dired-hide-dotfiles-mode))
   :custom
@@ -981,7 +1033,24 @@ Gather statistics for frequently used commands.
   (unbind-key "C-M-n" dired-mode-map)
 
   ;; dired-x.el is found in site-lisp
-  (use-package dired-x))
+  (use-package dired-x :demand t)
+
+  (defun shou/copy-full-path ()
+    "Copy the full path of the current buffer to the kill ring."
+    (interactive)
+    (let ((path))
+      (setq path
+            (if (derived-mode-p 'dired-mode)
+                (dired-get-filename)
+              (buffer-file-name)))
+      (if (not path)
+          (message "full path not found: %s" (buffer-file-name))
+        (message path)
+        (kill-new path))))
+
+  ;; copy full path of the current file
+  (bind-key "W" #'shou/copy-full-path dired-mode-map)
+  )
 #+end_src
 
 ** dired+.el
