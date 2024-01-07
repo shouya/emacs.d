@@ -191,8 +191,24 @@ Delete current active region when I begin typing or pasting.
 
 ** Save recent file
 
+Built-in module:
+
 #+begin_src emacs-lisp
-(use-package recentf)
+(use-package recentf
+  :demand t
+  :bind ("C-x f" . shou/find-recent-file)
+  :config
+  (add-to-list 'recentf-exclude (rx "bookmarks" eol))
+  ;; save 200 files instead of default 20 files in history
+  (setq recentf-max-saved-items 200)
+  (recentf-mode 1)
+  (defun shou/find-recent-file ()
+    (interactive)
+    (find-file (completing-read "Choose recent file: " recentf-list))
+    )
+  (with-eval-after-load 'marginalia
+    (add-to-list 'marginalia-prompt-categories '("Choose recent file:" . file)))
+  )
 #+end_src
 
 ** Basic org mode behavior
@@ -639,6 +655,7 @@ Show docs beside completion
 #+begin_src emacs-lisp
 (use-package consult
   :elpaca t
+  :after recentf
   :bind
   (("M-g g" . consult-goto-line)
    ;; any org heading
