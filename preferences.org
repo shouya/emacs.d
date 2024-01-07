@@ -234,6 +234,9 @@ Built-in module:
 
   ;; additional key binding for quiting org source code edit (orig: C-c ')
   (bind-key "C-c C-c" #'org-edit-src-exit 'org-src-mode-map)
+
+  ;; hide the "=", "*", "/" symbols
+  (setq org-hide-emphasis-markers t)
   )
 #+end_src
 
@@ -244,7 +247,7 @@ Built-in module:
   (when (boundp 'tool-bar-mode) (tool-bar-mode -1))
   (when (boundp 'menu-bar-mode) (menu-bar-mode -1))
   (when (boundp 'scroll-bar-mode) (scroll-bar-mode -1)))
-(add-hook 'emacs-startup-hook #'shou/hide-ui-elements)
+(shou/hide-ui-elements)
 #+end_src
 
 Also, do not show splash screen.
@@ -1240,6 +1243,75 @@ National Velocity-like experience with =deft=.
       :immediate-finish t)
      )))
 #+END_SRC
+
+** Org-store-link
+
+I use =C-c l= to store link, and =C-c L= to store a id link to a heading.
+
+#+begin_src emacs-lisp
+(use-package org
+  :bind
+  ("C-c l" . org-store-link)
+  ("C-c L" . shou/copy-idlink-to-clipboard)
+
+  :config
+  ;; Adapted from Rainer's blog:
+  ;; https://koenig-haunstetten.de/2018/02/17/improving-my-orgmode-workflow/
+  (defun shou/copy-idlink-to-clipboard()
+    "Copy an ID link with the
+headline to killring, if no ID is there then create a new unique
+ID.  This function works only in org-mode or org-agenda buffers.
+
+The purpose of this function is to easily construct id:-links to
+org-mode items. If its assigned to a key it saves you marking the
+text and copying to the killring."
+    (interactive)
+    (save-window-excursion
+      (when (eq major-mode 'org-agenda-mode) ;switch to orgmode
+        (org-agenda-show)
+        (org-agenda-goto))
+      (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
+        (let* ((head (nth 4 (org-heading-components)))
+               ;; replace links with their description
+               (clean-head (replace-regexp-in-string org-link-bracket-re "\\2" head))
+               (id (funcall 'org-id-get-create))
+               (link (format "[[id:%s][%s]]" id clean-head)))
+          (kill-new link)
+          (message "Copied %s to killring (clipboard)" link)
+        )))))
+#+end_src
+
+** Clip link
+
+Capture web page link and title.
+
+#+begin_src emacs-lisp
+(use-package org-cliplink
+  :elpaca t
+  :after org
+  :commands (org-cliplink-capture)
+  :bind ("C-c C-L" . org-cliplink))
+#+end_src
+
+** Key to insert timestamp
+
+Press F5 to insert current timestamp.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (defun shou/insert-timestamp ()
+    (interactive)
+    (insert (org-format-time-string "[%H:%M]: " (org-current-time))))
+  (bind-key "<f5>" 'shou/insert-timestamp org-mode-map))
+#+end_src
+
+** Export support
+
+I don't use any other export backends (e.g. ==odt=, =icalendar=).
+
+#+begin_src emacs-lisp
+(setq org-export-backends '(ascii html latex))
+#+end_src
 
 ** Org-modern
 
