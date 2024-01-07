@@ -1386,9 +1386,11 @@ Mostly to load indentation settings.
   :hook (prog-mode . dtrt-indent-mode)
   :elpaca t
   :config
-  ;; aliases that I sometimes type when I forget how to spell "dtrt"
+  ;; I sometimes type when I forget how to spell "dtrt"
   (defalias 'detect-indentation 'dtrt-indent-mode)
-  (defalias 'detect-tab-size 'dtrt-indent-mode))
+  (defalias 'detect-tab-size 'dtrt-indent-mode)
+  (defalias 'dets 'dtrt-indent-mode)
+  )
 #+end_src
 
 ** Language server protocol (LSP)
@@ -1806,6 +1808,21 @@ otherwise fallback to =dumb-jump=.
   (apheleia-global-mode 1))
 #+end_src
 
+** Treesit
+
+Configure the built-in tree sit modes.
+
+#+begin_src emacs-lisp
+(use-package treesit
+  :when (version<= "29.1" emacs-version)
+  :custom
+  (major-mode-remap-alist
+   '((rust-mode . rust-ts-mode)
+     (toml-mode . toml-ts-mode)
+     (yaml-mode . yaml-ts-mode)
+     )))
+#+end_src
+
 * AI features
 
 ** copilot.el
@@ -1987,6 +2004,8 @@ otherwise fallback to =dumb-jump=.
 
 ** Data formats
 
+*** CSV
+
 #+begin_src emacs-lisp
 (use-package csv-mode
   :commands csv-mode
@@ -1994,6 +2013,7 @@ otherwise fallback to =dumb-jump=.
   :config
   (add-hook 'csv-mode-hook 'csv-align-mode))
 #+end_src
+
 
 ** Declarative formats
 
@@ -2018,6 +2038,27 @@ otherwise fallback to =dumb-jump=.
   :mode (("\\.service\\'" . systemd-mode)
          ("\\.timer\\'" . systemd-mode)
          ("/etc/systemd/.*\\.conf\\'" . systemd-mode)))
+#+end_src
+
+** Fish
+
+#+begin_src emacs-lisp
+(use-package fish-mode
+  :elpaca t
+  :mode "\\.fish\\'"
+  :custom
+  ;; to match the same indentation as fish_indent
+  (fish-indent-offset 4))
+#+end_src
+
+** Lean
+
+#+begin_src emacs-lisp
+(use-package lean4-mode
+  :elpaca (:host github :repo "leanprover/lean4-mode" :files ("*.el" "data"))
+  :config
+  (with-eval-after-load 'lsp-mode
+    (add-to-list 'lsp-file-watch-ignored-directories "\\.lean\\'")))
 #+end_src
 
 ** Rust
@@ -2106,6 +2147,32 @@ Built-in rust mode:
 ;; avoid conflict with cargo mode
 (with-eval-after-load 'conf-mode
   (unbind-key "C-c C-c" conf-mode-map))
+#+end_src
+
+*** Haskell
+
+#+begin_src emacs-lisp
+(use-package haskell-mode
+  :elpaca t
+  :bind (:map haskell-mode-map
+              ("C-c C-c" . haskell-compile)
+              ("C-c `" . haskell-interactive-bring)
+              ("C-c C-l" . haskell-process-load-or-reload)
+              ("C-c C-t" . haskell-process-do-type)
+              ("C-c C-i" . haskell-process-do-info)
+              ("M-." . haskell-mode-jump-to-def))
+  :hook (haskell-mode . shou/disable-apheleia-mode)
+  :mode (("\\.hs\\'" . haskell-mode))
+  :custom
+  ;; build with "stack build"
+  (haskell-compile-cabal-build-command "stack build")
+  ;; do not show error in a popup window
+  (haskell-interactive-popup-errors nil)
+  ;; show logs
+  (haskell-process-log t)
+  ;; auto load imports
+  (haskell-process-auto-import-modules t)
+)
 #+end_src
 * Troubleshooting
 
