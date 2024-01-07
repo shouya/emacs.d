@@ -1263,6 +1263,25 @@ Delta supports highlighting language-syntax, within-line diff, etc.
   :hook (magit-mode . magit-delta-mode))
 #+end_src
 
+*** Git auto commit
+
+I automatically backup my org files using git after idle for a
+while. The mode is activated for specific folder only using
+=.dir-locals.el=.
+
+#+begin_src emacs-lisp
+(use-package git-auto-commit-mode
+  :elpaca t
+  :commands git-auto-commit-mode
+  :custom
+  ;; auto push to remote
+  (gac-automatically-push-p t)
+  ;; only backup after 120 secs
+  (gac-debounce-interval 120)
+  ;; do not prompt for gpg signature
+  (gac-commit-additional-flag "--no-gpg-sign"))
+#+end_src
+
 ** Project management
 
 #+begin_src emacs-lisp
