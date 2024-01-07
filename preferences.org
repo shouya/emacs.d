@@ -88,6 +88,16 @@ The goal in this section is to cover the most critical editing features I need t
   (setq use-short-answers t))
 #+end_src
 
+** Save customization in separate file
+
+By default the customization is saved into =init.el=. Avoid the mess by saving it
+in a separate file =custom.el=.
+
+#+BEGIN_SRC emacs-lisp
+(setq-default custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load-file custom-file)
+#+END_SRC
+
 ** Recursive minibuffer
 
 Allow performing actions in minibuffer that uses minibuffer.
