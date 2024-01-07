@@ -2393,6 +2393,20 @@ Configure the built-in tree sit modes.
          ("/etc/systemd/.*\\.conf\\'" . systemd-mode)))
 #+end_src
 
+** Emacs lisp
+
+Shorten the mode name to =Elisp=.
+
+#+begin_src emacs-lisp
+(add-hook 'emacs-lisp-mode-hook (lambda () (setq-default mode-name "Elisp")))
+#+end_src
+
+Evaluate an expression with pretty print:
+
+#+begin_src emacs-lisp
+(bind-key "M-:" #'pp-eval-expression)
+#+end_src
+
 ** Fish
 
 #+begin_src emacs-lisp
