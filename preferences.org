@@ -269,6 +269,14 @@ Also, do not show splash screen.
   )
 #+end_src
 
+** Set default major mode
+
+The default major mode is fundamental-mode, which is very limited.
+
+#+begin_src emacs-lisp
+(setq initial-major-mode 'text-mode)
+#+end_src
+
 * UI
 
 ** Tweak main UI
@@ -802,6 +810,7 @@ I use =tempel= to quickly enter frequently used snippets.
 
 #+begin_src emacs-lisp
 (use-package visual-regexp
+  :after multiple-cursors
   :elpaca t
   :bind (("M-%" . vr/query-replace)))
 #+end_src
@@ -1298,8 +1307,7 @@ while. The mode is activated for specific folder only using
   (projectile-switch-project-action 'shou/action-after-switch-project)
   (projectile-track-known-projects-automatically nil)
 
-  :hook (after-init . projectile-mode)
-
+  :hook (emacs-startup . projectile-mode)
   :bind-keymap
   ("M-`" . projectile-command-map)
 
