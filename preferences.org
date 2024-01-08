@@ -740,7 +740,7 @@ Extra completion:
     (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)))
 #+end_src
 
-Show docs beside completion
+Show docs beside completion:
 
 #+begin_src emacs-lisp
 (use-package corfu-popupinfo
@@ -752,6 +752,16 @@ Show docs beside completion
               ("M-n" . #'corfu-popupinfo-scroll-up)
               ("M-p" . #'corfu-popupinfo-scroll-down)
               ))
+#+end_src
+
+Corfu completion in terminal:
+
+#+begin_src emacs-lisp
+(use-package corfu-terminal
+  :unless (display-graphic-p)
+  :elpaca (corfu-terminal :host codeberg :repo "akib/emacs-corfu-terminal")
+  :after corfu
+  :hook (corfu-mode . corfu-terminal-mode))
 #+end_src
 
 ** Consult
