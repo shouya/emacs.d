@@ -294,6 +294,9 @@ Key bindings:
 
   ;; hide the "=", "*", "/" symbols
   (setq org-hide-emphasis-markers t)
+
+  ;; do not put label to the right
+  (setq org-tags-column 0)
   )
 #+end_src
 
@@ -1444,9 +1447,6 @@ I don't use any other export backends (e.g. ==odt=, =icalendar=).
   :after org
   :hook (emacs-startup . global-org-modern-mode)
   :config
-  ;; do not put label to the right
-  (setq org-tags-column 0)
-
   ;; align agenda tags to the right at 80 column
   (setq org-agenda-tags-column -80
         org-agenda-block-separator ?─)
@@ -2189,8 +2189,8 @@ Configure the built-in tree sit modes.
 
 #+begin_src emacs-lisp
 (use-package copilot
-  :elpaca (:host github :repo "raymond-w-ko/copilot.el" :files ("dist" "*.el"))
-  ;; :elpaca (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  ;; :elpaca (:host github :repo "raymond-w-ko/copilot.el" :files ("dist" "*.el"))
+  :elpaca (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
   :commands (copilot-mode copilot-clear-overlay copilot-complete copilot-diagnose)
   :custom
   ;; enable logging (max size: 10000)
@@ -2212,7 +2212,7 @@ Configure the built-in tree sit modes.
   (("C-<iso-lefttab>" . copilot-complete))
 
   :hook
-  (text-mode . copilot-mode)
+  ;; (text-mode . copilot-mode)
   (conf-mode . copilot-mode)
   (prog-mode . copilot-mode)
 
