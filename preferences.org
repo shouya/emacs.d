@@ -745,13 +745,17 @@ Show docs beside completion:
 #+begin_src emacs-lisp
 (use-package corfu-popupinfo
   :after corfu
-  :hook (corfu-mode . corfu-popupinfo-mode)
+  :hook (corfu-mode . shou/enable-corfu-popupinfo-conditionally)
   :ensure nil
   :bind (:map corfu-map
               ;; Scroll in the documentation window
               ("M-n" . #'corfu-popupinfo-scroll-up)
               ("M-p" . #'corfu-popupinfo-scroll-down)
-              ))
+              )
+  :config
+  (defun shou/enable-corfu-popupinfo-conditionally ()
+    (when (not (display-graphic-p))
+      (corfu-popupinfo-mode 1))))
 #+end_src
 
 Corfu completion in terminal:
