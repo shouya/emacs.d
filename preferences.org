@@ -297,6 +297,15 @@ Key bindings:
 
   ;; do not put label to the right
   (setq org-tags-column 0)
+
+  ;; put footnote under the current heading instead of a "footnotes" section
+  (setq org-footnote-section nil)
+
+  ;; Avoid accidental text edit in invisible area
+  (setq org-catch-invisible-edits 'show-and-error)
+
+  ;; make TAB acts as in major mode
+  (setq org-src-tab-acts-natively t)
   )
 #+end_src
 
