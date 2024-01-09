@@ -1453,6 +1453,51 @@ I don't use any other export backends (e.g. ==odt=, =icalendar=).
 (setq org-export-backends '(ascii html latex))
 #+end_src
 
+I use pandoc for exporting to mediawiki and gfm.
+
+#+begin_src emacs-lisp
+(use-package ox-pandoc
+  :elpaca t
+  :after ox
+  :demand t ;; required for registering org-export-dispatch
+  :custom
+  (org-pandoc-menu-entry
+   '(
+     (?w "as mediawiki." org-pandoc-export-as-mediawiki)
+     (?g "as gfm." org-pandoc-export-as-gfm)
+     ))
+  (org-pandoc-options-for-mediawiki '((shift-heading-level-by . "1")))
+  (org-pandoc-options-for-gfm '((shift-heading-level-by . "1")
+                                (wrap . "none")))
+  :config
+  (defun shou/ox-mediawiki-transform ()
+    "Transform the current buffer to meet my ideal mediawiki format."
+    ;; 1. remove the inserted <span id=xxx></span>
+    (goto-char (point-min))
+    (while (re-search-forward "<span id=\"[0-9a-z-]+\"></span>" nil t)
+      (replace-match ""))
+
+    ;; 2. convert org dates like [2023-06-21 Wed] into [[Jun 21, 2023]]
+    (goto-char (point-min))
+    (while (re-search-forward org-ts-regexp-inactive nil t)
+      (let* ((ts (match-string 0))
+             (parsed (save-match-data (org-parse-time-string ts)))
+             (encoded (encode-time parsed))
+             (formatted (format-time-string "[[%b %-d, %Y]]" encoded)))
+        (replace-match formatted)))
+
+    ;; restore cursor
+    (goto-char (point-min)))
+
+  (add-hook 'org-pandoc-after-processing-mediawiki-hook
+            'shou/ox-mediawiki-transform))
+
+(use-package ox
+  :config
+  ;; allow exporting broken links
+  (setq org-export-with-broken-links 'mark))
+#+end_src
+
 ** Org-modern
 
 #+begin_src emacs-lisp
