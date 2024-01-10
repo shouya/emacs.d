@@ -2171,7 +2171,7 @@ otherwise fallback to =dumb-jump=.
   :after flycheck lsp-mode)
 
 (use-package sideline-lsp
-  :after lsp-mode
+  :after lsp-modeline
   :demand t
   :config
   ;; the default code action prefix is the unicode emoji char "💡" (U+1F4A1).
@@ -2588,10 +2588,8 @@ Built-in rust mode:
 
 #+begin_src emacs-lisp
 (use-package rust-ts-mode
-  :after rust-mode
   :when (fboundp 'rust-ts-mode)
   :mode ("\\.rs\\'" . rust-mode)
-
   :bind (:map rust-ts-mode-map
 	        ("C-c C-d" . rust-dbg-wrap-or-unwrap))
   :custom
@@ -2608,8 +2606,6 @@ Built-in rust mode:
 
   ;; show variable types as inlay hints
   (lsp-rust-analyzer-server-display-inlay-hints t)
-
-  :config
   )
 #+end_src
 
@@ -2629,7 +2625,6 @@ For rust-related compile mode regexp alist, etc.
 #+begin_src emacs-lisp
 (use-package cargo
   :elpaca t
-  :after rust-mode
   :bind
   (:map cargo-mode-map
         ("C-c C-c r" . cargo-process-run-release)
