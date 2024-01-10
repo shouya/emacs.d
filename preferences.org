@@ -2169,6 +2169,23 @@ otherwise fallback to =dumb-jump=.
 (use-package sideline-lsp
   :elpaca t
   :after flycheck lsp-mode)
+
+(use-package sideline-lsp
+  :after lsp-mode
+  :demand t
+  :config
+  ;; the default code action prefix is the unicode emoji char "💡" (U+1F4A1).
+  ;; Because of some reason it my Noto Color Emoji font cannot be specified
+  ;; so the default font fallbacks to Symbola. Symbola has a different height
+  ;; than my default font, so whenever the sideline shows up, the lineheight
+  ;; would shift a bit, causing a uncomfortable visual twitch. To fix this,
+  ;; I just simply copy the icon from the lsp-mode's modeline, which uses
+  ;; all-the-icons under the hood.
+  (setq sideline-lsp-code-actions-prefix
+        (concat
+         (lsp-modeline--code-actions-icon 'lsp-modeline-code-actions-face)
+         " "))
+  )
 #+end_src
 
 ** Highlight all occurrences of word at point
