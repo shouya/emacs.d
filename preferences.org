@@ -807,15 +807,11 @@ Corfu completion in terminal:
    :preview-key '(:debounce 0.1 any))
   )
 
-(with-eval-after-load 'lsp-mode
-  (use-package consult-lsp
-    :bind (:map lsp-mode-map
-                ("C-c C-j" . consult-lsp-symbols))))
-
-(with-eval-after-load 'eglot
-  (use-package consult-eglot
-    :bind (:map eglot-mode-map
-                ("C-c C-j" . consult-eglot-symbols))))
+(use-package consult-lsp
+  :elpaca t
+  :after lsp-mode
+  :bind (:map lsp-mode-map
+              ("C-c C-j" . consult-lsp-symbols)))
 #+end_src
 
 ** CtrlF as isearch
@@ -1830,19 +1826,19 @@ Mostly to load indentation settings.
   ;; to fix a weird bug
   (setq lsp-keymap-prefix "M-l")
 
-  :commands (lsp lsp-mode lsp-deferred)
-  :bind
-  (:map lsp-mode-map
-        ("C-c C-f" . lsp-format-buffer)
-        ("M-," . xref-find-definitions)
-        ("M-." . xref-find-definitions-other-window))
-
-  :bind
-  (:map lsp-command-map
-        ("l" . lsp-inlay-hints-mode))
+  :commands (lsp lsp-mode)
+  :bind (:map lsp-mode-map
+              ("C-c C-f" . lsp-format-buffer)
+              ("M-," . xref-find-definitions)
+              ("M-." . xref-find-definitions-other-window)
+              :map lsp-command-map
+              ("l" . lsp-inlay-hints-mode))
 
   :bind-keymap
   ("M-l" . lsp-command-map)
+
+  :hook
+  (rust-ts-mode . lsp-deferred)
 
   :custom
   ;; use Corfu!
@@ -1885,20 +1881,19 @@ Mostly to load indentation settings.
   ;; do not execute single action automatically. let me see what actions are available.
   (lsp-auto-execute-action nil)
 
-  :hook
-  (lsp-completion-mode . shou/lsp-mode-setup-completion)
-
   :config
   ;; see https://github.com/minad/corfu/wiki#basic-example-configuration-with-orderless
   (defun shou/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(orderless))) ;; Configure orderless
+  (add-hook 'lsp-completion-mode-hook 'shou/lsp-mode-setup-completion)
 
-  ;; exclude watch files for elixir projects
+  ;; exclude unwanted watch files
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.elixir_ls")
   (add-to-list 'lsp-file-watch-ignored "\\.beam\\'")
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]_build\\'")
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]deps\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "\\.lean\\'")
 
   ;; override default lsp-xref backend
   (add-hook 'lsp-mode-hook 'insert-dumb-jump-to-xref)
@@ -1930,8 +1925,10 @@ Mostly to load indentation settings.
   (defun shou/add-lsp-next-checker (checker)
     (setq shou/flycheck-local-cache
           `((lsp . ((next-checkers . (,checker)))))))
+  (message "lsp loaded")
   )
 #+end_src
+
 ** Terminal and shell
 *** Eshell
 
@@ -2202,6 +2199,7 @@ otherwise fallback to =dumb-jump=.
 #+begin_src emacs-lisp
 (use-package apheleia
   :elpaca t
+  :hook (emacs-startup . apheleia-global-mode)
   :config
   (add-to-list 'apheleia-formatters '(mix . ("mix" "format" "-")))
   (add-to-list 'apheleia-formatters '(prettier . (npx "prettier" "--stdin-filepath" filepath)))
@@ -2231,9 +2229,7 @@ otherwise fallback to =dumb-jump=.
   (advice-add 'apheleia--create-rcs-patch :around #'shou/fix-apheleia-accidental-deletion)
 
   ;; used in hooks to turn off apheleia mode for some modes
-  (defun shou/disable-apheleia-mode nil (apheleia-mode -1))
-
-  (apheleia-global-mode 1))
+  (defun shou/disable-apheleia-mode nil (apheleia-mode -1)))
 #+end_src
 
 ** Treesit
@@ -2514,13 +2510,39 @@ Evaluate an expression with pretty print:
 
 #+begin_src emacs-lisp
 (use-package lean4-mode
-  :elpaca (:host github :repo "leanprover/lean4-mode" :files ("*.el" "data"))
-  :config
-  (with-eval-after-load 'lsp-mode
-    (add-to-list 'lsp-file-watch-ignored-directories "\\.lean\\'")))
+  :elpaca (:host github :repo "leanprover/lean4-mode" :files ("*.el" "data")))
 #+end_src
 
 ** Rust
+
+*** Normal rust mode
+
+#+begin_src emacs-lisp
+(use-package rust-mode
+  :mode ("\\.rs\\'" . rust-mode)
+  :custom
+  ;; do not show a buffer for format errors
+  (rust-format-show-buffer nil)
+
+  ;; set default indent size to 2. Actual indent size will be auto-detected
+  (rust-indent-offset 2)
+
+  ;; enable proc macro expansion for rust-analyzer (used by lsp mode)
+  (lsp-rust-analyzer-proc-macro-enable t)
+
+  ;; default: "check".
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+
+  ;; enable clippy by default
+  (lsp-rust-clippy-preference "on")
+
+  ;; show variable types as inlay hints
+  (lsp-rust-analyzer-server-display-inlay-hints t)
+
+  :bind
+  (:map rust-mode-map
+        ("C-c C-c C-e" . lsp-rust-analyzer-open-cargo-toml)))
+#+end_src
 
 *** Rust TS mode
 
@@ -2528,6 +2550,7 @@ Built-in rust mode:
 
 #+begin_src emacs-lisp
 (use-package rust-ts-mode
+  :after rust-mode
   :when (fboundp 'rust-ts-mode)
   :bind (:map rust-ts-mode-map
 	        ("C-c C-d" . rust-dbg-wrap-or-unwrap))
@@ -2548,7 +2571,8 @@ Built-in rust mode:
 
   :config
   ;; rust-related compile mode regexp alist, etc.
-  (require 'rust-compile))
+  (require 'rust-compile)
+  )
 #+end_src
 
 *** Cargo
@@ -2556,6 +2580,7 @@ Built-in rust mode:
 #+begin_src emacs-lisp
 (use-package cargo
   :elpaca t
+  :after rust-mode
   :bind
   (:map cargo-mode-map
         ("C-c C-c r" . cargo-process-run-release)
@@ -2593,14 +2618,14 @@ Built-in rust mode:
       (apply orig-fun args)))
   (advice-add 'cargo-process-current-test :around #'shou/cargo-process-current-test-patch)
 
-  ;; fix incorrect filename regexp in compilation mode
-  ;; See https://github.com/rust-lang/rust-mode/issues/452
-  (setq error_stack-regexps
-        '("\\(?:at\\|',\\) \\(\\([^:\s]+\\):\\([0-9]+\\)\\)"
-          2 3 nil nil 1))
-  (setf
-   (cdr (assoc 'cargo compilation-error-regexp-alist-alist))
-   error_stack-regexps)
+  ;; ;; fix incorrect filename regexp in compilation mode
+  ;; ;; See https://github.com/rust-lang/rust-mode/issues/452
+  ;; (setq error_stack-regexps
+  ;;       '("\\(?:at\\|',\\) \\(\\([^:\s]+\\):\\([0-9]+\\)\\)"
+  ;;         2 3 nil nil 1))
+  ;; (setf
+  ;;  (cdr (assoc 'cargo compilation-error-regexp-alist-alist))
+  ;;  error_stack-regexps)
   )
 
 ;; avoid conflict with cargo mode
@@ -2608,7 +2633,7 @@ Built-in rust mode:
   (unbind-key "C-c C-c" conf-mode-map))
 #+end_src
 
-*** Haskell
+** Haskell
 
 #+begin_src emacs-lisp
 (use-package haskell-mode
@@ -2632,6 +2657,14 @@ Built-in rust mode:
   ;; auto load imports
   (haskell-process-auto-import-modules t)
 )
+#+end_src
+
+** Nix
+
+#+begin_src emacs-lisp
+(use-package nix-mode
+  :elpaca t
+  :mode "\\.nix\\'")
 #+end_src
 
 * Troubleshooting
