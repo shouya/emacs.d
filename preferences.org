@@ -2555,6 +2555,8 @@ Evaluate an expression with pretty print:
 
 #+begin_src emacs-lisp
 (use-package rust-mode
+  :elpaca t
+  :when (not (fboundp 'rust-ts-mode))
   :mode ("\\.rs\\'" . rust-mode)
   :custom
   ;; do not show a buffer for format errors
@@ -2588,6 +2590,8 @@ Built-in rust mode:
 (use-package rust-ts-mode
   :after rust-mode
   :when (fboundp 'rust-ts-mode)
+  :mode ("\\.rs\\'" . rust-mode)
+
   :bind (:map rust-ts-mode-map
 	        ("C-c C-d" . rust-dbg-wrap-or-unwrap))
   :custom
@@ -2606,9 +2610,18 @@ Built-in rust mode:
   (lsp-rust-analyzer-server-display-inlay-hints t)
 
   :config
-  ;; rust-related compile mode regexp alist, etc.
-  (require 'rust-compile)
   )
+#+end_src
+
+*** Rust compilation support
+
+For rust-related compile mode regexp alist, etc.
+
+#+begin_src emacs-lisp
+(use-package rust-compile
+  :after rust-ts-mode
+  :demand t
+  :elpaca (rust-mode :files ("rust-compile.el")))
 #+end_src
 
 *** Cargo
