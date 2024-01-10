@@ -2276,7 +2276,7 @@ Configure the built-in tree sit modes.
   (("C-<iso-lefttab>" . copilot-complete))
 
   :hook
-  ;; (text-mode . copilot-mode)
+  (text-mode . copilot-mode)
   (conf-mode . copilot-mode)
   (prog-mode . copilot-mode)
 
@@ -2363,6 +2363,25 @@ Configure the built-in tree sit modes.
   (defun shou/ignore-copilot-indent-warning ()
     (setq-local copilot--indent-warning-printed-p t))
   (add-hook 'copilot-mode-hook #'shou/ignore-copilot-indent-warning))
+#+end_src
+
+*** copilot fix with org-todo
+
+See https://github.com/copilot-emacs/copilot.el/issues/172.
+
+#+begin_src emacs-lisp
+(use-package copilot
+  :after org
+  :config
+  (defun shou/disable-copilot-temporarily (fn &rest args)
+    (if (not (and (boundp 'copilot-mode) copilot-mode))
+        (apply fn args)
+      (copilot-mode -1)
+      (apply fn args)
+      (copilot-mode 1)))
+
+  ;; advice it on org-todo
+  (advice-add 'org-todo :around #'shou/disable-copilot-temporarily))
 #+end_src
 
 ** gptel
