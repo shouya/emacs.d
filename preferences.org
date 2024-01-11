@@ -2194,6 +2194,7 @@ otherwise fallback to =dumb-jump=.
 
 #+begin_src emacs-lisp
 (use-package idle-highlight-mode
+  :disabled
   :elpaca t
   :hook (prog-mode . idle-highlight-mode)
   :custom
