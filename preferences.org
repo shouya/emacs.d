@@ -2273,15 +2273,15 @@ Configure the built-in tree sit modes.
 #+begin_src emacs-lisp
 (use-package copilot
   ;; :elpaca (:host github :repo "raymond-w-ko/copilot.el" :files ("dist" "*.el"))
-  :elpaca (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :elpaca (:host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el")
+                 ;; the next commit has bug with jumping cursor
+                 :ref "653fe7b12990b5b7a050971bed4579022ce4b4f8"
+                 )
   :commands (copilot-mode copilot-clear-overlay copilot-complete copilot-diagnose)
   :custom
   ;; enable logging (max size: 10000)
   (copilot-log-max 10000)
   (copilot-idle-delay 0.3)
-  ;; (copilot-network-proxy '(:host "127.0.0.1" :port 8888))
-  ;; no warning if mode-specific offset cannot be found
-  (copilot-indent-warning-suppress t)
 
   :init
   ;; keys bind to copilot-completion-map
@@ -2357,26 +2357,6 @@ Configure the built-in tree sit modes.
           ;; replace the last char with a placeholder, e.g. "hello" => "hell@"
           (censor (lambda (s) (concat (substring s 0 -1) "@"))))
       (s-replace-regexp slur-regexp censor text)))
-
-  ;; copilot-completion-map doesn't always trigger when flymake
-  ;; overlay is present at the same position. So I wrote this
-  ;; workaround to bind the keys to copilot-map and only trigger
-  ;; copilot-functions when the overlay is visible.
-  (defun shou/copilot-override-key (key f)
-    "Only execute copilot f key if copilot overlay is visible"
-    (if (copilot--overlay-visible)
-        (funcall f)
-      (let ((copilot-mode nil))
-        ;; fallback to default behavior
-        (call-interactively (key-binding key)))))
-
-  (cl-loop for (key . f) in shou/copilot-keymap
-           do
-           (message "binding %s to %s" key f)
-           (bind-key key f copilot-completion-map)
-           (bind-key key `(lambda () (interactive)
-                            (shou/copilot-override-key ,(kbd key) (quote ,f)))
-                     copilot-mode-map))
 
   ;; silent the warning: https://github.com/copilot-emacs/copilot.el/issues/220
   (defun shou/ignore-copilot-indent-warning ()
