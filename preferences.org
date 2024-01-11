@@ -1103,6 +1103,8 @@ Gather statistics for frequently used commands.
   (dired-recursive-copies 'always)
   ;; Ask once before deleting
   (dired-recursive-deletes 'top)
+  ;; Show human readable size
+  (dired-listing-switches "-lah")
 
   :config
   ;; used for deft
