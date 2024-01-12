@@ -306,6 +306,10 @@ Key bindings:
 
   ;; make TAB acts as in major mode
   (setq org-src-tab-acts-natively t)
+
+  ;; use alternating set of bullet for lists. Default behaviour is to
+  ;; only use "-".
+  (setq org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
   )
 #+end_src
 
@@ -2419,7 +2423,9 @@ See https://github.com/copilot-emacs/copilot.el/issues/172.
       (copilot-mode 1)))
 
   ;; advice it on org-todo
-  (advice-add 'org-todo :around #'shou/disable-copilot-temporarily))
+  (advice-add 'org-todo :around #'shou/disable-copilot-temporarily)
+  ;; used in org-indent-item/org-outdent-item/org-cycle-list-bullet
+  (advice-add 'org-list-struct-apply-struct :around #'shou/disable-copilot-temporarily))
 #+end_src
 
 ** gptel
