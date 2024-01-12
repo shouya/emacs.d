@@ -1075,6 +1075,22 @@ I'd also like to have a bit of visual hint for pair levels.
   :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 
+** Nonlinear undo history
+
+Undo-tree is good, but it sometimes slows down saving (uses too much memory), and I don't really need all its rich functionalities. Now I'm trying out =vundo= on emacs 28.
+
+#+begin_src emacs-lisp
+(use-package vundo
+  ;; vundo requires emacs 28
+  :elpaca (vundo :host github :repo "casouri/vundo")
+  :when (version<= "28" emacs-version)
+  :bind ("C-x u" . vundo)
+  :custom
+  (vundo-compact-display t)
+  )
+#+end_src
+
+
 ** =keyfreq.el=
 
 Gather statistics for frequently used commands.
