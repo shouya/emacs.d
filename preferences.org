@@ -2738,7 +2738,21 @@ For rust-related compile mode regexp alist, etc.
 #+begin_src emacs-lisp
 (use-package nix-mode
   :elpaca t
-  :mode "\\.nix\\'")
+  :mode "\\.nix\\'"
+  )
+#+end_src
+
+LSP configuration
+
+#+begin_src emacs-lisp
+(use-package lsp-nix
+  :after lsp-mode
+  :demand t
+  :config
+  (add-to-list 'lsp-client-packages 'lsp-nix)
+  (setq lsp-nix-nil-server-path (f-canonical "~/.nix-profile/bin/nil"))
+  (add-hook 'nix-mode-hook #'lsp-deferred)
+  )
 #+end_src
 
 * Troubleshooting
