@@ -2034,7 +2034,10 @@ Add more command completions for various command line utilities.
 #+begin_src emacs-lisp
 (use-package pcmpl-args
   :elpaca t
-  :after eshell)
+  :after eshell
+  :init
+  ;; pcmpl should require this but didn't
+  (require 'pcmpl-gnu))
 #+end_src
 
 *** Jump to current eshell instance
@@ -2116,7 +2119,7 @@ Use commands like =emamux:send-buffer=.
 ** Jump to definition
 
 I use =dumb-jump=, which works out of the box for many languages. I
-prioritize =lsp-mode=’s find-definition function if it works,
+prioritize =lsp-mode= find-definition function if it works,
 otherwise fallback to =dumb-jump=.
 
 #+begin_src emacs-lisp
