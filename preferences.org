@@ -1921,7 +1921,9 @@ Mostly to load indentation settings.
      lsp-rust
      lsp-pylsp
      lsp-javascript
-     lsp-json))
+     lsp-json
+     lsp-nix
+     ))
 
   ;; do not execute single action automatically. let me see what actions are available.
   (lsp-auto-execute-action nil)
@@ -2762,6 +2764,7 @@ For rust-related compile mode regexp alist, etc.
 (use-package nix-mode
   :elpaca t
   :mode "\\.nix\\'"
+  :hook (nix-mode . lsp-deferred)
   )
 #+end_src
 
@@ -2769,13 +2772,8 @@ LSP configuration
 
 #+begin_src emacs-lisp
 (use-package lsp-nix
-  :after lsp-mode
-  :demand t
   :config
-  (add-to-list 'lsp-client-packages 'lsp-nix)
-  (setq lsp-nix-nil-server-path (f-canonical "~/.nix-profile/bin/nil"))
-  (add-hook 'nix-mode-hook #'lsp-deferred)
-  )
+  (setq lsp-nix-nil-server-path (f-canonical "~/.nix-profile/bin/nil")))
 #+end_src
 
 * Troubleshooting
