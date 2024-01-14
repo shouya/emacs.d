@@ -1094,7 +1094,6 @@ Undo-tree is good, but it sometimes slows down saving (uses too much memory), an
   )
 #+end_src
 
-
 ** =keyfreq.el=
 
 Gather statistics for frequently used commands.
@@ -1106,6 +1105,30 @@ Gather statistics for frequently used commands.
   :config
   (keyfreq-autosave-mode 1))
 #+end_src
+
+** Open a scratch buffer
+
+Several differences from the default =*scratch-buffer*= (or =M-x scratch=)
+
+1. the data is persistent across restarts, no loss of file content
+2. you can open several scratch buffers as you want
+3. it runs org mode by default
+
+#+BEGIN_SRC emacs-lisp
+(defun scratch ()
+  "open a scratch buffer"
+  (interactive)
+  (let* ((buffer-name (make-temp-name "scratch-"))
+         (buffer (generate-new-buffer buffer-name))
+         (scratch-dir (f-expand "~/tmp/scratch"))
+         (target-file (format "%s/%s.org" scratch-dir buffer-name)))
+    (make-directory scratch-dir 'parents)
+    (set (make-local-variable 'major-mode) 'org-mode)
+    (switch-to-buffer buffer)
+    (write-file target-file)
+    (org-mode)))
+#+END_SRC
+
 
 * File management
 
