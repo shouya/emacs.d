@@ -1905,6 +1905,9 @@ Mostly to load indentation settings.
   ;; use Corfu!
   (lsp-completion-provider :none)
 
+  ;; use flycheck
+  (lsp-diagnostics-provider :flycheck)
+
   ;; 1 sec or fail
   (lsp-response-timeout 1.0)
 
