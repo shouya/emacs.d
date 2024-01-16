@@ -1434,6 +1434,22 @@ National Velocity-like experience with =deft=.
      )))
 #+END_SRC
 
+** Refiling
+
+#+begin_src emacs-lisp
+(use-package org
+  :custom
+  (org-refile-targets '(("projects.org" . (:maxlevel . 9))
+                        ("mencti.org" . (:level . 1))
+                        ))
+
+  ;; refile in one go
+  (org-outline-path-complete-in-steps nil)
+
+  ;; show full path
+  (org-refile-use-outline-path 'file)
+  )
+#+end_src
 ** Org-store-link
 
 I use =C-c l= to store link, and =C-c L= to store a id link to a heading.
