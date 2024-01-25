@@ -2382,6 +2382,9 @@ Configure the built-in tree sit modes.
      ;; do not enable copilot on files that may contain secrets
      (string-match-p "\\(?:secret\\|cred\\|hidden\\|private|auth\\)"
                      (shou/buffer-file-name))
+     ;; do not enable copilot on gpg files
+     (string-match-p "\\.\\(gpg\\|asc\\)\\'"
+                     (shou/buffer-file-name))
      ;; do not enable copilot on files in tmp/cu
      (string-match-p "tmp/cu" (shou/buffer-file-name))
      ;; do not match server files
