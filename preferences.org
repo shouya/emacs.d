@@ -2798,6 +2798,20 @@ LSP configuration
   (setq lsp-nix-nil-server-path (f-canonical "~/.nix-profile/bin/nil")))
 #+end_src
 
+** Web mode
+
+#+begin_src emacs-lisp
+(use-package web-mode
+  :elpaca t
+  :mode ("\\.html?\\'" "\\.ts?\\'" "\\.svelte\\'")
+  :custom
+  ;; extra indentation mode
+  (web-mode-script-padding 2)
+  (web-mode-part-padding 2)
+  (web-mode-style-padding 2)
+  )
+#+end_src
+
 * Troubleshooting
 
 ** Startup benchmarking
