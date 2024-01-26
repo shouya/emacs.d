@@ -1631,6 +1631,9 @@ I use pandoc for exporting to mediawiki and gfm.
   ;; sort branches (or any refs) by creation date
   (magit-list-refs-sortby "-creatordate")
 
+  ;; greatly improve scrolling performance on large diffs
+  ;; c.f. https://emacs.stackexchange.com/questions/28736/emacs-pointcursor-movement-lag
+  (auto-window-vscroll nil)
 
   :config
   ;; so it don't close other windows
