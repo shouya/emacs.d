@@ -112,6 +112,8 @@ Allow performing actions in minibuffer that uses minibuffer.
 (bind-key "C-x |" #'split-window-right)
 (bind-key "C-x -" #'split-window-below)
 (bind-key "M-o" #'other-window)
+(defun shou/other-window-backwards nil (interactive) (other-window -1))
+(bind-key "M-O" #'shou/other-window-backwards)
 
 ;; prefer splitting window vertically (|)
 (setq split-width-threshold 140)
