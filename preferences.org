@@ -2474,7 +2474,9 @@ See https://github.com/copilot-emacs/copilot.el/issues/172.
         (apply fn args)
       (copilot-mode -1)
       (apply fn args)
-      (copilot-mode 1)))
+      (save-restriction
+        (widen)
+        (copilot-mode 1))))
 
   ;; advice it on org-todo
   (advice-add 'org-todo :around #'shou/disable-copilot-temporarily)
