@@ -2335,7 +2335,6 @@ Configure the built-in tree sit modes.
   (major-mode-remap-alist
    '((rust-mode . rust-ts-mode)
      (toml-mode . toml-ts-mode)
-     (yaml-mode . yaml-ts-mode)
      )))
 #+end_src
 
