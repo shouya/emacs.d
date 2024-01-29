@@ -1498,7 +1498,7 @@ Capture web page link and title.
   :elpaca t
   :after org
   :commands (org-cliplink-capture)
-  :bind ("C-c C-L" . org-cliplink))
+  :bind ("C-c C-S-l" . org-cliplink))
 #+end_src
 
 ** Key to insert timestamp
