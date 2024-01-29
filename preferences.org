@@ -1131,6 +1131,15 @@ Several differences from the default =*scratch-buffer*= (or =M-x scratch=)
     (org-mode)))
 #+END_SRC
 
+** Code folding support
+
+#+begin_src emacs-lisp
+(use-package hs-minor-mode
+  :elpaca nil
+  :hook (prog-mode . hs-minor-mode)
+  :bind (:map hs-minor-mode-map
+              ("C-c @ TAB" . hs-toggle-hiding)))
+#+end_src
 
 * File management
 
