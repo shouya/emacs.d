@@ -1141,6 +1141,16 @@ Several differences from the default =*scratch-buffer*= (or =M-x scratch=)
               ("C-c @ TAB" . hs-toggle-hiding)))
 #+end_src
 
+** Edit string at point
+
+#+begin_src emacs-lisp
+(use-package string-edit-at-point
+  :elpaca t
+  :commands string-edit-at-point
+  :bind (:map prog-mode-map
+              ("C-c '" . string-edit-at-point)))
+#+end_src
+
 * File management
 
 ** Basic config
