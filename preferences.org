@@ -205,6 +205,12 @@ By default, right mouse button is bound to set mark and middle mouse button is b
 (global-unset-key (kbd "C-<mouse-3>"))
 #+end_src
 
+*** Disable tab indentation
+
+#+begin_src emacs-lisp
+(setq-default indent-tabs-mode nil)
+#+end_src
+
 ** Save last position for each file
 
 #+begin_src emacs-lisp
@@ -456,7 +462,6 @@ Second, we set the font set for various types of special symbols:
 ;; symbols cannot be overriden by fontset by default. Turning off this setting.
 (setq use-default-font-for-symbols nil)
 #+end_src
-
 
 ** Icon fonts
 
