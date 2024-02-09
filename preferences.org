@@ -2514,16 +2514,26 @@ Press =C-c <RET>= to send your input.
 
 #+begin_src emacs-lisp
 (use-package gptel
-  :elpaca t
+  :elpaca (:host github :repo "karthink/gptel")
   :commands (gptel-send gptel gptel-menu gptel-set-topic)
   :custom
   (gptel-default-mode 'org-mode)
+  (gptel-log-level 'info)
   :config
   ;; auto scroll as the response comes in
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   ;; move cursor to the end of response
   (add-hook 'gptel-post-response-hook 'gptel-end-of-response)
-  )
+
+  ;; openrouter.ai as default backend
+  (require 'shou-pass)
+  (gptel-make-openai "Openrouter.ai"
+    :models '("gryphe/mythomist-7b" "recursal/eagle-7b" "undi95/toppy-m-7b")
+    :stream t
+    :key (lambda nil (shou/get-pass-entry "openrouter-ai/api-key"))
+    :host "openrouter.ai"
+    :endpoint "/api/v1/chat/completions"
+    ))
 #+end_src
 
 * Languages and modes
