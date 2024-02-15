@@ -1969,6 +1969,7 @@ Mostly to load indentation settings.
      lsp-rust
      lsp-pylsp
      lsp-javascript
+     lsp-css
      lsp-json
      lsp-nix
      ))
@@ -2849,7 +2850,35 @@ LSP configuration
   (web-mode-script-padding 2)
   (web-mode-part-padding 2)
   (web-mode-style-padding 2)
+  ;; indentation
+  (web-mode-markup-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  (web-mode-css-indent-offset 2)
   )
+#+end_src
+
+** CSS
+
+#+begin_src emacs-lisp
+(use-package css-mode
+  :elpaca nil
+  :custom
+  (css-indent-offset 2)
+  :config
+  (add-hook 'css-mode-hook #'lsp-deferred))
+#+end_src
+
+** JavaScript
+
+#+begin_src emacs-lisp
+(use-package js
+  :elpaca nil
+  :custom
+  (js-indent-level 2)
+  :config
+  (with-eval-after-load 'lsp-javascript
+    (setq lsp-typescript-surveys-enabled nil))
+  (add-hook 'js-mode-hook #'lsp-deferred))
 #+end_src
 
 * Troubleshooting
