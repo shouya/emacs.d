@@ -2198,16 +2198,22 @@ otherwise fallback to =dumb-jump=.
 
 #+begin_src emacs-lisp
 (use-package dumb-jump
-  :commands (dumb-jump-xref-activate)
+  :elpaca t
+  :functions (dumb-jump-xref-activate)
   :custom
   (dumb-jump-selector 'completing-read)
   (dumb-jump-force-searcher 'rg)
   ;; Defaults to --pcre2. ripgrep's pcre is an opt-in feature that's not enabled by default.
   (dumb-jump-rg-search-args "--auto-hybrid-regex")
-  :config
+  :init
+  (require 'xref)
   (remove-hook 'xref-backend-functions #'etags--xref-backend)
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
-  )
+
+  ;; Do not show a *xref* buffer when there are multiple
+  ;; candidates. Show a completion buffer instead.
+  (when (fboundp 'xref-show-definitions-completing-read)
+    (setq xref-show-definitions-function #'xref-show-definitions-completing-read)))
 
 (with-eval-after-load 'xref
   (bind-key* "M-," #'xref-find-definitions)
