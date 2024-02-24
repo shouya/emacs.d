@@ -2366,6 +2366,8 @@ Configure the built-in tree sit modes.
   (major-mode-remap-alist
    '((rust-mode . rust-ts-mode)
      (toml-mode . toml-ts-mode)
+     ;; treesit-install-grammar https://github.com/tree-sitter/tree-sitter-css
+     (css-mode . css-ts-mode)
      )))
 #+end_src
 
