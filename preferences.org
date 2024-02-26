@@ -605,7 +605,6 @@ Enable line wrap by default:
 #+end_src
 
 * Editing
-
 ** Behavior tweaks
 *** Remove trailing whitespace on save
 
@@ -1255,7 +1254,6 @@ Several differences from the default =*scratch-buffer*= (or =M-x scratch=)
 #+end_src
 
 * Org mode
-
 ** Base directory for org files
 
 #+begin_src emacs-lisp
@@ -1637,8 +1635,15 @@ I use pandoc for exporting to mediawiki and gfm.
                       :foreground "gray60"))
 #+end_src
 
-* Programming features
+** Spot weaselwords
 
+#+begin_src emacs-lisp
+(use-package writegood-mode
+  :elpaca t
+  :hook (org-mode . writegood-mode))
+#+end_src
+
+* Programming features
 ** Source control
 
 *** Magit
