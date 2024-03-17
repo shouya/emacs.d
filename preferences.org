@@ -795,6 +795,8 @@ Corfu completion in terminal:
   :after recentf
   :bind
   (("M-g g" . consult-goto-line)
+   ;; consult single line
+   ("M-g M-g" . consult-line)
    ;; any org heading
    ("C-c C-S-j" . consult-org-agenda)
    ("C-x b" . consult-buffer)
