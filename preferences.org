@@ -1683,7 +1683,9 @@ I use pandoc for exporting to mediawiki and gfm.
   (unbind-key "M-n" magit-status-mode-map)
 
   ;; do not show list of tags to faster
-  (remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
+  ;; (remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
+  (add-to-list 'magit-section-initial-visibility-alist
+               '([tags branchbuf] . hide))
 
   ;; magit/transient uses some functions from emacs 28
   (when (< emacs-major-version 28)
