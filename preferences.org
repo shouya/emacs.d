@@ -2668,6 +2668,19 @@ Evaluate an expression with pretty print:
 (bind-key "M-:" #'pp-eval-expression)
 #+end_src
 
+** Bash
+
+#+begin_src emacs-lisp
+(use-package sh-script
+  ;; configure the built-in shell script mode
+  :elpaca nil
+  :config
+  ;; remove comint completion. corfu is preferred.
+  (add-hook 'sh-base-mode-hook
+            (lambda ()
+              (remove-hook 'completion-at-point-functions #'comint-completion-at-point t))))
+#+end_src
+
 ** Fish
 
 #+begin_src emacs-lisp
