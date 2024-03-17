@@ -2377,16 +2377,17 @@ Configure the built-in tree sit modes.
 #+end_src
 
 * AI features
-
 ** copilot.el
 
 #+begin_src emacs-lisp
 (use-package copilot
-  ;; :elpaca (:host github :repo "raymond-w-ko/copilot.el" :files ("dist" "*.el"))
-  :elpaca (:host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el")
-                 ;; the next commit has bug with jumping cursor
-                 :ref "653fe7b12990b5b7a050971bed4579022ce4b4f8"
+  :elpaca (:host github :repo "raymond-w-ko/copilot.el" :files ("dist" "*.el")
+                 :branch "fix-gh-172"
                  )
+  ;; :elpaca (:host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el")
+  ;;                ;; the next commit has bug with jumping cursor
+  ;;                :ref "653fe7b12990b5b7a050971bed4579022ce4b4f8"
+  ;;                )
   :commands (copilot-mode copilot-clear-overlay copilot-complete copilot-diagnose)
   :custom
   ;; enable logging (max size: 10000)
@@ -2505,6 +2506,7 @@ See https://github.com/copilot-emacs/copilot.el/issues/172.
 
 #+begin_src emacs-lisp
 (use-package copilot
+  :disabled
   :after org
   :config
   (defun shou/disable-copilot-temporarily (fn &rest args)
