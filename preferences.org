@@ -870,8 +870,7 @@ I use =jinx= for spell check.
   :bind (:map jinx-mode-map
               ("C-;" . jinx-correct))
   :hook
-  (text-mode . jinx-mode)
-  (prog-mode . jinx-mode)
+  (emacs-startup . global-jinx-mode)
 
   :custom
   (jinx-languages "en_US")
