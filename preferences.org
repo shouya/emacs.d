@@ -896,15 +896,16 @@ I use =jinx= for spell check.
   (advice-add 'jinx--correct-replace :before #'shou/jinx--add-to-abbrev)
 
   (defun shou/jinx-valid-english-possive-p (start)
+  (defun shou/jinx-valid-english-possessive-p (start)
     (let ((word (buffer-substring-no-properties start (point))))
-      (and (string-suffix-p "'s" word)
+      (and (string-match-p "['’]s\\'" word)
            (cl-loop
             with word-stripped = (substring word 0 -2)
             for w in jinx--session-words
             thereis (and (string-equal-ignore-case word-stripped w)
-                         (string-match-p "\\`[[:lower:]]+\\'" w))))))
+                         (string-match-p "\\`[[:alpha:]]+\\'" w))))))
 
-  (add-to-list 'jinx--predicates #'shou/jinx-valid-english-possive-p))
+  (add-to-list 'jinx--predicates #'shou/jinx-valid-english-possessive-p))
 #+end_src
 
 ** Snippets
