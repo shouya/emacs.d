@@ -895,7 +895,9 @@ I use =jinx= for spell check.
 
   (advice-add 'jinx--correct-replace :before #'shou/jinx--add-to-abbrev)
 
-  (defun shou/jinx-valid-english-possive-p (start)
+  ;; enable abbrev mode in jinx mode for auto-correction
+  (add-hook 'jinx-mode-hook #'abbrev-mode)
+
   (defun shou/jinx-valid-english-possessive-p (start)
     (let ((word (buffer-substring-no-properties start (point))))
       (and (string-match-p "['’]s\\'" word)
