@@ -996,7 +996,15 @@ I use =tempel= to quickly enter frequently used snippets.
   (remote-file-name-inhibit-cache 10)
 
   ;; do not store remote command history over tramp
-  (tramp-histfile-override t))
+  (tramp-histfile-override t)
+
+  :config
+  (defun shou/turn-off-project-detection ()
+    (setq-local projectile-auto-update-cache nil)
+    (setq-local projectile-dynamic-mode-line nil)
+    (setq-local doom-modeline-project-detection nil))
+  (add-hook 'tramp-mode-hook #'shou/turn-off-project-detection)
+  )
 #+end_src
 
 ** Sudo edit
