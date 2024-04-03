@@ -2003,6 +2003,11 @@ Mostly to load indentation settings.
   ;; do not execute single action automatically. let me see what actions are available.
   (lsp-auto-execute-action nil)
 
+  ;; show multiline type info
+  (lsp-eldoc-render-all t)
+  ;; do not show truncated message
+  (eldoc-echo-area-display-truncation-message nil)
+
   :config
   ;; see https://github.com/minad/corfu/wiki#basic-example-configuration-with-orderless
   (defun shou/lsp-mode-setup-completion ()
@@ -2454,7 +2459,6 @@ Configure the built-in tree sit modes.
      ;; do not match server files
      (string-match-p "examples/server" (shou/buffer-file-name))
      ))
-
   (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
 
   (defun shou/advice-copilot-mode (orig-fn &rest args)
