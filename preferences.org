@@ -2466,38 +2466,6 @@ Configure the built-in tree sit modes.
       (apply orig-fn args)))
   (advice-add 'copilot-mode :around #'shou/advice-copilot-mode)
 
-  ;; cached copilot slur regexp, computed on first invocation
-  (defvar shou/copilot-slur-regexp nil)
-  (defun shou/copilot-slur-regexp nil
-    (or (bound-and-true-p shou/copilot-slur-regexp)
-        (setq shou/copilot-slur-regexp
-              ;; the list comes from https://moyix.net/~moyix/copilot_slurs_rot13.txt
-              (let* ((words (->> (f-read "~/.emacs.d/assets/copilot_slurs_rot13.txt")
-                                 (rot13)
-                                 (s-split "\n")
-                                 (-remove (lambda (s)
-                                            (or (s-starts-with-p "#" s)
-                                                (s-starts-with-p "<" s)
-                                                (s-blank-p s)))))))
-                (eval `(rx word-start (or ,@words) word-end))))))
-
-  (defun shou/toggle-highlight-copilot-slurs nil
-    "Toggle highlight of copilot slurs."
-    (interactive)
-    (if (bound-and-true-p shou/copilot-slur-on)
-        (progn
-          (setq-local shou/copilot-slur-on nil)
-          (unhighlight-regexp (shou/copilot-slur-regexp)))
-      (setq-local shou/copilot-slur-on t)
-      (highlight-regexp (shou/copilot-slur-regexp))))
-
-  (defun shou/neuter-copilot-slur-words (text)
-    (let ((slur-regexp (shou/copilot-slur-regexp))
-          ;; replace the last char with a placeholder, e.g. "hello" => "hell@"
-          (censor (lambda (s) (concat (substring s 0 -1) "@"))))
-      (s-replace-regexp slur-regexp censor text)))
-
-
   ;; copilot-completion-map doesn't always trigger when flymake
   ;; overlay is present at the same position. So I wrote this
   ;; workaround to bind the keys to copilot-map and only trigger
