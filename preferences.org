@@ -420,8 +420,9 @@ Never show graphical dialog box.
 
 #+begin_src emacs-lisp
 (add-hook 'emacs-startup-hook
-	  (lambda () (set-frame-font "JetBrains Mono ExtraLight")))
-(set-face-attribute 'default nil :family "JetBrains Mono ExtraLight" :height 130)
+	  (lambda ()
+            (set-frame-font "JetBrains Mono ExtraLight")
+            (set-face-attribute 'default nil :family "JetBrains Mono ExtraLight" :height 130)))
 #+end_src
 
 ** Fonts for special codepoints
