@@ -2052,6 +2052,7 @@ Mostly to load indentation settings.
   (defun shou/add-lsp-next-checker (checker)
     (setq shou/flycheck-local-cache
           `((lsp . ((next-checkers . (,checker)))))))
+
   (message "lsp loaded")
   )
 #+end_src
@@ -2453,6 +2454,8 @@ Configure the built-in tree sit modes.
                      (shou/buffer-file-name))
      ;; do not enable copilot on gpg files
      (string-match-p "\\.\\(gpg\\|asc\\)\\'"
+                     (shou/buffer-file-name))
+     (string-match-p "\\.bean\\'"
                      (shou/buffer-file-name))
      ;; do not enable copilot on files in tmp/cu
      (string-match-p "tmp/cu" (shou/buffer-file-name))
