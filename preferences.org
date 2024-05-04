@@ -34,7 +34,7 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 
 #+begin_src emacs-lisp
 (use-package atomic-chrome
-  :elpaca t
+  :ensure t
   :hook (emacs-startup . atomic-chrome-start-server)
   :if (display-graphic-p)
   :custom
@@ -52,9 +52,9 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 ** Load some basic libraries and packages
 
 #+begin_src emacs-lisp
-(use-package dash :elpaca t :demand t)
-(use-package f :elpaca t :demand t)
-(use-package s :elpaca t :demand t)
+(use-package dash :ensure t :demand t)
+(use-package f :ensure t :demand t)
+(use-package s :ensure t :demand t)
 
 (elpaca-wait)
 #+end_src
@@ -178,7 +178,7 @@ Delete current active region when I begin typing or pasting.
 
 #+begin_src emacs-lisp
 (use-package expand-region
-  :elpaca t
+  :ensure t
   :bind (("C-=" . er/expand-region)
          ("C--" . er/contract-region))
   :custom
@@ -341,7 +341,7 @@ Also, do not show splash screen.
 
 #+begin_src emacs-lisp
 (use-package helpful
-  :elpaca t
+  :ensure t
   :bind
   ("C-h k" . helpful-key)
   ("C-h f" . helpful-callable)
@@ -476,7 +476,7 @@ command:
 
 #+begin_src emacs-lisp
 (use-package all-the-icons
-  :elpaca t
+  :ensure t
   :commands all-the-icons-install-fonts)
 #+end_src
 
@@ -484,7 +484,7 @@ command:
 
 #+begin_src emacs-lisp
 (use-package doom-modeline
-  :elpaca t
+  :ensure t
   :hook (emacs-startup . doom-modeline-mode)
   :custom
   (doom-modeline-height 30)
@@ -509,7 +509,7 @@ command:
 
 #+begin_src emacs-lisp
 (use-package diff-hl
-  :elpaca t
+  :ensure t
   :hook (emacs-startup . global-diff-hl-mode))
 #+end_src
 
@@ -527,7 +527,7 @@ other parenthesis is beyond visible area.
 
 #+begin_src emacs-lisp
 (use-package golden-ratio
-  :elpaca (:host github :repo "shouya/golden-ratio.el")
+  :ensure (:host github :repo "shouya/golden-ratio.el")
   :hook (emacs-startup . golden-ratio-mode)
   :custom
   (golden-ratio-exclude-buffer-names '("*Ediff Control Panel*"))
@@ -552,7 +552,7 @@ other parenthesis is beyond visible area.
 
 #+begin_src emacs-lisp
 (use-package transpose-frame
-  :elpaca t
+  :ensure t
   :init
   ;; window-redisplay-end-trigger was obsolete and removed from latest
   ;; emacs 29 snapshot.
@@ -573,7 +573,7 @@ Show popup window in desired styles.
 
 #+begin_src emacs-lisp
 (use-package popwin
-  :elpaca t
+  :ensure t
   :hook (emacs-startup . popwin-mode)
   :config
   (push '("*elixir-format-errors*" :noselect t) popwin:special-display-config)
@@ -593,7 +593,7 @@ Show popup window in desired styles.
 
 #+begin_src emacs-lisp
 (use-package page-break-lines
-  :elpaca t
+  :ensure t
   :hook (emacs-startup . global-page-break-lines-mode))
 #+end_src
 
@@ -618,10 +618,8 @@ Enable line wrap by default:
 Stolen from https://stackoverflow.com/a/45363946/1232832.
 
 #+begin_src emacs-lisp
-(bind-key "M-<up>"
-  #'(lambda() (interactive) (scroll-other-window -1)))
-(bind-key "M-<down>"
-  #'(lambda() (interactive) (scroll-other-window 1)))
+(bind-key "M-<up>" 'scroll-other-window)
+(bind-key "M-<down>" 'scroll-other-window-down)
 #+end_src
 
 *** Show column number
@@ -636,7 +634,7 @@ Show vertical completion for minibuffer options:
 
 #+begin_src emacs-lisp
 (use-package vertico
-  :elpaca (:host github
+  :ensure (:host github
 		 :repo "minad/vertico"
 		 :files (:defaults "extensions/*")
 		 :includes (vertico-repeat))
@@ -652,7 +650,7 @@ And show rich info on the margin:
 
 #+begin_src emacs-lisp
 (use-package marginalia
-  :elpaca t
+  :ensure t
   :init
   (marginalia-mode)
 
@@ -673,7 +671,7 @@ Narrow down the selection using orderless style:
 
 #+begin_src emacs-lisp
 (use-package orderless
-  :elpaca t
+  :ensure t
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides
@@ -690,8 +688,9 @@ Narrow down the selection using orderless style:
 
 #+begin_src emacs-lisp
 (use-package corfu
-  :elpaca (corfu :files (:defaults "extensions/*")
-                 :includes (corfu-info
+  :ensure (corfu :files (:defaults "extensions/*")
+                 :includes (corfu-echo
+                            corfu-info
                             corfu-directory
                             corfu-history
                             corfu-popupinfo))
@@ -702,6 +701,7 @@ Narrow down the selection using orderless style:
 
   :hook
   (emacs-startup . global-corfu-mode)
+  (emacs-startup . corfu-popupinfo-mode)
 
   :custom
   ;; if the line is already indented, try complete instead
@@ -728,7 +728,7 @@ Show icon for completion:
 #+begin_src emacs-lisp
 (use-package kind-icon
   :after corfu
-  :elpaca t
+  :ensure t
   :functions (kind-icon-margin-formatter)
   :init
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
@@ -742,7 +742,7 @@ Extra completion:
 
 #+begin_src emacs-lisp
 (use-package cape
-  :elpaca t
+  :ensure t
   :commands (shou/text-mode-completions)
   :demand t
 
@@ -790,7 +790,7 @@ Corfu completion in terminal:
 #+begin_src emacs-lisp
 (use-package corfu-terminal
   :unless (display-graphic-p)
-  :elpaca (corfu-terminal :host codeberg :repo "akib/emacs-corfu-terminal")
+  :ensure (corfu-terminal :host codeberg :repo "akib/emacs-corfu-terminal")
   :after corfu
   :hook (corfu-mode . corfu-terminal-mode))
 #+end_src
@@ -799,7 +799,7 @@ Corfu completion in terminal:
 
 #+begin_src emacs-lisp
 (use-package consult
-  :elpaca t
+  :ensure t
   :after recentf
   :bind
   (("M-g g" . consult-goto-line)
@@ -828,7 +828,7 @@ Corfu completion in terminal:
   )
 
 (use-package consult-lsp
-  :elpaca t
+  :ensure t
   :after lsp-mode
   :bind (:map lsp-mode-map
               ("C-c C-j" . consult-lsp-symbols)))
@@ -838,7 +838,7 @@ Corfu completion in terminal:
 
 #+begin_src emacs-lisp
 (use-package ctrlf
-  :elpaca t
+  :ensure t
   :bind
   (("C-s" . ctrlf-forward-default)
    ("C-r" . ctrlf-backward-default)
@@ -855,7 +855,7 @@ I use =which-key= to display a screen of hints when a key prefix is entered.
 
 #+begin_src emacs-lisp
 (use-package which-key
-  :elpaca t
+  :ensure t
   :hook (emacs-startup . which-key-mode)
   :custom
   (which-key-idel-delay 1.5))
@@ -867,7 +867,7 @@ I use =jinx= for spell check.
 
 #+begin_src emacs-lisp
 (use-package jinx
-  :elpaca t
+  :ensure t
   :bind (:map jinx-mode-map
               ("C-;" . jinx-correct))
   :hook
@@ -917,7 +917,7 @@ I use =tempel= to quickly enter frequently used snippets.
 
 #+begin_src emacs-lisp
 (use-package tempel
-  :elpaca t
+  :ensure t
   :hook
   (text-mode . shou/add-tempel-to-capf)
   (prog-mode . shou/add-tempel-to-capf)
@@ -957,7 +957,7 @@ I use =tempel= to quickly enter frequently used snippets.
 
 #+begin_src emacs-lisp
 (use-package multiple-cursors
-  :elpaca t
+  :ensure t
   :bind (("C-x m" . mc/mark-all-dwim)
          ("C-M-SPC" . mc/mark-next-lines)
          ("C->" . mc/mark-next-like-this-symbol)
@@ -970,7 +970,7 @@ I use =tempel= to quickly enter frequently used snippets.
 ;; multiple-cursors.el doesn't support isearch (or ctrlf), so we
 ;; need to use phi-search instead.
 (use-package phi-search
-  :elpaca t
+  :ensure t
   :after multiple-cursors
   :bind
   (:map mc/keymap
@@ -983,7 +983,7 @@ I use =tempel= to quickly enter frequently used snippets.
 #+begin_src emacs-lisp
 (use-package visual-regexp
   :after multiple-cursors
-  :elpaca t
+  :ensure t
   :bind (("M-%" . vr/query-replace)))
 #+end_src
 
@@ -1012,7 +1012,7 @@ I use =tempel= to quickly enter frequently used snippets.
 
 #+begin_src emacs-lisp
 (use-package sudo-edit
-  :elpaca t
+  :ensure t
   :commands (sudo-edit sudo-edit-find-file))
 #+end_src
 
@@ -1020,7 +1020,7 @@ I use =tempel= to quickly enter frequently used snippets.
 
 #+begin_src emacs-lisp
 (use-package avy
-  :elpaca t
+  :ensure t
   :bind
   ("M-j" . avy-goto-char)
   ("M-J" . avy-pop-mark)
@@ -1061,7 +1061,7 @@ Pure keyboard context menu.
 
 #+begin_src emacs-lisp
 (use-package embark
-  :elpaca t
+  :ensure t
   :bind ("M-m" . embark-act)
   :config
   (defvar-keymap embark-identifier-map
@@ -1081,7 +1081,7 @@ I use =smartparens= package for (automatic) pair management.
 
 #+begin_src emacs-lisp
 (use-package smartparens-mode
-  :elpaca smartparens
+  :ensure smartparens
   :bind (:map smartparens-mode-map
               ("M-r" . sp-rewrap-sexp)
               ("M-<down>" . sp-splice-sexp)
@@ -1101,7 +1101,7 @@ I'd also like to have a bit of visual hint for pair levels.
 
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
-  :elpaca t
+  :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 
@@ -1112,7 +1112,7 @@ Undo-tree is good, but it sometimes slows down saving (uses too much memory), an
 #+begin_src emacs-lisp
 (use-package vundo
   ;; vundo requires emacs 28
-  :elpaca (vundo :host github :repo "casouri/vundo")
+  :ensure (vundo :host github :repo "casouri/vundo")
   :when (version<= "28" emacs-version)
   :bind ("C-x u" . vundo)
   :custom
@@ -1126,7 +1126,7 @@ Gather statistics for frequently used commands.
 
 #+begin_src emacs-lisp
 (use-package keyfreq
-  :elpaca t
+  :ensure t
   :hook (emacs-startup . keyfreq-mode)
   :config
   (keyfreq-autosave-mode 1))
@@ -1159,7 +1159,7 @@ Several differences from the default =*scratch-buffer*= (or =M-x scratch=)
 
 #+begin_src emacs-lisp
 (use-package hs-minor-mode
-  :elpaca nil
+  :ensure nil
   :hook (prog-mode . hs-minor-mode)
   :bind (:map hs-minor-mode-map
               ("C-c @ TAB" . hs-toggle-hiding)))
@@ -1169,7 +1169,7 @@ Several differences from the default =*scratch-buffer*= (or =M-x scratch=)
 
 #+begin_src emacs-lisp
 (use-package string-edit-at-point
-  :elpaca t
+  :ensure t
   :commands string-edit-at-point
   :bind (:map prog-mode-map
               ("C-c '" . string-edit-at-point)))
@@ -1181,7 +1181,7 @@ Copy to X clipboard:
 
 #+begin_src emacs-lisp
 (use-package xclip
-  :elpaca t
+  :ensure t
   :when (not (display-graphic-p))
   :hook (emacs-startup . xclip-mode))
 #+end_src
@@ -1190,7 +1190,7 @@ Scroll with mouse wheel:
 
 #+begin_src emacs-lisp
 (use-package xterm-mouse-mode
-  :elpaca nil
+  :ensure nil
   :when (not (display-graphic-p))
   :hook (emacs-startup . xterm-mouse-mode)
   )
@@ -1290,7 +1290,7 @@ Scroll with mouse wheel:
 
 #+begin_src emacs-lisp
 (use-package dired-hide-dotfiles
-  :elpaca t
+  :ensure t
   :after dired
   :hook (dired-mode . dired-hide-dotfiles-mode))
 #+end_src
@@ -1419,7 +1419,7 @@ National Velocity-like experience with =deft=.
 
 #+begin_src emacs-lisp
 (use-package deft
-  :elpaca t
+  :ensure t
   :bind ("C-M-n" . deft)
   :commands (deft)
   :custom
@@ -1559,7 +1559,7 @@ Capture web page link and title.
 
 #+begin_src emacs-lisp
 (use-package org-cliplink
-  :elpaca t
+  :ensure t
   :after org
   :commands (org-cliplink-capture)
   :bind ("C-c C-S-l" . org-cliplink))
@@ -1589,7 +1589,7 @@ I use pandoc for exporting to mediawiki and gfm.
 
 #+begin_src emacs-lisp
 (use-package ox-pandoc
-  :elpaca t
+  :ensure t
   :after ox
   :demand t ;; required for registering org-export-dispatch
   :custom
@@ -1634,7 +1634,7 @@ I use pandoc for exporting to mediawiki and gfm.
 
 #+begin_src emacs-lisp
 (use-package org-modern
-  :elpaca t
+  :ensure t
   :after org
   :hook (emacs-startup . global-org-modern-mode)
   :config
@@ -1681,7 +1681,7 @@ I use pandoc for exporting to mediawiki and gfm.
 
 #+begin_src emacs-lisp
 (use-package writegood-mode
-  :elpaca t
+  :ensure t
   :hook (org-mode . writegood-mode))
 #+end_src
 
@@ -1692,7 +1692,7 @@ I use pandoc for exporting to mediawiki and gfm.
 
 #+begin_src emacs-lisp
 (use-package magit
-  :elpaca t
+  :ensure t
   :bind
   ("C-x g" . magit)
   ("C-x C-g" . magit-file-dispatch)
@@ -1753,7 +1753,7 @@ Hotkey to remember:
 
 #+begin_src emacs-lisp
 (use-package forge
-  :elpaca t
+  :ensure t
   :after magit
   :bind (:map magit-mode-map
               ("M-W" . forge-copy-url-at-point-as-kill))
@@ -1789,7 +1789,7 @@ Hotkey to remember:
 
 #+begin_src emacs-lisp
 (use-package browse-at-remote
-  :elpaca t
+  :ensure t
   :bind (("C-c g g" . browse-at-remote)
          ("C-c g G" . browse-at-remote-kill)
          ;; mimic "open-at-point" behaviour
@@ -1803,7 +1803,7 @@ Delta supports highlighting language-syntax, within-line diff, etc.
 
 #+begin_src emacs-lisp
 (use-package magit-delta
-  :elpaca t
+  :ensure t
   :if (executable-find "delta")
   :hook (magit-mode . magit-delta-mode))
 #+end_src
@@ -1816,7 +1816,7 @@ while. The mode is activated for specific folder only using
 
 #+begin_src emacs-lisp
 (use-package git-auto-commit-mode
-  :elpaca t
+  :ensure t
   :commands git-auto-commit-mode
   :custom
   ;; auto push to remote
@@ -1831,7 +1831,7 @@ while. The mode is activated for specific folder only using
 
 #+begin_src emacs-lisp
 (use-package projectile
-  :elpaca t
+  :ensure t
   :custom
   (projectile-completion-system #'completing-read)
   (projectile-enable-caching nil)
@@ -1912,7 +1912,7 @@ Few shortcuts:
 
 #+begin_src emacs-lisp
 (use-package rg
-  :elpaca t
+  :ensure t
   :bind (("C-c s s" . rg-dwim)
          ("C-c s p" . rg-project)
          ("C-c s r" . rg)
@@ -1939,7 +1939,7 @@ Mostly to load indentation settings.
 #+begin_src emacs-lisp
 (use-package editorconfig
   :hook (prog-mode . editorconfig-mode)
-  :elpaca t)
+  :ensure t)
 #+end_src
 
 *** Guess tab size
@@ -1947,7 +1947,7 @@ Mostly to load indentation settings.
 #+begin_src emacs-lisp
 (use-package dtrt-indent
   :hook (prog-mode . dtrt-indent-mode)
-  :elpaca t
+  :ensure t
   :config
   ;; I sometimes type when I forget how to spell "dtrt"
   (defalias 'detect-indentation 'dtrt-indent-mode)
@@ -1960,7 +1960,7 @@ Mostly to load indentation settings.
 
 #+begin_src emacs-lisp
 (use-package lsp-mode
-  :elpaca t
+  :ensure t
   :init
   ;; to fix a weird bug
   (setq lsp-keymap-prefix "M-l")
@@ -1986,6 +1986,10 @@ Mostly to load indentation settings.
 
   ;; use flycheck
   (lsp-diagnostics-provider :flycheck)
+
+  ;; do not show debug messages that tend to be long (turn off for debugging)
+  ;; example: rust-analyzer crash message
+  (lsp--show-message nil)
 
   ;; 1 sec or fail
   (lsp-response-timeout 1.0)
@@ -2201,7 +2205,7 @@ Add more command completions for various command line utilities.
 
 #+begin_src emacs-lisp
 (use-package pcmpl-args
-  :elpaca t
+  :ensure t
   :after eshell
   :init
   ;; pcmpl should require this but didn't
@@ -2237,7 +2241,7 @@ Some programs requires a more POSIX compatible terminal software. I use =eat= fo
 
 #+begin_src emacs-lisp
 (use-package eat
-  :elpaca '(eat :type git
+  :ensure '(eat :type git
                   :host codeberg
                   :repo "akib/emacs-eat"
                   :files ("*.el" ("term" "term/*.el") "*.texi"
@@ -2280,7 +2284,7 @@ Use commands like =emamux:send-buffer=.
 
 #+begin_src emacs-lisp
 (use-package emamux
-  :elpaca t
+  :ensure t
   :commands (emamux:send-buffer emamux:send-region))
 #+end_src
 
@@ -2292,7 +2296,7 @@ otherwise fallback to =dumb-jump=.
 
 #+begin_src emacs-lisp
 (use-package dumb-jump
-  :elpaca t
+  :ensure t
   :functions (dumb-jump-xref-activate)
   :custom
   (dumb-jump-selector 'completing-read)
@@ -2319,7 +2323,7 @@ otherwise fallback to =dumb-jump=.
 
 #+begin_src emacs-lisp
 (use-package flycheck
-  :elpaca t
+  :ensure t
   :commands flycheck-mode
   :hook (prog-mode . flycheck-mode)
 
@@ -2350,7 +2354,7 @@ otherwise fallback to =dumb-jump=.
 
 #+begin_src emacs-lisp
 (use-package sideline
-  :elpaca t
+  :ensure t
   :custom
   ;; show sideline immediately
   (sideline-delay 0)
@@ -2362,11 +2366,11 @@ otherwise fallback to =dumb-jump=.
   )
 
 (use-package sideline-flycheck
-  :elpaca t
+  :ensure t
   :after (flycheck sideline)
   :hook (flycheck-mode . sideline-flycheck-setup))
 (use-package sideline-lsp
-  :elpaca t
+  :ensure t
   :after flycheck lsp-mode)
 
 (use-package sideline-lsp
@@ -2392,7 +2396,7 @@ otherwise fallback to =dumb-jump=.
 #+begin_src emacs-lisp
 (use-package idle-highlight-mode
   :disabled
-  :elpaca t
+  :ensure t
   :hook (prog-mode . idle-highlight-mode)
   :custom
   (idle-highlight-idle-time 0.5))
@@ -2415,7 +2419,7 @@ otherwise fallback to =dumb-jump=.
 
 #+begin_src emacs-lisp
 (use-package apheleia
-  :elpaca t
+  :ensure t
   :hook (emacs-startup . apheleia-global-mode)
   :config
   (add-to-list 'apheleia-formatters '(mix . ("mix" "format" "-")))
@@ -2587,7 +2591,7 @@ Press =C-c <RET>= to send your input.
 
 #+begin_src emacs-lisp
 (use-package gptel
-  :elpaca (:host github :repo "karthink/gptel")
+  :ensure (:host github :repo "karthink/gptel")
   :commands (gptel-send gptel gptel-menu gptel-set-topic)
   :custom
   (gptel-default-mode 'org-mode)
@@ -2614,7 +2618,7 @@ Press =C-c <RET>= to send your input.
 *** Markdown
 #+begin_src emacs-lisp
 (use-package markdown-mode
-  :elpaca t
+  :ensure t
   :commands gfm-mode
   :mode (("\.md$" . gfm-mode)
          ("\.markdown$" . gfm-mode))
@@ -2633,7 +2637,7 @@ Press =C-c <RET>= to send your input.
 
 #+begin_src emacs-lisp
 (use-package mediawiki
-  :elpaca t
+  :ensure t
   :commands mediawiki-mode
   :config
   (unbind-key "<tab>" mediawiki-mode-map)
@@ -2688,10 +2692,10 @@ Press =C-c <RET>= to send your input.
 
 #+begin_src emacs-lisp
 (use-package dockerfile-mode
-  :elpaca t
+  :ensure t
   :mode "Dockerfile")
 (use-package docker-compose-mode
-  :elpaca t
+  :ensure t
   :mode "docker-compose\\.ya?ml"
   :mode "fig\\.ya?ml")
 #+end_src
@@ -2700,7 +2704,7 @@ Press =C-c <RET>= to send your input.
 
 #+begin_src emacs-lisp
 (use-package systemd
-  :elpaca t
+  :ensure t
   :if (eq system-type 'gnu/linux)
   :mode (("\\.service\\'" . systemd-mode)
          ("\\.timer\\'" . systemd-mode)
@@ -2726,7 +2730,7 @@ Evaluate an expression with pretty print:
 #+begin_src emacs-lisp
 (use-package sh-script
   ;; configure the built-in shell script mode
-  :elpaca nil
+  :ensure nil
   :config
   ;; remove comint completion. corfu is preferred.
   (add-hook 'sh-base-mode-hook
@@ -2738,7 +2742,7 @@ Evaluate an expression with pretty print:
 
 #+begin_src emacs-lisp
 (use-package fish-mode
-  :elpaca t
+  :ensure t
   :mode "\\.fish\\'"
   :custom
   ;; to match the same indentation as fish_indent
@@ -2749,7 +2753,7 @@ Evaluate an expression with pretty print:
 
 #+begin_src emacs-lisp
 (use-package lean4-mode
-  :elpaca (:host github :repo "leanprover/lean4-mode" :files ("*.el" "data")))
+  :ensure (:host github :repo "leanprover/lean4-mode" :files ("*.el" "data")))
 #+end_src
 
 ** Rust
@@ -2758,7 +2762,7 @@ Evaluate an expression with pretty print:
 
 #+begin_src emacs-lisp
 (use-package rust-mode
-  :elpaca t
+  :ensure t
   :mode ("\\.rs\\'" . rust-mode)
   :init
   (when (fboundp 'rust-ts-mode)
@@ -2824,7 +2828,7 @@ Tree sitter mode specific config.
 
 #+begin_src emacs-lisp
 (use-package cargo
-  :elpaca t
+  :ensure t
   :bind
   (:map cargo-mode-map
         ("C-c C-c r" . cargo-process-run-release)
@@ -2871,7 +2875,7 @@ Tree sitter mode specific config.
 
 #+begin_src emacs-lisp
 (use-package haskell-mode
-  :elpaca t
+  :ensure t
   :bind (:map haskell-mode-map
               ("C-c C-c" . haskell-compile)
               ("C-c `" . haskell-interactive-bring)
@@ -2897,7 +2901,7 @@ Tree sitter mode specific config.
 
 #+begin_src emacs-lisp
 (use-package nix-mode
-  :elpaca t
+  :ensure t
   :mode "\\.nix\\'"
   :hook (nix-mode . lsp-deferred)
   )
@@ -2915,7 +2919,7 @@ LSP configuration
 
 #+begin_src emacs-lisp
 (use-package web-mode
-  :elpaca t
+  :ensure t
   :mode ("\\.html?\\'" "\\.ts?\\'" "\\.svelte\\'")
   :custom
   ;; extra indentation mode
@@ -2933,7 +2937,7 @@ LSP configuration
 
 #+begin_src emacs-lisp
 (use-package css-mode
-  :elpaca nil
+  :ensure nil
   :custom
   (css-indent-offset 2)
   :config
@@ -2944,7 +2948,7 @@ LSP configuration
 
 #+begin_src emacs-lisp
 (use-package js
-  :elpaca nil
+  :ensure nil
   :custom
   (js-indent-level 2)
   :config
@@ -2953,12 +2957,36 @@ LSP configuration
   (add-hook 'js-mode-hook #'lsp-deferred))
 #+end_src
 
+** GraphViz
+
+Preview with =graphviz-dot-preview= (=C-c C-p=).
+
+#+begin_src emacs-lisp
+(use-package graphviz-dot-mode
+  :ensure t
+  :custom
+  (graphviz-dot-indent-width 2)
+  (graphviz-dot-preview-extension "svg")
+  )
+#+end_src
+
+Also enable =dot= language in org-babel.
+
+#+begin_src emacs-lisp
+(use-package org
+  :ensure nil
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((dot . t))))
+#+end_src
+
 * Troubleshooting
 
 ** Startup benchmarking
 
 #+begin_src emacs-lisp :tangle no
-(use-package esup :elpaca t)
+(use-package esup :ensure t)
 #+end_src
 
 ** Scrolling benchmarking

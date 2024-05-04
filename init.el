@@ -17,11 +17,11 @@
 	    (setq file-name-handler-alist cfg--file-name-handler-alist)))
 (add-hook 'emacs-startup-hook
           (lambda () (message "Emacs ready in %.2f seconds with %d garbage collections."
-                         (float-time (time-subtract (current-time) before-init-time))
-                         gcs-done)))
+                              (float-time (time-subtract (current-time) before-init-time))
+                              gcs-done)))
 
 ;; ----------- initialize elpaca ---------------
-(defvar elpaca-installer-version 0.6)
+(defvar elpaca-installer-version 0.7)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
@@ -61,8 +61,10 @@
 ;; -- enable use-package
 (elpaca elpaca-use-package
   (elpaca-use-package-mode)
-  ;; I would like to manually specify :elpaca t for packages I want it to fetch
-  (setq elpaca-use-package-by-default nil))
+  ;; I would like to manually specify :ensure t for packages I want it to fetch
+  (setq elpaca-use-package-by-default nil)
+  (setq use-package-always-ensure nil)
+  )
 (elpaca-wait)
 
 ;; fix https://github.com/progfolio/elpaca/issues/216 (magit dep on seq)
