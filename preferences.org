@@ -55,6 +55,8 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 (use-package dash :ensure t :demand t)
 (use-package f :ensure t :demand t)
 (use-package s :ensure t :demand t)
+;; magit/forge requires the latest version of transient instead of the built-in one.
+(use-package transient :ensure (:fetcher github :repo "magit/transient"))
 
 (elpaca-wait)
 #+end_src
@@ -1727,15 +1729,6 @@ I use pandoc for exporting to mediawiki and gfm.
   (add-to-list 'magit-section-initial-visibility-alist
                '([tags branchbuf] . hide))
 
-  ;; magit/transient uses some functions from emacs 28
-  (when (< emacs-major-version 28)
-    (defun length= (str n)
-      (= (length str) n))
-    (defun string-replace (old new s)
-      (s-replace old new s))
-    (defun string-search (needle haystack &optional start-pos)
-      (s-contains? needle haystack)))
-
   ;; show exact date on revision page
   (setq magit-revision-headers-format (->> magit-revision-headers-format
                                            (s-replace "%ad" "%ad (%aD)")
@@ -1750,6 +1743,7 @@ Online features, PR, issues, etc.
 Hotkey to remember:
 
 | =C-c C-o= | forge-browse-topic |
+| =C-c C-e= | edit field dwim    |
 
 #+begin_src emacs-lisp
 (use-package forge
@@ -1757,6 +1751,10 @@ Hotkey to remember:
   :after magit
   :bind (:map magit-mode-map
               ("M-W" . forge-copy-url-at-point-as-kill))
+  :custom-face
+  ;; The status (unread/read) affects the boldness of the text, while
+  ;; the state (open/close) affects the text color (normal/dimmed).
+  (forge-topic-unread ((t (:foreground nil))))
   :config
   ;; '(githost apihost id class)
   (add-to-list 'forge-alist
