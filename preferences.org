@@ -21,6 +21,7 @@
 
 #+begin_src emacs-lisp
 (use-package server
+  :demand t
   :config
   (defun shou/server-start ()
     (when (not (server-running-p))
