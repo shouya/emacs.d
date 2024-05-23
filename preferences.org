@@ -1715,6 +1715,15 @@ I use pandoc for exporting to mediawiki and gfm.
                       :foreground "gray60"))
 #+end_src
 
+*** Use valign mode for pixel-perfect table alignment
+
+#+begin_src emacs-lisp
+(use-package valign
+  :ensure t
+  :hook (org-mode . valign-mode)
+  :custom (valign-fancy-bar t))
+#+end_src
+
 ** Spot weaselwords
 
 #+begin_src emacs-lisp
