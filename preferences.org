@@ -114,13 +114,47 @@ Allow performing actions in minibuffer that uses minibuffer.
 #+begin_src emacs-lisp
 (bind-key "C-x |" #'split-window-right)
 (bind-key "C-x -" #'split-window-below)
-(bind-key "M-o" #'other-window)
+;; (bind-key "M-o" #'other-window)
 (defun shou/other-window-backwards nil (interactive) (other-window -1))
 (bind-key "M-O" #'shou/other-window-backwards)
 
 ;; prefer splitting window vertically (|)
 (setq split-width-threshold 140)
 (setq split-height-threshold nil)
+
+;; window layout undo/redo with C-c left/right
+(winner-mode 1)
+#+end_src
+
+*** Ace window
+
+#+begin_src emacs-lisp
+(use-package ace-window
+  :ensure t
+  :bind ("M-o" . ace-window)
+  :hook
+  ;; show window keys in the mode line
+  (emacs-startup . ace-window-display-mode)
+  :custom
+  ;; always dispatch window
+  (aw-dispatch-always t)
+  ;; use home row keys for window switching
+  (aw-keys '(?a ?s ?d ?f ?j ?k ?l))
+  ;; do not show an overlay for window switching character
+  (aw-display-mode-overlay nil)
+  ;; custom dispatch keys
+  (aw-dispatch-alist
+   '((?x aw-delete-window "Delete window")
+     (?m aw-swap-window "Swap window")
+     (?| aw-split-window-vert "Ace - Split vertically")
+     (?- aw-split-window-horz "Ace - Split horizontally")
+     (?0 delete-other-windows "Ace - Maximize window")
+     (?b balance-windows "Balance window")
+     (?+ balance-windows)
+     (?u (lambda (&rest _) (winner-undo)) "Winner - Undo")
+     (?r (lambda (&rest _) (winner-redo)) "Winner - Redo")
+     (?? aw-show-dispatch-help)
+     )))
 #+end_src
 
 ** Kill current buffer by default
@@ -531,6 +565,7 @@ other parenthesis is beyond visible area.
 #+begin_src emacs-lisp
 (use-package golden-ratio
   :ensure (:host github :repo "shouya/golden-ratio.el")
+  :disabled t
   :hook (emacs-startup . golden-ratio-mode)
   :custom
   (golden-ratio-exclude-buffer-names '("*Ediff Control Panel*"))
