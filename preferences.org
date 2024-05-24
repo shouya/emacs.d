@@ -1732,6 +1732,20 @@ I use pandoc for exporting to mediawiki and gfm.
   :hook (org-mode . writegood-mode))
 #+end_src
 
+** Math symbols in Tex input method
+
+#+begin_src emacs-lisp
+(use-package quail
+  :ensure nil
+  :config
+  (with-temp-buffer
+    ;; the input method has to be triggered for `quail-package-alist' to be non-nil
+    (activate-input-method "TeX")
+    (let ((quail-current-package (assoc "TeX" quail-package-alist)))
+      (quail-define-rules ((append . t))
+                          ("\\and" ?∧)
+                          ("\\or" ?∨)))))
+#+end_src
 * Programming features
 ** Source control
 
