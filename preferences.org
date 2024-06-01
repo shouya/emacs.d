@@ -114,7 +114,18 @@ Allow performing actions in minibuffer that uses minibuffer.
 #+begin_src emacs-lisp
 (bind-key "C-x |" #'split-window-right)
 (bind-key "C-x -" #'split-window-below)
-;; (bind-key "M-o" #'other-window)
+
+(defun shou/other-window-or-ace ()
+  "Switch to other window. If C-u is pressed, call ave-window."
+  (interactive)
+  (if (not (equal '(4) current-prefix-arg))
+      (other-window 1)
+    ;; show window keys in the mode line
+    (funcall 'ace-window-display-mode 1)
+    (call-interactively 'ace-window)
+    (funcall 'ace-window-display-mode -1)))
+(bind-key "M-o" #'shou/other-window-or-ace)
+
 (defun shou/other-window-backwards nil (interactive) (other-window -1))
 (bind-key "M-O" #'shou/other-window-backwards)
 
@@ -131,10 +142,7 @@ Allow performing actions in minibuffer that uses minibuffer.
 #+begin_src emacs-lisp
 (use-package ace-window
   :ensure t
-  :bind ("M-o" . ace-window)
-  :hook
-  ;; show window keys in the mode line
-  (emacs-startup . ace-window-display-mode)
+  :commands (ace-window-display-mode ace-window)
   :custom
   ;; always dispatch window
   (aw-dispatch-always t)
