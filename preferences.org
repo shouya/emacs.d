@@ -1242,9 +1242,7 @@ Scroll with mouse wheel:
   )
 #+end_src
 
-
 * File management
-
 ** Basic config
 
 #+begin_src emacs-lisp
@@ -1341,6 +1339,14 @@ Scroll with mouse wheel:
   :hook (dired-mode . dired-hide-dotfiles-mode))
 #+end_src
 
+* Tools
+** Process manager
+
+#+begin_src emacs-lisp
+(use-package proced
+  :custom
+  (proced-enable-color-flag t))
+#+end_src
 * Org mode
 ** Base directory for org files
 
@@ -2574,7 +2580,7 @@ Configure the built-in tree sit modes.
      ;; do not enable copilot when i'm editing wiki
      (derived-mode-p 'mediawiki-mode)
      ;; do not enable copilot on files that may contain secrets
-     (string-match-p "\\(?:secret\\|cred\\|hidden\\|private|auth\\)"
+     (string-match-p "\\(?:secret\\|cred\\|hidden\\|private\\|auth\\|app-2024\\)"
                      (shou/buffer-file-name))
      ;; do not enable copilot on gpg files
      (string-match-p "\\.\\(gpg\\|asc\\)\\'"
