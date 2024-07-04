@@ -2539,7 +2539,36 @@ Configure the built-in tree sit modes.
      )))
 #+end_src
 
-* AI features
+** Highlighting TODOs
+
+#+begin_src emacs-lisp
+(use-package hl-todo
+  :ensure (:depth nil)
+  :custom
+  (hl-todo-keyword-faces
+   '(("TODO" . "#721045")
+     ("FIXME" . "#a0132f")
+     ("HACK" . "#813e00"))))
+#+end_src
+
+*** List TODOs in consult
+
+#+begin_src emacs-lisp
+(use-package consult-todo
+  :ensure t
+  :after (magit hl-todo))
+#+end_src
+
+*** List TODOs in magit
+
+#+begin_src emacs-lisp
+(use-package magit-todos
+  :ensure t
+  :after (magit hl-todo)
+  :config (magit-todos-mode 1))
+#+end_src
+
+* Auto-completion
 ** copilot.el
 
 #+begin_src emacs-lisp
