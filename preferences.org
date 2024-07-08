@@ -1532,7 +1532,6 @@ National Velocity-like experience with =deft=.
 
      ("d" "Day planning" plain (file+olp+datetree "plan.org")
       ,(concat ":PROPERTIES:\n:ADDED: %U\n:END:\n"
-               "gunka:\n- [ ]%?\n- [ ]\n"
                "cilre:\n- [ ]\n- [ ]\n"
                "chore:\n- [ ] vocab\n- [ ] diary\n"
                "sevzi:\n- [ ]\n"
