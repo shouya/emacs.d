@@ -1255,7 +1255,9 @@ Scroll with mouse wheel:
 (use-package dired
   :commands (dired dired-jump shou/copy-full-path)
   :bind (:map dired-mode-map
-              ("." . dired-hide-dotfiles-mode))
+              ("." . dired-hide-dotfiles-mode)
+              ("u" . diredp-up-directory)
+              )
   :custom
   ;; Copy file to split window
   (dired-dwim-target t)
