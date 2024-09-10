@@ -3098,6 +3098,16 @@ Also enable =dot= language in org-babel.
    '((dot . t))))
 #+end_src
 
+** Shader languages
+
+GLSL:
+
+#+begin_src emacs-lisp
+(use-package glsl-mode
+  :ensure t
+  :mode ("\\.glsl\\'" "\\.vert\\'" "\\.frag\\'" "\\.comp\\'"))
+#+end_src
+
 * Troubleshooting
 
 ** Startup benchmarking
