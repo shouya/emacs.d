@@ -2887,7 +2887,9 @@ Evaluate an expression with pretty print:
 
   :bind
   (:map rust-mode-map
-        ("C-c C-c C-e" . lsp-rust-analyzer-open-cargo-toml))
+        ("C-c C-c C-e" . lsp-rust-analyzer-open-cargo-toml)
+        ("C-c C-t" . shou/insert-rust-todo)
+        )
 
   :custom
   ;; do not show a buffer for format errors
@@ -2907,6 +2909,13 @@ Evaluate an expression with pretty print:
     (setf
      (cdr (assoc 'cargo compilation-error-regexp-alist-alist))
      error_stack-regexps))
+
+  (defun shou/insert-rust-todo ()
+    """Insert a todo!() macro"""
+    (interactive)
+    (when (region-active-p)
+      (delete-region (region-beginning) (region-end)))
+    (insert "todo!()"))
   )
 #+end_src
 
