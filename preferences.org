@@ -1138,7 +1138,7 @@ I use =smartparens= package for (automatic) pair management.
               ("M-r" . sp-rewrap-sexp)
               ("M-<down>" . sp-splice-sexp)
               ("M-S-<right>" . sp-forward-slurp-sexp)
-              ("M-S-<left>" . sp-backward-barf-sexp)
+              ("M-S-<left>" . sp-forward-barf-sexp)
               ("M-<right>" . sp-forward-sexp)
               ("M-<left>" . sp-backward-sexp))
   :hook prog-mode
