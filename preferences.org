@@ -1903,7 +1903,10 @@ while. The mode is activated for specific folder only using
   ;; only backup after 120 secs
   (gac-debounce-interval 120)
   ;; do not prompt for gpg signature
-  (gac-commit-additional-flag "--no-gpg-sign"))
+  (gac-commit-additional-flag "--no-gpg-sign")
+  ;; do not show any message
+  (gac-silent-message-p t)
+  )
 #+end_src
 
 ** Project management
