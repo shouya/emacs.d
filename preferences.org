@@ -2115,6 +2115,9 @@ Mostly to load indentation settings.
   ;; do not show truncated message
   (eldoc-echo-area-display-truncation-message nil)
 
+  ;; jump to reference instead of showing a list of references
+  (lsp-xref-force-references t)
+
   :config
   ;; see https://github.com/minad/corfu/wiki#basic-example-configuration-with-orderless
   (defun shou/lsp-mode-setup-completion ()
