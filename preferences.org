@@ -1740,6 +1740,7 @@ I use pandoc for exporting to mediawiki and gfm.
 
 #+begin_src emacs-lisp
 (use-package valign
+  :disabled
   :ensure t
   :hook (org-mode . valign-mode)
   :custom (valign-fancy-bar t))
