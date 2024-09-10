@@ -432,6 +432,12 @@ The default major mode is fundamental-mode, which is very limited.
 (setq initial-major-mode 'text-mode)
 #+end_src
 
+** Set default input method
+
+#+begin_src emacs-lisp
+(setq default-input-method "TeX")
+#+end_src
+
 * UI
 
 ** Tweak main UI
