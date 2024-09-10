@@ -2718,6 +2718,18 @@ Press =C-c <RET>= to send your input.
     ))
 #+end_src
 
+** ancilla.el
+
+#+begin_src emacs-lisp
+(use-package ancilla
+  ;; :ensure (:host github :repo "shouya/ancilla.el")
+  :ensure nil :load-path "~/projects/ancilla/ancilla.el"
+  :custom
+  (ancilla-adaptor-chat-model "gpt-4o-mini")
+  (ancilla-adaptor-chat-openai-api-key (auth-source-pass-get 'secret "openai/api-key"))
+  )
+#+end_src
+
 * Languages and modes
 ** Markup formats
 *** Markdown
