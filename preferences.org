@@ -144,8 +144,8 @@ Allow performing actions in minibuffer that uses minibuffer.
   :ensure t
   :commands (ace-window-display-mode ace-window)
   :custom
-  ;; always dispatch window
-  (aw-dispatch-always t)
+  ;; don't dispatch window if not necessary
+  (aw-dispatch-always nil)
   ;; use home row keys for window switching
   (aw-keys '(?a ?s ?d ?f ?j ?k ?l))
   ;; do not show an overlay for window switching character
