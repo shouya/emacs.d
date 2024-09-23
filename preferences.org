@@ -1695,6 +1695,7 @@ I use pandoc for exporting to mediawiki and gfm.
 (use-package org-modern
   :ensure t
   :after org
+  :disabled
   :hook (emacs-startup . global-org-modern-mode)
   :config
   ;; align agenda tags to the right at 80 column
