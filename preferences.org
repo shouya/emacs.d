@@ -2090,8 +2090,9 @@ Mostly to load indentation settings.
   (lsp-imenu-sort-methods '(position kind name))
   (lsp-imenu-show-container-name t)
 
-  ;; do not show breadcrumb
-  (lsp-headerline-breadcrumb-enable nil)
+  ;; do show breadcrumb
+  (lsp-headerline-breadcrumb-enable t)
+  (lsp-headerline-breadcrumb-segments '(symbols))
 
   ;; do not auto configure dap-mode unless I explicitly asked for it.
   ;; otherwise it starts dap-tooltip-mode which interfere with the corfu popup.
