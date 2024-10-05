@@ -976,6 +976,7 @@ I use =tempel= to quickly enter frequently used snippets.
 
   :bind
   ("C-<tab>" . shou/tempel-expand-or-complete)
+  ("<F7>" . tempel-insert)
 
   (:map tempel-map
         ("<tab>" . tempel-next)
@@ -989,8 +990,7 @@ I use =tempel= to quickly enter frequently used snippets.
   :config
   (defun shou/add-tempel-to-capf ()
     (make-local-variable 'completion-at-point-functions)
-    (add-to-list 'completion-at-point-functions #'tempel-complete))
-
+    (add-to-list 'completion-at-point-functions #'tempel-expand))
 
   ;; expand directly if there is an exact match, otherwise show candidates
   (defun shou/tempel-expand-or-complete ()
