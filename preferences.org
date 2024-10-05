@@ -1906,7 +1906,7 @@ while. The mode is activated for specific folder only using
   ;; do not prompt for gpg signature
   (gac-commit-additional-flag "--no-gpg-sign")
   ;; do not show any message
-  (gac-silent-message-p t)
+  ;; (gac-silent-message-p t)
   )
 #+end_src
 
