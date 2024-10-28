@@ -1768,8 +1768,11 @@ I use pandoc for exporting to mediawiki and gfm.
     (let ((quail-current-package (assoc "TeX" quail-package-alist)))
       (quail-define-rules ((append . t))
                           ("\\and" ?∧)
-                          ("\\or" ?∨)))))
+                          ("\\or" ?∨)
+                          ;; \bar is \=
+                          ))))
 #+end_src
+
 * Programming features
 ** Source control
 
