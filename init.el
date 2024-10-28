@@ -79,6 +79,7 @@
 
 ;; use package configuration
 (setq use-package-always-defer t)
+(setq use-package-compute-statistics t)
 
 ;; ----------- load custom config --------------
 (setq vc-follow-symlinks t)
