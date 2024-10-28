@@ -1213,8 +1213,9 @@ Several differences from the default =*scratch-buffer*= (or =M-x scratch=)
 (use-package hs-minor-mode
   :ensure nil
   :hook (prog-mode . hs-minor-mode)
-  :bind (:map hs-minor-mode-map
-              ("C-c @ TAB" . hs-toggle-hiding)))
+  :bind (:map prog-mode-map
+              ("C-c @ TAB" . hs-toggle-hiding)
+              ("C-<return>" . hs-toggle-hiding)))
 #+end_src
 
 ** Edit string at point
