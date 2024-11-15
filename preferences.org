@@ -270,8 +270,13 @@ Built-in module:
 (use-package recentf
   :demand t
   :bind ("C-x f" . shou/find-recent-file)
+  :custom
+  (recentf-exclude
+   (list (rx "bookmarks" eol) ;; or it always shows up first
+         (rx ".rustup/toolchains") ;; rust library source files
+         ))
+
   :config
-  (add-to-list 'recentf-exclude (rx "bookmarks" eol))
   ;; save 200 files instead of default 20 files in history
   (setq recentf-max-saved-items 200)
   (recentf-mode 1)
