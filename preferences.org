@@ -2482,7 +2482,13 @@ otherwise fallback to =dumb-jump=.
   ;; all-the-icons under the hood.
   (setq sideline-lsp-code-actions-prefix
         (concat
-         (lsp-modeline--code-actions-icon 'lsp-modeline-code-actions-face)
+         (lsp-icons-all-the-icons-icon
+          'octicon
+          "light-bulb"
+          'lsp-modeline-code-actions-face
+          lsp-modeline-code-action-fallback-icon
+          'modeline-code-action
+          :v-adjust -0.0575)
          " "))
   )
 #+end_src
