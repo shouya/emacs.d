@@ -2119,6 +2119,7 @@ Mostly to load indentation settings.
      lsp-css
      lsp-json
      lsp-nix
+     lsp-lua
      ))
 
   ;; do not execute single action automatically. let me see what actions are available.
@@ -3137,6 +3138,13 @@ GLSL:
   :mode ("\\.glsl\\'" "\\.vert\\'" "\\.frag\\'" "\\.comp\\'"))
 #+end_src
 
+** Lua
+
+#+begin_src emacs-lisp
+(use-package lua-mode
+  :ensure t
+  :mode "\\.lua\\'")
+#+end_src
 * Troubleshooting
 
 ** Startup benchmarking
