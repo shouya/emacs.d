@@ -2471,7 +2471,7 @@ otherwise fallback to =dumb-jump=.
   :after flycheck lsp-mode)
 
 (use-package sideline-lsp
-  :after lsp-modeline
+  :after (lsp-modeline all-the-icons)
   :demand t
   :config
   ;; the default code action prefix is the unicode emoji char "💡" (U+1F4A1).
@@ -2483,13 +2483,7 @@ otherwise fallback to =dumb-jump=.
   ;; all-the-icons under the hood.
   (setq sideline-lsp-code-actions-prefix
         (concat
-         (lsp-icons-all-the-icons-icon
-          'octicon
-          "light-bulb"
-          'lsp-modeline-code-actions-face
-          lsp-modeline-code-action-fallback-icon
-          'modeline-code-action
-          :v-adjust -0.0575)
+         (all-the-icons-octicon "light-bulb" :v-adjust -0.0575)
          " "))
   )
 #+end_src
