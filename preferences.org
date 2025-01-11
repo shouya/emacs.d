@@ -275,6 +275,8 @@ Built-in module:
    (list (rx "bookmarks" eol) ;; or it always shows up first
          (rx ".rustup/toolchains") ;; rust library source files
          ))
+  ;; auto clean up every day after 11:00pm
+  (recentf-auto-cleanup "11:00pm")
 
   :config
   ;; save 200 files instead of default 20 files in history
