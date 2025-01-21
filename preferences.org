@@ -2524,7 +2524,6 @@ otherwise fallback to =dumb-jump=.
   (add-to-list 'apheleia-formatters '(mix . ("mix" "format" "-")))
   (add-to-list 'apheleia-formatters '(prettier . (npx "prettier" "--stdin-filepath" filepath)))
   (add-to-list 'apheleia-formatters '(rustfmt . ("rustfmt" "--quiet" "--emit" "stdout")))
-
   (add-to-list 'apheleia-mode-alist '(elixir-mode . mix))
 
   ;; See https://github.com/raxod502/apheleia/issues/30
@@ -2739,8 +2738,8 @@ Press =C-c <RET>= to send your input.
 
 #+begin_src emacs-lisp
 (use-package ancilla
-  ;; :ensure (:host github :repo "shouya/ancilla.el")
-  :ensure nil :load-path "~/projects/ancilla/ancilla.el"
+  :ensure (:host github :repo "shouya/ancilla.el")
+  ;; :ensure nil :load-path "~/projects/ancilla/ancilla.el"
   :custom
   (ancilla-adaptor-chat-model "gpt-4o-mini")
   (ancilla-adaptor-chat-openai-api-key (auth-source-pass-get 'secret "openai/api-key"))
