@@ -1937,6 +1937,7 @@ while. The mode is activated for specific folder only using
   (projectile-mode-line "P")
   (projectile-switch-project-action 'shou/action-after-switch-project)
   (projectile-track-known-projects-automatically nil)
+  (projectile-fd-executable "fd")
 
   :hook (emacs-startup . projectile-mode)
   :bind-keymap
