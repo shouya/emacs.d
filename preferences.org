@@ -2652,6 +2652,8 @@ Configure the built-in tree sit modes.
      (string-match-p "tmp/cu" (shou/buffer-file-name))
      ;; do not match server files
      (string-match-p "examples/server" (shou/buffer-file-name))
+     ;; do not enable on proprietary codes
+     (string-match-p "/mr/" (shou/buffer-file-name))
      ))
   (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
 
