@@ -1804,6 +1804,9 @@ I use pandoc for exporting to mediawiki and gfm.
   ;; c.f. https://emacs.stackexchange.com/questions/28736/emacs-pointcursor-movement-lag
   (auto-window-vscroll nil)
 
+  ;; apply ANSI colors in magit process buffer (e.g. allows for colorful git hooks)
+  (magit-process-finish-apply-ansi-colors t)
+
   :config
   ;; so it don't close other windows
   (fset 'magit-restore-window-configuration (lambda (x) (kill-buffer-and-window)))
