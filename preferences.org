@@ -2562,13 +2562,13 @@ Configure the built-in tree sit modes.
 
 #+begin_src emacs-lisp
 (use-package treesit
-  :when (version<= "29.1" emacs-version)
-  :custom
-  (major-mode-remap-alist
-   '((toml-mode . toml-ts-mode)
-     ;; treesit-install-grammar https://github.com/tree-sitter/tree-sitter-css
-     (css-mode . css-ts-mode)
-     )))
+  :when (version<= "29.1" emacs-version))
+
+(setq major-mode-remap-alist
+      '((toml-mode . toml-ts-mode)
+        (rust-mode . rust-ts-mode)
+        ;; treesit-install-grammar https://github.com/tree-sitter/tree-sitter-css
+        (css-mode . css-ts-mode)))
 #+end_src
 
 ** Highlighting TODOs
@@ -2598,6 +2598,17 @@ Configure the built-in tree sit modes.
   :ensure t
   :after (magit hl-todo)
   :config (magit-todos-mode 1))
+#+end_src
+
+** Direnv
+
+#+begin_src emacs-lisp
+(use-package direnv
+  :ensure t
+  :demand t
+  :when (executable-find "direnv")
+  :config
+  (direnv-mode))
 #+end_src
 
 * Auto-completion
