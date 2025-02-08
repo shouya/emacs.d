@@ -812,6 +812,7 @@ Extra completion:
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
 
+  (setq text-mode-ispell-word-completion nil)
   (defun shou/text-mode-completions ()
     (make-local-variable 'completion-at-point-functions)
     ;; add to the end
