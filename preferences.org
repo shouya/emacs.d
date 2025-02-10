@@ -2648,28 +2648,53 @@ Configure the built-in tree sit modes.
         (buffer-name)
         ""))
 
-  (defun shou/copilot-disable-predicate ()
-    (or
-     ;; do not enable copilot when i'm editing wiki
-     (derived-mode-p 'mediawiki-mode)
-     ;; do not enable copilot on files that may contain secrets
-     (string-match-p "\\(?:secret\\|cred\\|hidden\\|private\\|auth\\|app-2024\\)"
-                     (shou/buffer-file-name))
-     ;; do not enable copilot on gpg files
-     (string-match-p "\\.\\(gpg\\|asc\\)\\'"
-                     (shou/buffer-file-name))
-     (string-match-p "\\.bean\\'"
-                     (shou/buffer-file-name))
-     (string-match-p "org/\\(plan\\|projects\\).org"
-                     (shou/buffer-file-name))
-     ;; do not enable copilot on files in tmp/cu
-     (string-match-p "tmp/cu" (shou/buffer-file-name))
-     ;; do not match server files
-     (string-match-p "examples/server" (shou/buffer-file-name))
-     ;; do not enable on proprietary codes
-     (string-match-p "/mr/" (shou/buffer-file-name))
-     ))
+  (defvar-local shou/copilot-switch nil)
+  (cl-defun shou/copilot-disable-predicate ()
+    (let ((buffer-file (shou/buffer-file-name)))
+      ;; if local copilot-buffer-state is set
+      (pcase shou/copilot-switch
+        ('disable (cl-return-from shou/copilot-disable-predicate t))
+        ('enable (cl-return-from shou/copilot-disable-predicate nil)))
+      (or
+       ;; do not enable copilot when i'm editing wiki
+       (derived-mode-p 'mediawiki-mode)
+       ;; do not enable copilot on files that may contain secrets
+       (string-match-p "\\(?:secret\\|cred\\|hidden\\|private\\|auth\\|app-2024\\)"
+                       buffer-file)
+       ;; do not enable copilot on gpg files
+       (string-match-p "\\.\\(gpg\\|asc\\)\\'"
+                       buffer-file)
+       (string-match-p "\\.bean\\'"
+                       buffer-file)
+       (string-match-p "org/\\(plan\\|projects\\).org"
+                       buffer-file)
+       ;; do not enable copilot on files in tmp/cu
+       (string-match-p "tmp/cu" buffer-file)
+       ;; do not match server files
+       (string-match-p "examples/server" buffer-file)
+       ;; do not enable on proprietary codes
+       (string-match-p "/mr/" buffer-file))))
+
   (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
+
+  (defun shou/toggle-copilot ()
+    "Force enable/disable copilot locally"
+    (interactive)
+    (let ((new-mode
+           (or
+            (and (eq shou/copilot-switch 'disable) 'enable)
+            (and (eq shou/copilot-switch 'enable) 'disable)
+            (and copilot-mode 'disable)
+            (and (not copilot-mode) 'enable)
+            'disable)))
+      (setq-local shou/copilot-switch new-mode)
+      (pcase new-mode
+        ('enable
+         (message "Copilot enabled")
+         (copilot-mode 1))
+        ('disable
+         (message "Copilot disabled")
+         (copilot-mode -1)))))
 
   (defun shou/advice-copilot-mode (orig-fn &rest args)
     (when (not (shou/copilot-disable-predicate))
