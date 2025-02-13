@@ -2525,6 +2525,7 @@ otherwise fallback to =dumb-jump=.
 #+begin_src emacs-lisp
 (use-package apheleia
   :ensure t
+  :disabled
   :hook (emacs-startup . apheleia-global-mode)
   :config
   (add-to-list 'apheleia-formatters '(mix . ("mix" "format" "-")))
@@ -3071,6 +3072,7 @@ Tree sitter mode specific config.
               ("C-c C-t" . haskell-process-do-type)
               ("C-c C-i" . haskell-process-do-info)
               ("M-." . haskell-mode-jump-to-def))
+  :after apheleia-mode
   :hook (haskell-mode . shou/disable-apheleia-mode)
   :mode (("\\.hs\\'" . haskell-mode))
   :custom
