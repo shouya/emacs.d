@@ -3103,7 +3103,7 @@ Tree sitter mode specific config.
     (setq lsp-nix-nixd-nixpkgs-expr "import <nixpkgs> {}"))
   (when (executable-find "home-manager")
     (setq lsp-nix-nixd-home-manager-options-expr
-          (format "(builtins.getFlake \"%s\").homeConfigurations.shou.options"
+          (format "(builtins.getFlake \"%s\").homeConfigurations.\"shou@mrnix\".options"
                   (f-canonical "~/.config/home-manager"))))
   (when (executable-find "nixos-version")
     (setq lsp-nix-nixd-nixos-options-expr
