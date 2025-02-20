@@ -2785,7 +2785,7 @@ Press =C-c <RET>= to send your input.
 
 #+begin_src emacs-lisp
 (use-package ancilla
-  :ensure (:host github :repo "shouya/ancilla.el")
+  :ensure (:host github :repo "shouya/ancilla.el" :files ("ancilla.el"))
   ;; :ensure nil :load-path "~/projects/ancilla/ancilla.el"
   :custom
   (ancilla-adaptor-chat-model "gpt-4o-mini")
