@@ -2793,6 +2793,17 @@ Press =C-c <RET>= to send your input.
   )
 #+end_src
 
+** aider
+
+#+begin_src emacs-lisp
+(use-package aider
+  :ensure (:host github :repo "tninja/aider.el" :files ("aider.el"))
+  :bind
+  ("C-c A" . aider-transient-menu)
+  :custom
+  (aider-args '("--model" "gpt-4o" "--edit-format" "diff")))
+#+end_src
+
 * Languages and modes
 ** Markup formats
 *** Markdown
