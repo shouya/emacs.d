@@ -2079,6 +2079,7 @@ Mostly to load indentation settings.
   :hook
   ;; enable LSP on these modes
   (rust-mode . lsp-deferred)
+  (rust-ts-mode . lsp-deferred)
 
   :custom
   ;; use Corfu!
