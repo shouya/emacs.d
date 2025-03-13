@@ -2962,7 +2962,8 @@ Evaluate an expression with pretty print:
   :bind
   (:map rust-mode-map
         ("C-c C-c C-e" . lsp-rust-analyzer-open-cargo-toml)
-        ("C-c C-t" . shou/insert-rust-todo))
+        ("C-c C-t" . shou/insert-rust-todo)
+        ("C-c m" . rust-toggle-mutability))
 
   :custom
   ;; do not show a buffer for format errors
@@ -3059,6 +3060,9 @@ Tree sitter mode specific config.
   ;; show backtrace in cargo-run
   (cargo-process--enable-rust-backtrace t)
   (cargo-process--command-watch "watch --why -q -x run")
+
+  ;; discover cargo from current PATH (for direnv)
+  (cargo-process--custom-path-to-bin "cargo")
 
   :config
   (defun cargo-process-run-release ()
