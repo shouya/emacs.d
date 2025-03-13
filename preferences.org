@@ -2052,8 +2052,7 @@ Mostly to load indentation settings.
   ;; I sometimes type when I forget how to spell "dtrt"
   (defalias 'detect-indentation 'dtrt-indent-mode)
   (defalias 'detect-tab-size 'dtrt-indent-mode)
-  (defalias 'dets 'dtrt-indent-mode)
-  )
+  (defalias 'dets 'dtrt-indent-mode))
 #+end_src
 
 ** Language server protocol (LSP)
@@ -2079,7 +2078,6 @@ Mostly to load indentation settings.
   :hook
   ;; enable LSP on these modes
   (rust-mode . lsp-deferred)
-  (rust-ts-mode . lsp-deferred)
 
   :custom
   ;; use Corfu!
@@ -2569,7 +2567,6 @@ Configure the built-in tree sit modes.
 
 (setq major-mode-remap-alist
       '((toml-mode . toml-ts-mode)
-        (rust-mode . rust-ts-mode)
         ;; treesit-install-grammar https://github.com/tree-sitter/tree-sitter-css
         (css-mode . css-ts-mode)))
 #+end_src
@@ -2958,13 +2955,14 @@ Evaluate an expression with pretty print:
   :mode ("\\.rs\\'" . rust-mode)
   :init
   (when (fboundp 'rust-ts-mode)
-    (setq rust-mode-treesitter-derive t))
+    (setq rust-mode-treesitter-derive t)
+    ;; lsp, dtrt, etc refers to the old offset when detecting rust-mode
+    (defvaralias 'rust-indent-offset 'rust-ts-mode-indent-offset))
 
   :bind
   (:map rust-mode-map
         ("C-c C-c C-e" . lsp-rust-analyzer-open-cargo-toml)
-        ("C-c C-t" . shou/insert-rust-todo)
-        )
+        ("C-c C-t" . shou/insert-rust-todo))
 
   :custom
   ;; do not show a buffer for format errors
@@ -2984,6 +2982,15 @@ Evaluate an expression with pretty print:
     (setf
      (cdr (assoc 'cargo compilation-error-regexp-alist-alist))
      error_stack-regexps))
+
+  ;; backport functions from rust-mode without treesitter
+  ;; used by `rust-dbg-wrap-or-unwrap'.
+  (when (fboundp 'rust-ts-mode)
+    (defun rust-in-str () (nth 3 (syntax-ppss)))
+    (defun rust-looking-back-str (s)
+      (when (search-backward s (line-beginning-position) t)
+        (forward-char (length s))
+        t)))
 
   (defun shou/insert-rust-todo ()
     """Insert a todo!() macro"""
