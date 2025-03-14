@@ -20,6 +20,10 @@
                               (float-time (time-subtract (current-time) before-init-time))
                               gcs-done)))
 
+;; Inhibit resizing frame on font changes
+;; Emacs resizing itself is pointless as I use tiling window manager
+(setq frame-inhibit-implied-resize t)
+
 ;; ----------- initialize elpaca ---------------
 (defvar elpaca-installer-version 0.9)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
