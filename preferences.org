@@ -2751,6 +2751,24 @@ See https://github.com/copilot-emacs/copilot.el/issues/172.
   (advice-add 'org-list-struct-apply-struct :around #'shou/disable-copilot-temporarily))
 #+end_src
 
+** copilot-chat.el
+
+#+begin_src emacs-lisp
+(use-package copilot-chat
+  :ensure (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
+  :after (markdown)
+  :bind
+  (("C-c S-c SPC" . copilot-chat-transient)
+   ("C-c S-c b" . copilot-chat-transient-buffers)
+   :map prog-mode-map
+   ("C-c S-c c" . copilot-chat-transient-code))
+  :custom
+  (copilot-chat-backend 'request)
+  (copilot-chat-model "gpt-4o-2024-11-20")
+  (copilot-chat-frontend 'markdown)
+  )
+#+end_src
+
 ** gptel
 
 Press =C-c <RET>= to send your input.
@@ -2795,11 +2813,34 @@ Press =C-c <RET>= to send your input.
 
 #+begin_src emacs-lisp
 (use-package aider
-  :ensure (:host github :repo "tninja/aider.el" :files ("aider.el"))
+  :disabled
+  :ensure (:host github :repo "tninja/aider.el"
+                 :files ("aider.el"
+                         "aider-core.el"
+                         "aider-file.el"
+                         "aider-code-change.el"
+                         "aider-discussion.el"
+                         "aider-prompt-mode.el"))
   :bind
   ("C-c A" . aider-transient-menu)
   :custom
-  (aider-args '("--model" "gpt-4o" "--edit-format" "diff")))
+  (aider-args '("--model" "gpt-4o" "--edit-format" "diff"))
+  )
+
+(use-package aidermacs
+  :ensure t
+  :bind
+  (("C-c A" . aidermacs-transient-menu))
+  :custom
+  (aidermacs-use-architect-mode t)
+  (aidermacs-architect-model "o3-mini")
+  (aidermacs-default-model "gpt-4o")
+  (aidermacs-vterm-multiline-newline-key "S-<return>")
+  ;; --watch-files doesn't work otherwise
+  (aidermacs-backend 'vterm)
+  :config
+  (require 'vterm)
+  )
 #+end_src
 
 * Languages and modes
