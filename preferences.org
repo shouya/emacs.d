@@ -1344,7 +1344,9 @@ Scroll with mouse wheel:
     (byte-compile-file "~/.emacs.d/site-lisp/dired+.el")
     ;; reload
     (unload-feature 'dired+ t)
-    (require 'dired+ nil t)))
+    (require 'dired+ nil t))
+
+  (unbind-key "M-b" dired-mode-map))
 #+end_src
 
 ** Hide dot files by default
