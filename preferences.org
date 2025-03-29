@@ -3268,6 +3268,16 @@ GLSL:
   :ensure t
   :mode "\\.lua\\'")
 #+end_src
+
+** Beancount
+
+#+begin_src emacs-lisp
+(use-package beancount
+  :ensure t
+  :mode ("\\.bean\\'" . beancount-mode)
+  :hook (beancount-mode . flycheck-mode))
+#+end_src
+
 * Troubleshooting
 
 ** Startup benchmarking
