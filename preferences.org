@@ -981,6 +981,7 @@ I use =tempel= to quickly enter frequently used snippets.
   :hook
   (text-mode . shou/add-tempel-to-capf)
   (prog-mode . shou/add-tempel-to-capf)
+  (conf-mode . shou/add-tempel-to-capf)
 
   :bind
   ("C-<tab>" . shou/tempel-expand-or-complete)
@@ -997,8 +998,8 @@ I use =tempel= to quickly enter frequently used snippets.
 
   :config
   (defun shou/add-tempel-to-capf ()
-    (make-local-variable 'completion-at-point-functions)
-    (add-to-list 'completion-at-point-functions #'tempel-expand))
+    (setq-local completion-at-point-functions
+                `(tempel-expand tempel-complete ,@completion-at-point-functions)))
 
   ;; expand directly if there is an exact match, otherwise show candidates
   (defun shou/tempel-expand-or-complete ()
