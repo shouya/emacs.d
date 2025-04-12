@@ -3279,6 +3279,18 @@ GLSL:
   :hook (beancount-mode . flycheck-mode))
 #+end_src
 
+** Python
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'python
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (setq-local fill-column 80)
+              (set (make-local-variable 'compile-command)
+                   (concat "nose "
+                           (shell-quote-argument buffer-file-name))))))
+#+end_src
+
 * Troubleshooting
 
 ** Startup benchmarking
