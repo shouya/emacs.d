@@ -2838,6 +2838,7 @@ Press =C-c <RET>= to send your input.
   (aidermacs-use-architect-mode t)
   (aidermacs-architect-model "o3-mini")
   (aidermacs-default-model "gpt-4o")
+  (aidermacs-watch-files t)
   (aidermacs-vterm-multiline-newline-key "S-<return>")
   ;; --watch-files doesn't work otherwise
   (aidermacs-backend 'vterm)
