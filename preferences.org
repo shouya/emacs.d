@@ -2842,7 +2842,7 @@ Press =C-c <RET>= to send your input.
   (aidermacs-vterm-multiline-newline-key "S-<return>")
   ;; --watch-files doesn't work otherwise
   (aidermacs-backend 'vterm)
-  :config
+  :init
   (require 'vterm)
   )
 #+end_src
