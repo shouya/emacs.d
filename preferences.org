@@ -2626,6 +2626,14 @@ Configure the built-in tree sit modes.
   (copilot-log-max 100)
   (copilot-idle-delay 0.3)
 
+  ;; pinning this version. newer versions seem broken.
+  (copilot-version "1.304.0")
+
+  ;; https://github.com/github/copilot-language-server-release?tab=readme-ov-file#configuration-management
+  (copilot-lsp-settings
+          '(:github (:copilot (:selectedCompletionModel "gpt-4o-copilot"))
+            :telemetry (:telemetryLevel "off")))
+
   :init
   ;; keys bind to copilot-completion-map
   (setq shou/copilot-keymap
