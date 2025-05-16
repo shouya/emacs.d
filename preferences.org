@@ -1043,7 +1043,6 @@ I use =tempel= to quickly enter frequently used snippets.
 
 #+begin_src emacs-lisp
 (use-package visual-regexp
-  :after multiple-cursors
   :ensure t
   :bind (("M-%" . vr/query-replace)))
 #+end_src
