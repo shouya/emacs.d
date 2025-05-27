@@ -1349,6 +1349,16 @@ Scroll with mouse wheel:
   (unbind-key "M-b" dired-mode-map))
 #+end_src
 
+** Narrow to a subset of files
+
+#+begin_src emacs-lisp
+(use-package dired-narrow
+  :ensure t
+  :after dired
+  :bind
+  (:map dired-mode-map ("/" . dired-narrow)))
+#+end_src
+
 ** Hide dot files by default
 
 #+begin_src emacs-lisp
