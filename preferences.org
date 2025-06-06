@@ -3301,12 +3301,19 @@ GLSL:
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'python
+  ;; force fill-column of 80 chars
+  (with-eval-after-load 'editorconfig
+    (add-hook 'editorconfig-after-apply-functions
+              (lambda (props)
+                (when (and (eq major-mode 'python-mode)
+                           (equal (gethash 'max_line_length props) "120"))
+                  (setq-local fill-column 80))))))
+
   (add-hook 'python-mode-hook
             (lambda ()
-              (setq-local fill-column 80)
               (set (make-local-variable 'compile-command)
                    (concat "nose "
-                           (shell-quote-argument buffer-file-name))))))
+                           (shell-quote-argument buffer-file-name)))))
 #+end_src
 
 * Troubleshooting
