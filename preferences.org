@@ -1236,6 +1236,28 @@ Several differences from the default =*scratch-buffer*= (or =M-x scratch=)
               ("C-c '" . string-edit-at-point)))
 #+end_src
 
+** Copy visible text
+
+Copy only visible text with ~C-c C-x v~.
+
+#+begin_src emacs-lisp
+(defun shou/copy-visible-text ()
+  (interactive)
+  (let ((beg (if (use-region-p) (region-beginning) (point-min)))
+        (end (if (use-region-p) (region-end) (point-max))))
+    (let ((visible-text "") (pos beg) next)
+      (while (< pos end)
+        (setq next (next-char-property-change pos end))
+        (unless (invisible-p pos)
+          (setq visible-text (concat visible-text
+                                     (buffer-substring-no-properties pos next))))
+        (setq pos next))
+      (kill-new visible-text)
+      (message "Copied %d visible characters" (length visible-text)))))
+
+(bind-key "C-c C-x v" #'shou/copy-visible-text global-map)
+#+end_src
+
 ** Terminal UI
 
 Copy to X clipboard:
@@ -1299,6 +1321,8 @@ Scroll with mouse wheel:
 
   ;; copy full path of the current file
   (bind-key "W" #'shou/copy-full-path dired-mode-map)
+  ;; copy visible text only
+  (bind-key "M-w" #'shou/copy-visible-text dired-mode-map)
   )
 #+end_src
 
