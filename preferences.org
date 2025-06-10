@@ -1818,6 +1818,16 @@ I use pandoc for exporting to mediawiki and gfm.
                           ))))
 #+end_src
 
+** REST client
+
+#+begin_src emacs-lisp
+(use-package ob-restclient
+  :ensure t
+  :init
+  (add-to-list 'org-structure-template-alist
+               '("r" . "src restclient :noheaders t\nGET http://httpbin.org/uuid")))
+#+end_src
+
 * Programming features
 ** Source control
 
