@@ -687,6 +687,18 @@ Stolen from https://stackoverflow.com/a/45363946/1232832.
 (column-number-mode 1)
 #+end_src
 
+*** No region without active mark
+
+Typically, even if I'm not selecting any region, accidentally pressing
+~M-w~ will kill some text delimited by whereever my mark was. This
+behavior is arbitrary and usually not desired. Setting the following
+option will make it so that ~M-w~ will only kill the region if the mark
+is currently active (as in transient-mark-mode)
+
+#+begin_src emacs-lisp
+(setq mark-even-if-inactive nil)
+#+end_src
+
 ** Minibuffer completion
 
 Show vertical completion for minibuffer options:
