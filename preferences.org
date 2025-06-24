@@ -745,12 +745,6 @@ Narrow down the selection using orderless style:
   :ensure t
   :custom
   (completion-styles '(orderless basic))
-  (completion-category-overrides
-   '(
-     ;; TRAMP hostname completion requires "basic" style to work
-     (file (styles basic partial-completion)))
-   )
-  ;; ignore case for filenames
   (read-file-name-completion-ignore-case t)
   )
 #+end_src
@@ -1064,14 +1058,30 @@ I use =tempel= to quickly enter frequently used snippets.
 #+begin_src emacs-lisp
 (use-package tramp
   :custom
-  (tramp-default-method "scp")
   ;; cache file names for 10 seconds
   (remote-file-name-inhibit-cache 10)
-
+  ;; avoid locking for remote files
+  (remote-file-name-inhibit-locks t)
+  (tramp-use-scp-direct-remote-copying t)
   ;; do not store remote command history over tramp
   (tramp-histfile-override t)
 
+  ;; increase inline transfer threshold
+  (tramp-copy-size-limit (* 1024 1024)) ;; 1MiB
+  ;; use rsync for larger files
+  (tramp-default-method "rsync")
+
+  ;; uncomment for debugging
+  ;; (tramp-verbose 10)
+
   :config
+  ;; (setq shou/tramp-methods
+  ;;       (list
+  ;;       ; sshx ignores login shell, force /bin/sh
+  ;;         (assoc "sshx" tramp-methods)
+  ;;         (assoc "sudoedit" tramp-methods)))
+  ;; (setq tramp-methods shou/tramp-methods)
+
   (defun shou/turn-off-project-detection ()
     (setq-local projectile-auto-update-cache nil)
     (setq-local projectile-dynamic-mode-line nil)
