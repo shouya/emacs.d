@@ -3235,21 +3235,19 @@ Tree sitter mode specific config.
   :ensure t
   :mode "\\.nix\\'"
   :hook (nix-mode . lsp-deferred)
+  :when (executable-find "nixd")
   :custom
   ;; disable nil in favor of nixd
   (lsp-disabled-clients '((nix-mode . nix-nil)))
   :config
-
-  (when (executable-find "nixd")
-    (setq lsp-nix-nixd-nixpkgs-expr "import <nixpkgs> {}"))
-  (when (executable-find "home-manager")
-    (setq lsp-nix-nixd-home-manager-options-expr
-          (format "(builtins.getFlake \"%s\").homeConfigurations.\"shou@mrnix\".options"
-                  (f-canonical "~/.config/home-manager"))))
-  (when (executable-find "nixos-version")
-    (setq lsp-nix-nixd-nixos-options-expr
-          (format "(builtins.getFlake \"%s\").nixosConfigurations.mrnix.options"
-                  (f-canonical "/etc/nixos")))))
+  (setq lsp-nix-nixd-nixpkgs-expr "import <nixpkgs> {}")
+  (setq lsp-nix-nixd-nixos-options-expr
+        (format "%s.nixosConfigurations.%s.options"
+                "(builtins.getFlake \"nixos-config\")"
+                (system-name)))
+  (setq lsp-nix-nixd-home-manager-options-expr
+        (format "%s.home-manager.users.type.getSubOptions []"
+                lsp-nix-nixd-nixos-options-expr)))
 #+end_src
 
 LSP configuration
