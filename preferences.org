@@ -2743,6 +2743,10 @@ Configure the built-in tree sit modes.
                        buffer-file)
        (string-match-p "org/\\(plan\\|projects\\).org"
                        buffer-file)
+       ;; exclude large buffer of pure texts,
+       ;; copilot is very inaccurate.
+       (and (derived-mode-p 'text-mode)
+            (> (buffer-size) 60000))
        ;; do not enable copilot on files in tmp/cu
        (string-match-p "tmp/cu" buffer-file)
        ;; do not match server files
