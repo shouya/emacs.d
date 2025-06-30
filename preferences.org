@@ -2001,24 +2001,24 @@ while. The mode is activated for specific folder only using
   :ensure t
   :custom
   (projectile-completion-system #'completing-read)
-  (projectile-enable-caching nil)
-  (projectile-indexing-method 'alien)
+  (projectile-indexing-method 'hybrid)
+  (projectile-enable-caching t)
   (projectile-globally-ignored-file-suffixes '("beam"))
   (projectile-create-missing-test-files t)
   ;; speed up tramp (https://emacs.stackexchange.com/questions/17543/tramp-mode-is-much-slower-than-using-terminal-to-ssh)
   (projectile-mode-line "P")
   (projectile-switch-project-action 'shou/action-after-switch-project)
   (projectile-track-known-projects-automatically nil)
-  (projectile-fd-executable "fd")
 
   :hook (emacs-startup . projectile-mode)
   :bind-keymap
   ("M-`" . projectile-command-map)
 
   :config
+  ;; not effective if indexing method is 'alien
   (setq projectile-globally-ignored-directories
         (append projectile-globally-ignored-directories
-                '(".elixir_ls" "_build")))
+                '(".elixir_ls" "_build" "*third_party")))
 
   ;; Elixir: jump to *_test.exs instead of *_test.ex
   (defun shou/fix-exs-test-file-name (name)
@@ -2221,6 +2221,7 @@ Mostly to load indentation settings.
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]_build\\'")
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]deps\\'")
   (add-to-list 'lsp-file-watch-ignored-directories "\\.lean\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]third_party\\'")
 
   ;; override default lsp-xref backend
   ;; (add-hook 'lsp-mode-hook 'insert-dumb-jump-to-xref)
