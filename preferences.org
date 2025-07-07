@@ -1836,6 +1836,8 @@ I use pandoc for exporting to mediawiki and gfm.
       (quail-define-rules ((append . t))
                           ("\\and" ?∧)
                           ("\\or" ?∨)
+                          ("\\implies" ?⇒)
+                          ("\\iso" ?≅)
                           ;; \bar is \=
                           ))))
 #+end_src
