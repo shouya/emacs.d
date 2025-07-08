@@ -1145,6 +1145,10 @@ Pure keyboard context menu.
 (use-package embark
   :ensure t
   :bind ("M-m" . embark-act)
+  :init
+  ;; Press C-h after pressing prefix to filter/narrow down the
+  ;; options. Alternative to `which-key'.
+  (setq prefix-help-command #'embark-prefix-help-command)
   :config
   (defvar-keymap embark-identifier-map
     :doc "Actions on symbol"
