@@ -1905,6 +1905,10 @@ I use pandoc for exporting to mediawiki and gfm.
   (setq magit-revision-headers-format (->> magit-revision-headers-format
                                            (s-replace "%ad" "%ad (%aD)")
                                            (s-replace "%cd" "%cd (%cD)")))
+
+  ;; https://github.com/magit/magit/discussions/5121#discussioncomment-9038715
+  ;; set diff.ignoreSubmodules=untracked to allow for faster git status.
+  (remove-hook 'magit-status-headers-hook 'magit-insert-diff-filter-header)
   )
 #+end_src
 
@@ -1975,7 +1979,23 @@ Delta supports highlighting language-syntax, within-line diff, etc.
 (use-package magit-delta
   :ensure t
   :if (executable-find "delta")
-  :hook (magit-mode . magit-delta-mode))
+  :init
+  ;; https://github.com/dandavison/magit-delta/issues/9#issuecomment-795435781
+  (setq shou/magit-delta-max-char 50000)
+
+  :hook (magit-mode . magit-delta-mode)
+  :config
+  (advice-add 'magit-delta-call-delta-and-convert-ansi-escape-sequences :around
+              (defun shou/magit-delta-colorize-maybe-a (fn &rest args)
+                (if (<= (point-max) shou/magit-delta-max-char)
+                    (apply fn args)
+                  (magit-delta-mode -1))))
+  ;; Re-enable mode after `magit-refresh' if there aren't too many characters
+  (add-hook 'magit-post-refresh-hook
+            (defun shou/magit-enable-magit-delta-maybe-h (&rest _args)
+              (when (and (not magit-delta-mode)
+                         (<= (point-max) shou/magit-delta-max-char))
+                (magit-delta-mode +1)))))
 #+end_src
 
 *** Git auto commit
