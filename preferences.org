@@ -2194,7 +2194,7 @@ Mostly to load indentation settings.
   (lsp-lens-place-position 'above-line)
 
   ;; performance tuning
-  (read-process-output-max (* 1 1024 1024)) ;; 20mb
+  (read-process-output-max (* 20 1024 1024)) ;; 20mb
 
   ;; only sort by position
   (lsp-imenu-sort-methods '(position kind name))
