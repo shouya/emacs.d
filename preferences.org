@@ -1552,7 +1552,7 @@ National Velocity-like experience with =deft=.
 #+begin_src emacs-lisp
 (use-package deft
   :ensure t
-  :bind ("C-M-n" . deft)
+  :bind ("C-M-s-N" . deft)
   :commands (deft)
   :custom
   (deft-extensions '("org" "txt" "md" "markdown"))
