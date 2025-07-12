@@ -113,6 +113,7 @@ Allow performing actions in minibuffer that uses minibuffer.
 
 #+begin_src emacs-lisp
 (bind-key "C-x |" #'split-window-right)
+(bind-key "C-x =" #'split-window-right)
 (bind-key "C-x -" #'split-window-below)
 
 (defun shou/other-window-or-ace ()
