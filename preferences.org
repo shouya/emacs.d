@@ -341,6 +341,9 @@ Key bindings:
 
   ;; save to the file directly, no a temp file
   (add-hook 'org-mode-hook 'auto-save-visited-mode)
+  ;; default is 5 sec, which is too intrusive
+  (setq auto-save-visited-interval 30)
+
   ;; save and don't leave a message.
   (setq auto-save-no-message t)
 
