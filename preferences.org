@@ -1883,6 +1883,9 @@ I use pandoc for exporting to mediawiki and gfm.
   ;; apply ANSI colors in magit process buffer (e.g. allows for colorful git hooks)
   (magit-process-finish-apply-ansi-colors t)
 
+  ;; show word-granularity diff
+  (magit-diff-refine-hunk 'all)
+
   :config
   ;; so it don't close other windows
   (fset 'magit-restore-window-configuration (lambda (x) (kill-buffer-and-window)))
