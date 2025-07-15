@@ -1149,6 +1149,7 @@ Pure keyboard context menu.
 (use-package embark
   :ensure t
   :bind ("M-m" . embark-act)
+  :after which-key ;; prefer embark's prefix help command
   :init
   ;; Press C-h after pressing prefix to filter/narrow down the
   ;; options. Alternative to `which-key'.
