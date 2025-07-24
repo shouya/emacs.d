@@ -3221,6 +3221,8 @@ Tree sitter mode specific config.
   ;; discover cargo from current PATH (for direnv)
   (cargo-process--custom-path-to-bin "cargo")
 
+  (cargo-process--command-clippy "clippy --no-deps")
+
   :config
   (defun cargo-process-run-release ()
     (interactive)
