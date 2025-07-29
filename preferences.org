@@ -26,7 +26,19 @@
   (defun shou/server-start ()
     (when (not (server-running-p))
       (server-start)))
-  (add-hook 'after-init-hook 'shou/server-start))
+  (add-hook 'after-init-hook 'shou/server-start)
+
+  (defun shou/server-save-and-close ()
+    "Save the buffer and close the server connection."
+    (interactive)
+    (save-buffer)
+    (server-edit))
+
+  (add-hook 'server-visit-hook
+            (lambda ()
+              (when (null window-system)  ; Only in terminal (tty)
+                (local-set-key (kbd "C-c C-c") #'shou/server-save-and-close))))
+  )
 #+end_src
 
 ** Start edit server (for browser extensions)
