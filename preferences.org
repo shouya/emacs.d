@@ -2736,7 +2736,7 @@ Configure the built-in tree sit modes.
   :custom
   ;; enable logging (max size: 10000)
   (copilot-log-max 100)
-  (copilot-idle-delay 0.3)
+  (copilot-idle-delay 1)
 
   ;; pinning this version. newer versions seem broken.
   ;; (copilot-version "1.304.0")
