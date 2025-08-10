@@ -3199,6 +3199,11 @@ Tree sitter mode specific config.
 
   ;; show variable types as inlay hints
   (lsp-rust-analyzer-server-display-inlay-hints t)
+
+  ;; fix rust-analyzer rebuilding every time
+  ;; ref. https://old.reddit.com/r/rust/comments/100bsme/rustflags_making_me_rebuild_every_crate_every/
+  (lsp-rust-analyzer-cargo-target "x86_64-unknown-linux-gnu")
+  (lsp-rust-analyzer-check-all-targets nil)
   )
 #+end_src
 
