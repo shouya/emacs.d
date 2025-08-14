@@ -1999,6 +1999,7 @@ Delta supports highlighting language-syntax, within-line diff, etc.
 (use-package magit-delta
   :ensure t
   :if (executable-find "delta")
+  :disabled
   :init
   ;; https://github.com/dandavison/magit-delta/issues/9#issuecomment-795435781
   (setq shou/magit-delta-max-char 50000)
