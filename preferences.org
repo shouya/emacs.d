@@ -2937,41 +2937,6 @@ Press =C-c <RET>= to send your input.
   )
 #+end_src
 
-** aider
-
-#+begin_src emacs-lisp
-(use-package aider
-  :disabled
-  :ensure (:host github :repo "tninja/aider.el"
-                 :files ("aider.el"
-                         "aider-core.el"
-                         "aider-file.el"
-                         "aider-code-change.el"
-                         "aider-discussion.el"
-                         "aider-prompt-mode.el"))
-  :bind
-  ("C-c A" . aider-transient-menu)
-  :custom
-  (aider-args '("--model" "gpt-4o" "--edit-format" "diff"))
-  )
-
-(use-package aidermacs
-  :ensure t
-  :bind
-  (("C-c A" . aidermacs-transient-menu))
-  :custom
-  (aidermacs-use-architect-mode t)
-  (aidermacs-architect-model "o3-mini")
-  (aidermacs-default-model "gpt-4o")
-  (aidermacs-watch-files t)
-  (aidermacs-vterm-multiline-newline-key "S-<return>")
-  ;; --watch-files doesn't work otherwise
-  (aidermacs-backend 'vterm)
-  :init
-  (require 'vterm)
-  )
-#+end_src
-
 * Languages and modes
 ** Markup formats
 *** Markdown
