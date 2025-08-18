@@ -3282,6 +3282,13 @@ LSP configuration
   (setq lsp-nix-nil-server-path (f-canonical "~/.nix-profile/bin/nil")))
 #+end_src
 
+Editing agenix encrypted files:
+
+#+begin_src emacs-lisp
+(use-package agenix
+  :ensure t)
+#+end_src
+
 ** Web mode
 
 #+begin_src emacs-lisp
