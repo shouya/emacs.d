@@ -791,6 +791,9 @@ Narrow down the selection using orderless style:
   ;; enable auto completion
   (corfu-auto t)
 
+  ;; show completion after 1s of idle
+  (corfu-auto-delay 1)
+
   :config
   ;; enable corfu completion for eval-expession/shell-command
   (defun corfu-enable-in-minibuffer ()
@@ -1321,6 +1324,7 @@ Scroll with mouse wheel:
   :hook (emacs-startup . xterm-mouse-mode)
   )
 #+end_src
+
 
 * File management
 ** Basic config
