@@ -2623,12 +2623,36 @@ otherwise fallback to =dumb-jump=.
 ** Highlight all occurrences of word at point
 
 #+begin_src emacs-lisp
-(use-package idle-highlight-mode
-  :disabled
+(use-package symbol-overlay
   :ensure t
-  :hook (prog-mode . idle-highlight-mode)
-  :custom
-  (idle-highlight-idle-time 0.5))
+  :hook (prog-mode . symbol-overlay-mode)
+  :bind (("M-i" . symbol-overlay-put)
+         :map symbol-overlay-map
+         ("m" . shou/mc-mark-all-symbol-overlays))
+  :config
+  ;; modified from https://lmno.lol/alvaro/its-all-up-for-grabs-and-it-compounds
+  (require 'multiple-cursors)
+  (defun shou/mc-mark-all-symbol-overlays ()
+    "Mark all symbol overlays using multiple cursors."
+    (interactive)
+    (mc/remove-fake-cursors)
+    (let* ((overlays (symbol-overlay-get-list 0))
+           (point-in-overlay (lambda (overlay)
+                               (and (<= (overlay-start overlay) (point))
+                                    (<  (point) (overlay-end overlay)))))
+           (curr-overlay (seq-find point-in-overlay overlays))
+           (offset (- (point) (overlay-start curr-overlay))))
+      (backward-char offset)
+      (setq deactivate-mark t)
+      (mapc (lambda (overlay)
+              (unless (funcall point-in-overlay overlay)
+                (mc/save-excursion
+                 (goto-char (overlay-start overlay))
+                 (mc/create-fake-cursor-at-point))))
+            overlays)
+      (symbol-overlay-put) ;; remove the overlay
+      (mc/maybe-multiple-cursors-mode)
+      )))
 #+end_src
 
 ** Compilation mode
