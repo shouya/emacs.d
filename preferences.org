@@ -495,7 +495,7 @@ Never show graphical dialog box.
 #+begin_src emacs-lisp
 (add-hook 'emacs-startup-hook
 	  (lambda ()
-            (set-frame-font "JetBrains Mono:style=Light")
+            (set-frame-font "JetBrains Mono:weight=Light")
             (set-face-attribute 'default nil :family "JetBrains Mono"
                                 :weight 'light
                                 :height 130)))
@@ -508,20 +508,20 @@ The default monospace font I use doesn't have much coverage for extensive codepo
 First, non-latin script should be displayed with the correct font variants:
 
 #+begin_src emacs-lisp
-(cl-loop for (script font) in
-         '((han "Noto Sans CJK TC DemiLight" :weight 'demilight)
-           (kana "Noto Sans CJK JP DemiLight" :weight 'demilight)
-           (hangul "Noto Sans CJK KR DemiLight" :weight 'demilight)
+(cl-loop for (script . font) in
+         '((han "Noto Sans CJK TC" :weight demilight)
+           (kana "Noto Sans CJK JP" :weight demilight)
+           (hangul "Noto Sans CJK KR" :weight demilight)
            (phonetic "Noto Sans")
            ;; JetBrains Mono's Greek alphabet has glyphs
            ;; indistinguishable from latin. See
            ;; https://github.com/JetBrains/JetBrainsMono/issues/623
-           (greek "Noto Sans" :weight 'light)
+           (greek "Noto Sans" :weight regular)
            )
          do
          (set-fontset-font t ;; font for 'default face
                            script
-                           (font-spec :family font)))
+                           (apply #'font-spec :family font)))
 #+end_src
 
 Second, we set the font set for various types of special symbols:
