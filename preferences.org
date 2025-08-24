@@ -528,7 +528,8 @@ Second, we set the font set for various types of special symbols:
 
 #+begin_src emacs-lisp
 ;; IPA symbols and diacritic marks (https://www.compart.com/en/unicode/block/U+0250)
-(set-fontset-font t '(#x0250 . #x036F) (font-spec :family "DejaVu Sans Mono"))
+(set-fontset-font t '(#x0250 . #x036F)
+                  (font-spec :family "Noto Sans Mono"))
 
 ;; gemoetric shapes (https://www.compart.com/en/unicode/block/U+25A0)
 (set-fontset-font t '(#x25A0 . #x25FF)
@@ -541,6 +542,9 @@ Second, we set the font set for various types of special symbols:
 
 ;; symbols cannot be overriden by fontset by default. Turning off this setting.
 (setq use-default-font-for-symbols nil)
+
+;; use noto sans mono as backup font for unsupported glyphs
+(set-fontset-font t nil "Noto Sans Mono" nil 'append)
 #+end_src
 
 ** Icon fonts
