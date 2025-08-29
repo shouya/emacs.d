@@ -3,13 +3,7 @@
 #+latex_header: \usemintedstyle{emacs}
 
 * Boot up
-** Enable packages are loadable
-
-=lisp/= stores modules I copied from [[https://github.com/purcell/emacs.d][purcell/emacs.d]].
-
-#+begin_src emacs-lisp
-(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-#+end_src
+** Add load path for contrib packages
 
 =site-lisp/= stores downloaded modules that are not on MELPA.
 
