@@ -259,6 +259,8 @@ By default, right mouse button is bound to set mark and middle mouse button is b
 
 *** Disable tab indentation
 
+Tab key never insert "\t" character. It should always indent.
+
 #+begin_src emacs-lisp
 (setq-default indent-tabs-mode nil)
 #+end_src
@@ -307,7 +309,7 @@ Store backup files to an independent directory instead of the same directory as 
                   ((f-directory? "~/.cache") "~/.cache")
                   (t "/tmp")))
        (backup-dir (f-join base-dir "emacs-backup")))
-  (when (not (f-directory? backup-dir))(f-mkdir backup-dir))
+  (when (not (f-directory? backup-dir)) (f-mkdir backup-dir))
   (setq backup-directory-alist `((".*" . ,backup-dir))
         auto-save-file-name-transforms `((".*" ,backup-dir t))))
 #+end_src
@@ -665,14 +667,6 @@ Show popup window in desired styles.
   (push '("*Flycheck errors*" :position bottom :stick t) popwin:special-display-config)
   (push '(cargo-process-mode :position bottom :stick t :height 10) popwin:special-display-config)
 )
-#+end_src
-
-** Show page break line (=^L=)
-
-#+begin_src emacs-lisp
-(use-package page-break-lines
-  :ensure t
-  :hook (emacs-startup . global-page-break-lines-mode))
 #+end_src
 
 ** Line wrap
