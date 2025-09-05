@@ -2039,7 +2039,17 @@ while. The mode is activated for specific folder only using
   (gac-commit-additional-flag "--no-gpg-sign")
   ;; do not show any message
   ;; (gac-silent-message-p t)
-  )
+
+  :config
+  ;; the original `gac-relative-file-name` runs `git rev-parse
+  ;; --show-toplevel` which returns wrong directory if the
+  ;; default-directory is not the under the same git root.
+  (advice-add #'gac-relative-file-name
+              :override
+              (lambda (filename)
+                (file-relative-name
+                 filename
+                 (locate-dominating-file filename ".git")))))
 #+end_src
 
 ** Project management
