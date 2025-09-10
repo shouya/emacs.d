@@ -2060,7 +2060,7 @@ while. The mode is activated for specific folder only using
   :custom
   (projectile-completion-system #'completing-read)
   (projectile-indexing-method 'hybrid)
-  (projectile-enable-caching t)
+  (projectile-enable-caching nil)
   (projectile-globally-ignored-file-suffixes '("beam"))
   (projectile-create-missing-test-files t)
   ;; speed up tramp (https://emacs.stackexchange.com/questions/17543/tramp-mode-is-much-slower-than-using-terminal-to-ssh)
