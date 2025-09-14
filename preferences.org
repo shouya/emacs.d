@@ -3456,6 +3456,14 @@ GLSL:
               (lsp-deferred))))
 #+end_src
 
+** RouterOS scripting
+
+#+begin_src emacs-lisp
+(use-package ros-script-mode
+  :mode "\\.rsc\\'"
+  )
+#+end_src
+
 * Troubleshooting
 
 ** Startup benchmarking
