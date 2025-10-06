@@ -283,13 +283,26 @@ Built-in module:
   (recentf-exclude
    (list (rx "bookmarks" eol) ;; or it always shows up first
          (rx ".rustup/toolchains") ;; rust library source files
+         (rx ".cargo/registry") ;; rust library source files
+         (rx "/nix/store") ;; nix source files
          ))
   ;; auto clean up every day after 11:00pm
   (recentf-auto-cleanup "11:00pm")
 
-  :config
-  ;; save 200 files instead of default 20 files in history
-  (setq recentf-max-saved-items 200)
+  :init
+  ;; save 2000 files instead of default 20 files in history
+  (setq recentf-max-saved-items 2000)
+
+  ;; save every 5 minutes (default: save on emacs exit)
+  (defun shou/recentf-save-if-changed ()
+    "Save `recentf-list` only if it has changed since last save."
+    (let ((last-recentf-list nil))
+      (lambda ()
+        (unless (equal last-recentf-list recentf-list)
+          (let ((inhibit-message t)) (recentf-save-list))
+          (setq last-recentf-list recentf-list)))))
+  (run-at-time 300 300 #'shou/recentf-save-if-changed)
+
   (recentf-mode 1)
   (defun shou/find-recent-file ()
     (interactive)
