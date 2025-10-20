@@ -1322,7 +1322,12 @@ Copy to X clipboard:
 (use-package xclip
   :ensure t
   :when (not (display-graphic-p))
-  :hook (emacs-startup . xclip-mode))
+  :hook (emacs-startup . xclip-mode)
+  :custom
+  (xclip-method (or
+                 (and (getenv "DISPLAY") 'xclip)
+                 (and (getenv "WAYLAND_DISPLAY") 'wl-copy)))
+  )
 #+end_src
 
 Scroll with mouse wheel:
@@ -1335,6 +1340,13 @@ Scroll with mouse wheel:
   )
 #+end_src
 
+** Clipboard support
+
+The ~select-active-regions~ will attempt to save everything selected to the system clipboard. After manually copying a region of text, the region will dissolve back to a cursor. Although there is no active region, a empty string is save into the system clipboard anyway, overriding the previous copied content. Disabling the copy-active selection should fix the issue.
+
+#+begin_src emacs-lisp
+(setq select-active-regions nil)
+#+end_src
 
 * File management
 ** Basic config
