@@ -3464,6 +3464,7 @@ GLSL:
 ** QML
 
 #+begin_src emacs-lisp
+(setq qml-ts-mode-indent-offset 2)
 (use-package qml-ts-mode
   :ensure (:host github :repo "xhcoding/qml-ts-mode" :files (:defaults "*.el"))
   :after lsp-mode
