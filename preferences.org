@@ -3477,6 +3477,17 @@ GLSL:
   )
 #+end_src
 
+** KDL
+
+#+begin_src emacs-lisp
+(use-package kdl-mode
+  :ensure t
+  :config
+  (add-hook 'kdl-mode-hook #'shou/set-tab-width-to-4)
+  (defun shou/set-tab-width-to-4 nil (setq-local tab-width 4))
+  )
+#+end_src
+
 * Troubleshooting
 
 ** Startup benchmarking
