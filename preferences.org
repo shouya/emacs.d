@@ -3039,7 +3039,13 @@ Press =C-c <RET>= to send your input.
   (bind-key "M-<return>" 'mediawiki-terminate-paragraph mediawiki-mode-map)
 
   (defun shou/default-date-from-firefox ()
-    (let* ((line (shell-command-to-string "wmctrl -l -x | grep -i firefox | grep -i wiki"))
+    (let* ((command
+            (cond
+             ((equal (getenv "XDG_CURRENT_DESKTOP") "niri")
+              "niri msg windows | grep -i -e firefox -e wiki")
+             ((not (null (getenv "DISPLAY")))
+              "wmctrl -l -x | grep -i firefox | grep -i wiki")))
+           (line (shell-command-to-string command))
            ;; matching text like Sep 20, 2022
            (regexp "[A-Z][a-z]\\{2\\} [0-9]\\{1,2\\}, [0-9]\\{4\\}")
            (match (s-match regexp line)))
