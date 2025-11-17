@@ -1348,6 +1348,68 @@ The ~select-active-regions~ will attempt to save everything selected to the syst
 (setq select-active-regions nil)
 #+end_src
 
+** Macros
+
+#+begin_src emacs-lisp
+(defun shou/modify-number-at-point (fn)
+  "Apply FN to the number at point and replace it with the result.
+
+FN takes one integer argument (the number found at point) and
+returns a new integer.  The replacement preserves the original
+number’s leading zeros when the new value fits in the same number
+of digits.  If the new value requires more digits, the width is
+expanded naturally.
+
+Signals an error if no number is found at point."
+  (save-excursion
+    (let* ((bounds (bounds-of-thing-at-point 'number))
+           (start (car bounds))
+           (end (cdr bounds)))
+      (unless bounds
+        (user-error "No number at point"))
+      (let* ((orig-num (buffer-substring-no-properties start end))
+             (orig-len (- end start))
+             (num (string-to-number orig-num))
+             (new-text (number-to-string (funcall fn num))))
+        (when (and (< (length new-text) orig-len)
+                   (string-prefix-p "0" orig-num))
+          (setq new-text (concat (make-string (- orig-len (length new-text)) ?0)
+                                 new-text)))
+        (delete-region start end)
+        (insert new-text)))))
+
+(defun shou/increment-at-point ()
+  "Increment the number at point by 1.
+
+Preserves leading zeros when the incremented number still fits
+the original width.  For example: 01 → 02, 09 → 10."
+  (interactive)
+  (shou/modify-number-at-point (lambda (x) (1+ x))))
+
+(defun shou/decrement-at-point ()
+  "Decrement the number at point by 1.
+
+Preserves leading zeros when the decremented number still fits
+the original width.  For example: 10 → 09."
+  (interactive)
+  (shou/modify-number-at-point (lambda (x) (1- x))))
+
+(defun shou/modify-number-at-point-expr (expr)
+  "Modify the number at point by evaluating EXPR with `x' bound to that number.
+
+EXPR is read as Elisp and evaluated.  The result must be an
+integer.  Leading zeros are preserved when the resulting value
+fits in the original number's width."
+  (interactive "sExpression (use x): ")
+  (shou/modify-number-at-point
+   (lambda (x) (eval (read expr)))))
+
+(bind-key "<f2>" nil) ;; free up the <f2> key space (previously used by 2C-mode commands)
+(bind-key "<f2> a" #'shou/increment-at-point)
+(bind-key "<f2> x" #'shou/decrement-at-point)
+(bind-key "<f2> e" #'shou/modify-number-at-point-expr)
+#+end_src
+
 * File management
 ** Basic config
 
