@@ -1694,6 +1694,9 @@ National Velocity-like experience with =deft=.
     (s-with (with-temp-buffer (org-time-stamp nil)) (s-chop-prefix "<") (s-chop-suffix ">")))
 
   :custom
+  ;; partial dates after today resolves to the current year
+  (org-read-date-prefer-future nil)
+
   (org-capture-templates
    `(("w" "Work" entry (file+headline "projects.org" "Work")
       "* TODO %^{Task (Work)}\n:PROPERTIES:\n:ADDED: %U\n:END:\n%?")
