@@ -2371,9 +2371,6 @@ Mostly to load indentation settings.
   (add-to-list 'lsp-file-watch-ignored-directories "\\.lean\\'")
   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]third_party\\'")
 
-  ;; override default lsp-xref backend
-  ;; (add-hook 'lsp-mode-hook 'insert-dumb-jump-to-xref)
-
   (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
 
   ;; disable lsp-modeline-diagnostics-mode
@@ -2383,16 +2380,6 @@ Mostly to load indentation settings.
   (unbind-key "M-p" lsp-signature-mode-map)
   ;; unbind it as well as I never bother using it.
   (unbind-key "M-n" lsp-signature-mode-map)
-
-  ;; fallback to dumb-jump if lsp can't find defn
-  ;; copied from https://github.com/hlissner/doom-emacs/issues/4662#issuecomment-780911875
-  (defun lsp-find-definition-or-dumb-jump ()
-    (interactive)
-    (let ((loc (lsp-request "textDocument/definition"
-                            (lsp--text-document-position-params))))
-      (if (seq-empty-p loc)
-          (lsp-show-xrefs (lsp--locations-to-xref-items loc) nil nil)
-        (dumb-jump-go))))
 
   ;; See https://github.com/minad/corfu/issues/188#issuecomment-1148658471
   (with-eval-after-load 'cape
@@ -2632,7 +2619,11 @@ otherwise fallback to =dumb-jump=.
   ;; Do not show a *xref* buffer when there are multiple
   ;; candidates. Show a completion buffer instead.
   (when (fboundp 'xref-show-definitions-completing-read)
-    (setq xref-show-definitions-function #'xref-show-definitions-completing-read)))
+    (setq xref-show-definitions-function #'xref-show-definitions-completing-read))
+
+  ;; unmark as obsolete, i need this function from time to time in lsp-mode.
+  (put 'dumb-jump-go 'byte-obsolete-info nil)
+  )
 
 (with-eval-after-load 'xref
   (bind-key* "M-," #'xref-find-definitions)
