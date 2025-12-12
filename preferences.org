@@ -2220,13 +2220,22 @@ while. The mode is activated for specific folder only using
   (project-vc-include-untracked t)  ;; include new, untracked files
   :bind-keymap
   ("M-`" . project-prefix-map)
+  :bind
+  (:map project-prefix-map
+        ("g" . shou/project-switch-to-magit))
   :config
   (require 'magit-extras) ;; inserts (m) magit to project-switch-commands
   (setq project-switch-commands
         '((project-find-file "Find file")
           (project-dired "Dired")
           (magit-project-status "Magit")))
-  )
+
+  (defun shou/project-switch-to-magit nil
+    "Switch to a project and call magit, regardless if in a project or not"
+    (interactive)
+    (let ((project-current-directory-override nil)
+          (default-directory ""))
+      (magit-project-status))))
 #+end_src
 
 *** Find marker file
