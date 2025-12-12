@@ -606,7 +606,7 @@ command:
   (doom-modeline-lsp t)
   (doom-modeline-modal-icon nil)
   (doom-modeline-buffer-state-icon t)
-  (doom-modeline-project-detection 'projectile)
+  (doom-modeline-project-detection 'project)
   (doom-modeline-persp-name nil)
   (doom-modeline-mu4e nil)
   ;; do not use project relative path
