@@ -85,6 +85,24 @@ The goal in this section is to cover the most critical editing features I need t
 (bind-key "C-c e" 'shou/find-emacs-config)
 #+end_src
 
+** =C-c E= to edit current computer's config
+
+#+begin_src emacs-lisp
+(defun shou/find-nixos-config ()
+  "Find nixos config"
+  (interactive)
+  (let* ((host (system-name))
+         (root "~/projects/user-config")
+         (primary (format "hosts/%s/default.nix" host))
+         (default-directory root))
+      (with-temp-buffer
+        (insert primary)
+        (goto-char (point-min))
+        (project-find-file))))
+
+(bind-key "C-c E" #'shou/find-nixos-config)
+#+end_src
+
 ** Always ask for short answers
 
 "yes/no" -> "y/n"
