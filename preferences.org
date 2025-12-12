@@ -450,6 +450,9 @@ Also, do not show splash screen.
   (setq projectile-auto-update-cache nil)
   (setq save-place-file "/tmp/emacs-sandbox/save-place")
   (setq savehist-file "/tmp/emacs-sandbox/history")
+  (with-eval-after-load 'project
+    (advice-add 'project--remember-dir :filter-args
+                (lambda (args) (cons (car args) '(t))))) ;; set nowrite
   (add-to-list 'native-comp-eln-load-path "/tmp/emacs-sandbox/eln-cache")
 
   (savehist-mode -1)
@@ -2144,11 +2147,14 @@ while. The mode is activated for specific folder only using
 
 ** Project management
 
+*** Projectile
+
 #+begin_src emacs-lisp
 (use-package projectile
   :ensure t
+  :disabled
   :custom
-  (projectile-completion-system #'completing-read)
+  (projectile-completion-system 'default)
   (projectile-indexing-method 'hybrid)
   (projectile-enable-caching nil)
   (projectile-globally-ignored-file-suffixes '("beam"))
@@ -2177,13 +2183,31 @@ while. The mode is activated for specific folder only using
   (advice-add #'projectile--test-name-for-impl-name
               :filter-return
               #'shou/fix-exs-test-file-name)
-
   (defun shou/action-after-switch-project ()
     "open magit or prompt for find file"
     (if (and (fboundp 'magit-git-repo-p)
              (magit-git-repo-p default-directory))
         (magit)
         (projectile-find-file)))
+  )
+#+end_src
+
+*** Project.el
+
+#+begin_src emacs-lisp
+(use-package project
+  :ensure nil
+  :custom
+  (project-vc-merge-submodules nil) ;; ignore files from submodules
+  (project-vc-include-untracked t)  ;; include new, untracked files
+  :bind-keymap
+  ("M-`" . project-prefix-map)
+  :config
+  (require 'magit-extras) ;; inserts (m) magit to project-switch-commands
+  (setq project-switch-commands
+        '((project-find-file "Find file")
+          (project-dired "Dired")
+          (magit-project-status "Magit")))
   )
 #+end_src
 
@@ -3169,6 +3193,12 @@ Evaluate an expression with pretty print:
 
 #+begin_src emacs-lisp
 (bind-key "M-:" #'pp-eval-expression)
+#+end_src
+
+Improve property list indentation:
+
+#+begin_src emacs-lisp
+;; (setq lisp-indent-function #'common-lisp-indent-function)
 #+end_src
 
 ** Bash
