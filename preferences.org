@@ -1265,6 +1265,8 @@ Gather statistics for frequently used commands.
 (use-package keyfreq
   :ensure t
   :hook (emacs-startup . keyfreq-mode)
+  :custom
+  (keyfreq-file "~/.emacs.d/keyfreq")
   :config
   (keyfreq-autosave-mode 1))
 #+end_src
