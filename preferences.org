@@ -1280,11 +1280,14 @@ Several differences from the default =*scratch-buffer*= (or =M-x scratch=)
 3. it runs org mode by default
 
 #+BEGIN_SRC emacs-lisp
-(defun scratch ()
+(defun scratch (buffer-name)
   "open a scratch buffer"
-  (interactive)
-  (let* ((buffer-name (make-temp-name "scratch-"))
-         (buffer (generate-new-buffer buffer-name))
+  (interactive
+   (list (completing-read "Buffer name: "
+                          (list (make-temp-name "scratch-")
+                                (make-temp-name "scratch-private-"))
+                          nil nil "scratch-")))
+  (let* ((buffer (generate-new-buffer buffer-name))
          (scratch-dir (f-expand "~/tmp/scratch"))
          (target-file (format "%s/%s.org" scratch-dir buffer-name)))
     (make-directory scratch-dir 'parents)
@@ -2913,8 +2916,7 @@ Configure the built-in tree sit modes.
 
   ;; https://github.com/github/copilot-language-server-release?tab=readme-ov-file#configuration-management
   (copilot-lsp-settings
-          '(:github (:copilot (:selectedCompletionModel "gpt-4o-copilot"))
-            :telemetry (:telemetryLevel "off")))
+          '(:telemetry (:telemetryLevel "off")))
 
   :init
   ;; keys bind to copilot-completion-map
@@ -2934,6 +2936,7 @@ Configure the built-in tree sit modes.
 
   :config
   (defun shou/buffer-file-name ()
+    "Return the file name of the current buffer (or the base buffer if in narrowed buffer)."
     (or (buffer-file-name)
         (and (buffer-base-buffer)
              (buffer-file-name (buffer-base-buffer)))
