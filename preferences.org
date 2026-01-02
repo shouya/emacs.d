@@ -1883,6 +1883,12 @@ I use pandoc for exporting to mediawiki and gfm.
              (formatted (format-time-string "[[%b %-d, %Y]]" encoded)))
         (replace-match formatted)))
 
+    ;; 3. convert [BROKEN LINK: White Nights] into [[White Nights]]
+    (goto-char (point-min))
+    (while (re-search-forward "\\[BROKEN LINK: \\(.*?\\)\\]" nil t)
+      (let ((link-text (match-string 1)))
+        (replace-match (format "[[%s]]" link-text))))
+
     ;; restore cursor
     (goto-char (point-min)))
 
