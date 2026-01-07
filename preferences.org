@@ -699,6 +699,8 @@ Show popup window in desired styles.
   (push "*explain-pause-log*" popwin:special-display-config)
   (push "*explain-pause-profiles*" popwin:special-display-config)
   (push '("*Flycheck errors*" :position bottom :stick t) popwin:special-display-config)
+  (push '("*Flycheck error messages*" :position bottom :height 10 :noselect t)
+        popwin:special-display-config)
   (push '(cargo-process-mode :position bottom :stick t :height 10) popwin:special-display-config)
 )
 #+end_src
