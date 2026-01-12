@@ -2298,7 +2298,8 @@ Few shortcuts:
          ("C-c s r" . rg)
          ("C-c s t" . rg-literal)
          :map rg-mode-map
-         ("C-x C-q" . wgrep-change-to-wgrep-mode))
+         ("C-x C-q" . wgrep-change-to-wgrep-mode)
+         ("w" . shou/rg-rerun-toggle-word))
   :custom
   ;; find when use
   (wgrep-auto-save-buffer t)
@@ -2309,7 +2310,14 @@ Few shortcuts:
   (defun shou/switch-to-rg-buffer (&rest args)
     (switch-to-buffer-other-window "*rg*"))
   (advice-add 'rg-run :after #'shou/switch-to-rg-buffer)
-  )
+
+  (defun shou/rg-rerun-toggle-word ()
+    "Rerun last search with toggled word-regexp."
+    (interactive)
+    (rg-rerun-toggle-flag "--word-regexp"))
+
+  ;; do not search lines with over 240 columns
+  (setq rg-initial-toggle-flags '("--max-columns=240" "--word-regexp")))
 #+end_src
 
 *** Load editor config
