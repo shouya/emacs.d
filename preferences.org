@@ -1755,7 +1755,12 @@ National Velocity-like experience with =deft=.
       :time-prompt t
       :immediate-finish t
       :jump-to-captured t
-      )
+      :before-finalize
+      (lambda ()
+        (org-back-to-heading t)
+        (end-of-line)
+        (unless (looking-back "\\[.*/.*\\]" (line-beginning-position)) (insert " [/]"))
+        (org-update-statistics-cookies nil)))
 
      ("n" "News" item (file+olp+datetree "nuzba.org")
       "%^{News item}"
@@ -1763,8 +1768,7 @@ National Velocity-like experience with =deft=.
 
      ("L" "Org protocol link" entry (file+headline "mencti.org" "Captures")
       "* TODO %:description\n:PROPERTIES:\n:ADDED: %U\n:END:\nSCHEDULED: %t\n%:link\n"
-      :immediate-finish t)
-     )))
+      :immediate-finish t))))
 #+END_SRC
 
 ** Refiling
