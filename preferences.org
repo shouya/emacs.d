@@ -803,10 +803,11 @@ Narrow down the selection using orderless style:
 #+begin_src emacs-lisp
 (use-package corfu
   :ensure (corfu :files (:defaults "extensions/*")
-                 :includes (corfu-echo
+                 :includes (corfu-auto
+                            corfu-echo
+                            corfu-history
                             corfu-info
                             corfu-directory
-                            corfu-history
                             corfu-popupinfo))
 
   :bind
@@ -826,6 +827,9 @@ Narrow down the selection using orderless style:
 
   ;; show completion after 1s of idle
   (corfu-auto-delay 1)
+
+  ;; characters to auto-trigger corfu, ignoring the delay
+  (corfu-auto-trigger ".:/")
 
   :config
   ;; enable corfu completion for eval-expession/shell-command
