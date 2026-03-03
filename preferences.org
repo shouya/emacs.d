@@ -2929,8 +2929,9 @@ Configure the built-in tree sit modes.
 ** copilot.el
 
 #+begin_src emacs-lisp
+(use-package track-changes :ensure (:source "MELPA")) ;; newer version required by copilot
 (use-package copilot
-  :ensure (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+  :ensure (:host github :repo "copilot-emacs/copilot.el")
   :commands (copilot-mode copilot-clear-overlay copilot-complete copilot-diagnose)
   :custom
   ;; enable logging (max size: 10000)
