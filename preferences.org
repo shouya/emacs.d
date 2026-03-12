@@ -286,6 +286,12 @@ Tab key never insert "\t" character. It should always indent.
 (setq-default indent-tabs-mode nil)
 #+end_src
 
+*** Duplicate
+
+#+begin_src emacs-lisp
+(bind-key* "M-j" #'duplicate-dwim)
+#+end_src
+
 ** Save last position for each file
 
 #+begin_src emacs-lisp
@@ -492,6 +498,12 @@ The default major mode is fundamental-mode, which is very limited.
 
 #+begin_src emacs-lisp
 (setq default-input-method "TeX")
+#+end_src
+
+** Automatic revert on file change
+
+#+begin_src emacs-lisp
+(global-auto-revert-mode 1)
 #+end_src
 
 * UI
@@ -1084,7 +1096,6 @@ I use =tempel= to quickly enter frequently used snippets.
 (use-package multiple-cursors
   :ensure t
   :bind (("C-x m" . mc/mark-all-dwim)
-         ("C-M-SPC" . mc/mark-next-lines)
          ("C->" . mc/mark-next-like-this-symbol)
          ("C-<" . mc/unmark-next-like-this)
          ("C-M->" . mc/skip-to-next-like-this)
@@ -1199,6 +1210,13 @@ Undo-tree is good, but it sometimes slows down saving (uses too much memory), an
   :custom
   (vundo-compact-display t)
   )
+#+end_src
+
+** Commenting
+
+#+begin_src emacs-lisp
+(bind-key* "C-x ;" #'comment-line)      ; comment code
+(bind-key* "M-;" #'comment-dwim)        ; add comment
 #+end_src
 
 ** =keyfreq.el=
