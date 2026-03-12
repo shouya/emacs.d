@@ -1169,32 +1169,32 @@ I use =tempel= to quickly enter frequently used snippets.
 
 ** Pair management
 
-I use =smartparens= package for (automatic) pair management.
-
-#+begin_src emacs-lisp
-(use-package smartparens-mode
-  :ensure smartparens
-  :bind (:map smartparens-mode-map
-              ("M-r" . sp-rewrap-sexp)
-              ("M-<down>" . sp-splice-sexp)
-              ("M-S-<right>" . sp-forward-slurp-sexp)
-              ("M-S-<left>" . sp-forward-barf-sexp)
-              ("M-<right>" . sp-forward-sexp)
-              ("M-<left>" . sp-backward-sexp))
-  :hook prog-mode
-  :custom
-  (sp-autodelete-pair nil)
-  (sp-autoinsert-pair nil)
-  :config
-  (require 'smartparens-config))
-#+end_src
-
-I'd also like to have a bit of visual hint for pair levels.
+*** Highlight nested pairs with colors
 
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+
+*** Inserting pairs
+
+Typing on opening delimiter inserts closing delimiter. Wrap pair around active region.
+
+#+begin_src emacs-lisp
+(electric-pair-mode 1)
+#+end_src
+
+*** Deleting pair
+
+Put cursor on (or before) the opening pair and hit =C-M-z= to delete the pair.
+
+#+begin_src emacs-lisp
+(setopt delete-pair-blink-delay 0.1)    ; delete pair immediately
+(when (version<= "31.1" emacs-version)
+  (setopt delete-pair-push-mark t)      ; use C-u C-SPC to jump to recently deleted closing pair
+  )
+(bind-key* "C-M-z" #'delete-pair)
 #+end_src
 
 ** Nonlinear undo history
