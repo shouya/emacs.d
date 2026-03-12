@@ -93,13 +93,16 @@
 (setq vc-follow-symlinks t)
 (when (file-newer-than-file-p "~/.emacs.d/preferences.org"
                               "~/.emacs.d/preferences.el")
-  (delete-file "~/.emacs.d/preferences.el"))
-(load-file (expand-file-name "secrets.el" "~/.emacs.d"))
+  (delete-file "~/.emacs.d/preferences.el")
+  (require 'org)
+  (org-babel-tangle-file
+   "~/.emacs.d/preferences.org"
+   "~/.emacs.d/preferences.el"
+   (rx string-start (or "emacs-lisp" "elisp") string-end)
+  ))
 
-;; this avoid jit emacs from compiling the file using system org mode
-(with-eval-after-load 'org
-  (org-babel-load-file "~/.emacs.d/preferences.org"))
-(require 'org)
+(load-file (expand-file-name "secrets.el" "~/.emacs.d"))
+(load-file (expand-file-name "preferences.el" "~/.emacs.d"))
 
 ;; ---------- config managed by emacs ----------
 (put 'downcase-region 'disabled nil)

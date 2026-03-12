@@ -1506,7 +1506,7 @@ fits in the original number's width."
 
 #+begin_src emacs-lisp
 (use-package org
-  :config
+  :init
   (setq org-directory "~/Documents/org")
 
   (defun org-file-path (filename)
@@ -1938,6 +1938,7 @@ I use pandoc for exporting to mediawiki and gfm.
 
 #+begin_src emacs-lisp
 (use-package ob-restclient
+  :after org
   :ensure t
   :init
   (add-to-list 'org-structure-template-alist
@@ -2739,7 +2740,7 @@ otherwise fallback to =dumb-jump=.
   (("C-<iso-lefttab>" . copilot-complete))
 
   :hook
-  (text-mode . copilot-mode)
+  ;; (text-mode . copilot-mode)
   (conf-mode . copilot-mode)
   (prog-mode . copilot-mode)
 
