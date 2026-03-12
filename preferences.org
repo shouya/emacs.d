@@ -1156,70 +1156,6 @@ I use =tempel= to quickly enter frequently used snippets.
   :commands (sudo-edit sudo-edit-find-file))
 #+end_src
 
-** O(1) jump around
-
-#+begin_src emacs-lisp
-(use-package avy
-  :ensure t
-  :bind
-  ("M-j" . avy-goto-char)
-  ("M-J" . avy-pop-mark)
-
-  :custom
-  (avy-style 'at-full)
-
-  :config
-  ;; https://karthinks.com/software/avy-can-do-anything/#avy-plus-embark-any-action-anywhere
-  (defun shou/def/avy-action-at-point (:key key :action f)
-    "define custom avy action"
-    (let ((avy-action-name
-           (intern (concat "avy-action-" (symbol-name f)))))
-      (progn
-        (eval `(defun ,avy-action-name (pt)
-                 (unwind-protect
-                     (save-excursion (goto-char pt) (funcall ',f))
-                   (select-window (cdr (ring-ref avy-ring 0))))
-                 t))
-        (eval `(setf (alist-get ,key avy-dispatch-alist) ',avy-action-name)))
-    ))
-
-  (shou/def/avy-action-at-point
-   :key ?L
-   :action 'shou/copy-idlink-to-clipboard)
-  (shou/def/avy-action-at-point
-   :key ?m
-   :action 'embark-act)
-  (shou/def/avy-action-at-point
-   :key ?K
-   :action 'kill-whole-line)
-  )
-#+end_src
-
-** Embark
-
-Pure keyboard context menu.
-
-#+begin_src emacs-lisp
-(use-package embark
-  :ensure t
-  :bind ("M-m" . embark-act)
-  :after which-key ;; prefer embark's prefix help command
-  :init
-  ;; Press C-h after pressing prefix to filter/narrow down the
-  ;; options. Alternative to `which-key'.
-  (setq prefix-help-command #'embark-prefix-help-command)
-  :config
-  (defvar-keymap embark-identifier-map
-    :doc "Actions on symbol"
-    :parent embark-identifier-map
-    "," 'xref-find-definitions
-    "." 'xref-find-definitions-other-window
-    ;; ("R" lsp-rename)
-    "g" 'rg-dwim
-    )
-  )
-#+end_src
-
 ** Pair management
 
 I use =smartparens= package for (automatic) pair management.
@@ -1314,16 +1250,6 @@ Several differences from the default =*scratch-buffer*= (or =M-x scratch=)
   :bind (:map prog-mode-map
               ("C-c @ TAB" . hs-toggle-hiding)
               ("C-<return>" . hs-toggle-hiding)))
-#+end_src
-
-** Edit string at point
-
-#+begin_src emacs-lisp
-(use-package string-edit-at-point
-  :ensure t
-  :commands string-edit-at-point
-  :bind (:map prog-mode-map
-              ("C-c '" . string-edit-at-point)))
 #+end_src
 
 ** Copy visible text
@@ -1557,14 +1483,6 @@ fits in the original number's width."
   :hook (dired-mode . dired-hide-dotfiles-mode))
 #+end_src
 
-* Tools
-** Process manager
-
-#+begin_src emacs-lisp
-(use-package proced
-  :custom
-  (proced-enable-color-flag t))
-#+end_src
 * Org mode
 ** Base directory for org files
 
@@ -2188,51 +2106,6 @@ while. The mode is activated for specific folder only using
 
 ** Project management
 
-*** Projectile
-
-#+begin_src emacs-lisp
-(use-package projectile
-  :ensure t
-  :disabled
-  :custom
-  (projectile-completion-system 'default)
-  (projectile-indexing-method 'hybrid)
-  (projectile-enable-caching nil)
-  (projectile-globally-ignored-file-suffixes '("beam"))
-  (projectile-create-missing-test-files t)
-  ;; speed up tramp (https://emacs.stackexchange.com/questions/17543/tramp-mode-is-much-slower-than-using-terminal-to-ssh)
-  (projectile-mode-line "P")
-  (projectile-switch-project-action 'shou/action-after-switch-project)
-  (projectile-track-known-projects-automatically nil)
-
-  :hook (emacs-startup . projectile-mode)
-  :bind-keymap
-  ("M-`" . projectile-command-map)
-
-  :config
-  ;; not effective if indexing method is 'alien
-  (setq projectile-globally-ignored-directories
-        (append projectile-globally-ignored-directories
-                '(".elixir_ls" "_build" "*third_party")))
-
-  ;; Elixir: jump to *_test.exs instead of *_test.ex
-  (defun shou/fix-exs-test-file-name (name)
-    (cond
-     ((string-suffix-p "_test.ex" name) (concat name "s"))
-     (t name)))
-
-  (advice-add #'projectile--test-name-for-impl-name
-              :filter-return
-              #'shou/fix-exs-test-file-name)
-  (defun shou/action-after-switch-project ()
-    "open magit or prompt for find file"
-    (if (and (fboundp 'magit-git-repo-p)
-             (magit-git-repo-p default-directory))
-        (magit)
-        (projectile-find-file)))
-  )
-#+end_src
-
 *** Project.el
 
 #+begin_src emacs-lisp
@@ -2259,35 +2132,6 @@ while. The mode is activated for specific folder only using
     (let ((project-current-directory-override nil)
           (default-directory ""))
       (magit-project-status))))
-#+end_src
-
-*** Find marker file
-
-#+begin_src emacs-lisp
-(with-eval-after-load 'projectile
-  (defun shou/projectile-find-marker-file ()
-    "Find the marker file (Cargo.toml, mix.exs, etc) for the current project."
-    (interactive)
-    (if-let* ((this-file (buffer-file-name))
-              (marker-files (projectile-project-type-attribute
-                             (projectile-project-type)
-                             'marker-files))
-              (get-target-marker-file
-               (lambda (f)
-		 (when-let* ((dir (locate-dominating-file default-directory f))
-                             (full-path (concat dir f))
-                             (_ (not (f-same-p this-file full-path))))
-                   full-path)))
-              (marker-file (seq-find get-target-marker-file marker-files))
-              (target-marker-file (funcall get-target-marker-file marker-file)))
-	(find-file target-marker-file)
-      (if-let* ((default-directory (f-dirname default-directory))
-		(parent-marker-file (seq-find get-target-marker-file marker-files))
-		(target-parent-marker-file (funcall get-target-marker-file parent-marker-file)))
-          (find-file target-parent-marker-file)
-	(message "No marker file found"))))
-
-  (bind-key "m" 'shou/projectile-find-marker-file projectile-command-map))
 #+end_src
 
 *** ripgrep (=rg=)
@@ -2833,87 +2677,6 @@ otherwise fallback to =dumb-jump=.
               (ansi-color-apply-on-region compilation-filter-start (point)))))
 #+end_src
 
-** Code formatting
-
-#+begin_src emacs-lisp
-(use-package apheleia
-  :ensure t
-  :disabled
-  :hook (emacs-startup . apheleia-global-mode)
-  :config
-  (add-to-list 'apheleia-formatters '(mix . ("mix" "format" "-")))
-  (add-to-list 'apheleia-formatters '(prettier . (npx "prettier" "--stdin-filepath" filepath)))
-  (add-to-list 'apheleia-formatters '(rustfmt . ("rustfmt" "--quiet" "--emit" "stdout")))
-  (add-to-list 'apheleia-mode-alist '(elixir-mode . mix))
-
-  ;; See https://github.com/raxod502/apheleia/issues/30
-  (defun shou/fix-apheleia-project-dir (orig-fn &rest args)
-    (let ((project (project-current)))
-      (if (not (null project))
-          (let ((default-directory (projectile-project-root))) (apply orig-fn args))
-        (apply orig-fn args))))
-
-  (advice-add 'apheleia-format-buffer :around #'shou/fix-apheleia-project-dir)
-
-  ;; sometimes apheleia erase the whole buffer, which is pretty annoying.
-  ;; fix it by detecting this scenario and simply doing no-op
-  (defun shou/fix-apheleia-accidental-deletion
-      (orig-fn old-buffer new-buffer &rest rest)
-    (if (and (=  0 (buffer-size new-buffer))
-             (/= 0 (buffer-size old-buffer)))
-        ;; do not override anything
-        nil
-        (apply orig-fn old-buffer new-buffer rest)))
-
-  (advice-add 'apheleia--create-rcs-patch :around #'shou/fix-apheleia-accidental-deletion)
-
-  ;; used in hooks to turn off apheleia mode for some modes
-  (defun shou/disable-apheleia-mode nil (apheleia-mode -1)))
-#+end_src
-
-** Treesit
-
-Configure the built-in tree sit modes.
-
-#+begin_src emacs-lisp
-(use-package treesit
-  :when (version<= "29.1" emacs-version))
-
-(setq major-mode-remap-alist
-      '((toml-mode . toml-ts-mode)
-        ;; treesit-install-grammar https://github.com/tree-sitter/tree-sitter-css
-        (css-mode . css-ts-mode)))
-#+end_src
-
-** Highlighting TODOs
-
-#+begin_src emacs-lisp
-(use-package hl-todo
-  :ensure (:depth nil)
-  :custom
-  (hl-todo-keyword-faces
-   '(("TODO" . "#721045")
-     ("FIXME" . "#a0132f")
-     ("HACK" . "#813e00"))))
-#+end_src
-
-*** List TODOs in consult
-
-#+begin_src emacs-lisp
-(use-package consult-todo
-  :ensure t
-  :after (magit hl-todo))
-#+end_src
-
-*** List TODOs in magit
-
-#+begin_src emacs-lisp
-(use-package magit-todos
-  :ensure t
-  :after (magit hl-todo)
-  :config (magit-todos-mode 1))
-#+end_src
-
 ** Direnv
 
 #+begin_src emacs-lisp
@@ -3077,64 +2840,6 @@ See https://github.com/copilot-emacs/copilot.el/issues/172.
   (advice-add 'org-todo :around #'shou/disable-copilot-temporarily)
   ;; used in org-indent-item/org-outdent-item/org-cycle-list-bullet
   (advice-add 'org-list-struct-apply-struct :around #'shou/disable-copilot-temporarily))
-#+end_src
-
-** copilot-chat.el
-
-#+begin_src emacs-lisp
-(use-package copilot-chat
-  :ensure (:host github :repo "chep/copilot-chat.el" :files ("*.el"))
-  :after (markdown)
-  :bind
-  (("C-c S-c SPC" . copilot-chat-transient)
-   ("C-c S-c b" . copilot-chat-transient-buffers)
-   :map prog-mode-map
-   ("C-c S-c c" . copilot-chat-transient-code))
-  :custom
-  (copilot-chat-backend 'request)
-  (copilot-chat-model "gpt-4o-2024-11-20")
-  (copilot-chat-frontend 'markdown)
-  )
-#+end_src
-
-** gptel
-
-Press =C-c <RET>= to send your input.
-
-#+begin_src emacs-lisp
-(use-package gptel
-  :ensure (:host github :repo "karthink/gptel")
-  :commands (gptel-send gptel gptel-menu gptel-set-topic)
-  :custom
-  (gptel-default-mode 'org-mode)
-  (gptel-log-level 'info)
-  :config
-  ;; auto scroll as the response comes in
-  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
-  ;; move cursor to the end of response
-  (add-hook 'gptel-post-response-hook 'gptel-end-of-response)
-
-  ;; openrouter.ai as default backend
-  (require 'shou-pass)
-  (gptel-make-openai "Openrouter.ai"
-    :models '("gryphe/mythomist-7b" "recursal/eagle-7b" "undi95/toppy-m-7b")
-    :stream t
-    :key (lambda nil (shou/get-pass-entry "openrouter-ai/api-key"))
-    :host "openrouter.ai"
-    :endpoint "/api/v1/chat/completions"
-    ))
-#+end_src
-
-** ancilla.el
-
-#+begin_src emacs-lisp
-(use-package ancilla
-  :ensure (:host github :repo "shouya/ancilla.el" :files ("ancilla.el"))
-  ;; :ensure nil :load-path "~/projects/ancilla/ancilla.el"
-  :custom
-  (ancilla-adaptor-chat-model "gpt-4o-mini")
-  (ancilla-adaptor-chat-openai-api-key (auth-source-pass-get 'secret "openai/api-key"))
-  )
 #+end_src
 
 * Languages and modes
