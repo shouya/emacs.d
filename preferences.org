@@ -1228,17 +1228,17 @@ Several differences from the default =*scratch-buffer*= (or =M-x scratch=)
   "open a scratch buffer"
   (interactive
    (list (completing-read "Buffer name: "
-                          (list (make-temp-name "scratch-")
-                                (make-temp-name "scratch-private-"))
+                          (list (concat (make-temp-name "scratch-") ".org")
+                                (concat (make-temp-name "scratch-private-") ".org")
+                                (concat (make-temp-name "scratch-") ".txt")
+                                )
                           nil nil "scratch-")))
   (let* ((buffer (generate-new-buffer buffer-name))
          (scratch-dir (f-expand "~/tmp/scratch"))
-         (target-file (format "%s/%s.org" scratch-dir buffer-name)))
+         (target-file (format "%s/%s" scratch-dir buffer-name)))
     (make-directory scratch-dir 'parents)
-    (set (make-local-variable 'major-mode) 'org-mode)
     (switch-to-buffer buffer)
-    (write-file target-file)
-    (org-mode)))
+    (write-file target-file)))
 #+END_SRC
 
 ** Code folding support
