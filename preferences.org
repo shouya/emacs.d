@@ -945,9 +945,9 @@ Corfu completion in terminal:
    ("M-s L" . consult-line-multi)
    ("M-s m" . consult-global-mark)
 
-   :map org-mode-map
-   ;; org heading of this file
-   ("C-c C-j" . consult-org-heading)
+   ;; :map org-mode-map
+   ;; ;; org heading of this file
+   ;; ("C-c C-j" . consult-org-heading)
    )
 
   :custom
