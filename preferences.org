@@ -2001,6 +2001,10 @@ I use pandoc for exporting to mediawiki and gfm.
   ;; https://github.com/magit/magit/discussions/5121#discussioncomment-9038715
   ;; set diff.ignoreSubmodules=untracked to allow for faster git status.
   (remove-hook 'magit-status-headers-hook 'magit-insert-diff-filter-header)
+
+  ;; Hit enter while visiting a blob file (from history) goes to the
+  ;; file in worktree
+  (bind-key "RET" #'magit-blob-visit-file 'magit-blob-mode-map)
   )
 #+end_src
 
