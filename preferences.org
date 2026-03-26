@@ -1959,7 +1959,7 @@ I use pandoc for exporting to mediawiki and gfm.
 
   :custom
   ;; https://twitter.com/iLemming/status/1243322552828571649
-  (magit-save-repository-buffers 'save-all-and-dont-ask)
+  (magit-save-repository-buffers 'dontask)
 
   ;; sort branches (or any refs) by creation date
   (magit-list-refs-sortby "-creatordate")
@@ -1977,6 +1977,7 @@ I use pandoc for exporting to mediawiki and gfm.
   :config
   ;; so it don't close other windows
   (fset 'magit-restore-window-configuration (lambda (x) (kill-buffer-and-window)))
+
   ;; automatically refresh after saving a file
   ;;
   ;; Edit: I turned it off as it makes editing a bit laggy. Now please
@@ -1984,19 +1985,10 @@ I use pandoc for exporting to mediawiki and gfm.
   ;;
   ;; (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
 
-  ;; do not override projectile keys
-  (unbind-key "M-p" magit-status-mode-map)
-  (unbind-key "M-n" magit-status-mode-map)
-
   ;; do not show list of tags to faster
   ;; (remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
   (add-to-list 'magit-section-initial-visibility-alist
                '([tags branchbuf] . hide))
-
-  ;; show exact date on revision page
-  (setq magit-revision-headers-format (->> magit-revision-headers-format
-                                           (s-replace "%ad" "%ad (%aD)")
-                                           (s-replace "%cd" "%cd (%cD)")))
 
   ;; https://github.com/magit/magit/discussions/5121#discussioncomment-9038715
   ;; set diff.ignoreSubmodules=untracked to allow for faster git status.
