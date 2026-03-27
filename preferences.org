@@ -2720,9 +2720,6 @@ otherwise fallback to =dumb-jump=.
   (copilot-idle-delay 1)
   (copilot-max-char 1000000) ;; increase to 1M
 
-  ;; pinning this version. newer versions seem broken.
-  ;; (copilot-version "1.304.0")
-
   ;; https://github.com/github/copilot-language-server-release?tab=readme-ov-file#configuration-management
   (copilot-lsp-settings
           '(:telemetry (:telemetryLevel "off")))
@@ -2744,6 +2741,8 @@ otherwise fallback to =dumb-jump=.
   (prog-mode . copilot-mode)
 
   :config
+  ;; (add-hook 'copilot-mode-hook #'copilot-nes-mode)
+
   (defun shou/buffer-file-name ()
     "Return the file name of the current buffer (or the base buffer if in narrowed buffer)."
     (or (buffer-file-name)
@@ -2763,25 +2762,16 @@ otherwise fallback to =dumb-jump=.
        ;; do not enable copilot when i'm editing wiki
        (derived-mode-p 'mediawiki-mode)
        ;; do not enable copilot on files that may contain secrets
-       (string-match-p "\\(?:secret\\|cred\\|hidden\\|private\\|auth\\|app-2024\\)"
-                       buffer-file)
+       (string-match-p "\\(?:secret\\|cred\\|hidden\\|private\\|auth\\|app-2024\\)" buffer-file)
        ;; do not enable copilot on gpg files
-       (string-match-p "\\.\\(gpg\\|asc\\)\\'"
-                       buffer-file)
-       (string-match-p "\\.bean\\'"
-                       buffer-file)
-       (string-match-p "org/\\(plan\\|projects\\).org"
-                       buffer-file)
+       (string-match-p "\\.\\(gpg\\|asc\\)\\'" buffer-file)
+       (string-match-p "\\.bean\\'" buffer-file)
+       (string-match-p "org/\\(plan\\|projects\\).org" buffer-file)
        ;; exclude large buffer of pure texts,
        ;; copilot is very inaccurate.
-       (and (derived-mode-p 'text-mode)
-            (> (buffer-size) 60000))
+       (and (derived-mode-p 'text-mode) (> (buffer-size) 60000))
        ;; do not enable copilot on files in tmp/cu
-       (string-match-p "tmp/cu" buffer-file)
-       ;; do not match server files
-       (string-match-p "examples/server" buffer-file)
-       ;; do not enable on proprietary codes
-       (string-match-p "/mr/" buffer-file))))
+       (string-match-p "tmp/cu" buffer-file))))
 
   (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
 
@@ -2827,13 +2817,7 @@ otherwise fallback to =dumb-jump=.
            (bind-key key f copilot-completion-map)
            (bind-key key `(lambda () (interactive)
                             (shou/copilot-override-key ,(kbd key) (quote ,f)))
-                     copilot-mode-map))
-
-
-  ;; silent the warning: https://github.com/copilot-emacs/copilot.el/issues/220
-  (defun shou/ignore-copilot-indent-warning ()
-    (setq-local copilot--indent-warning-printed-p t))
-  (add-hook 'copilot-mode-hook #'shou/ignore-copilot-indent-warning))
+                     copilot-mode-map)))
 #+end_src
 
 *** copilot fix with org-todo
