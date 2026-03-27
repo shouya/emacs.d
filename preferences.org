@@ -1997,6 +1997,9 @@ I use pandoc for exporting to mediawiki and gfm.
   ;; Hit enter while visiting a blob file (from history) goes to the
   ;; file in worktree
   (bind-key "RET" #'magit-blob-visit-file 'magit-blob-mode-map)
+
+  ;; rebind M-w for copying things (section revision, selection, etc)
+  (bind-key "M-w" #'magit-copy-section-value 'magit-mode-map)
   )
 #+end_src
 
