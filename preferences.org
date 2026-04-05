@@ -1085,9 +1085,20 @@ I use =tempel= to quickly enter frequently used snippets.
         (tempel-complete t)))
 
   (setq tempel-snippet-path (f-canonical "~/.emacs.d/snippets"))
-  (defun shou/tempel-snippet (file)
-    (f-read-text (f-join tempel-snippet-path file)))
+  (defun shou/tempel-snippet (file &optional replacements)
+    "Read snippet FILE from `tempel-snippet-path` and return its contents as a string.
+
+If REPLACEMENTS is non-nil, it should be an alist of (FROM . TO) strings.
+Each FROM string is replaced with the corresponding TO string throughout
+the snippet text. Replacements are applied sequentially in the order they
+appear in the alist."
+    (let ((text (f-read-text (f-join tempel-snippet-path file))))
+      (cl-loop
+       for (from . to) in replacements
+       do (setq text (string-replace from to text)))
+      text)
   )
+)
 #+end_src
 
 ** Multi cursor support
