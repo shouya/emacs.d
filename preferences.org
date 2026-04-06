@@ -3034,8 +3034,8 @@ Improve property list indentation:
   ;; do not show a buffer for format errors
   (rust-format-show-buffer nil)
 
-  ;; set default indent size to 2. Actual indent size will be auto-detected
-  (rust-indent-offset 2)
+  ;; set default indent size to 4. Actual indent size will be auto-detected
+  (rust-indent-offset 4)
 
   :config
   ;; fix incorrect filename regexp in compilation mode
@@ -3075,7 +3075,7 @@ Tree sitter mode specific config.
 (use-package rust-ts-mode
   :when (fboundp 'rust-ts-mode)
   :custom
-  (rust-ts-mode-indent-offset 2))
+  (rust-ts-mode-indent-offset 4))
 #+end_src
 
 *** Rust LSP config
