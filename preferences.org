@@ -263,7 +263,15 @@ Delete current active region when I begin typing or pasting.
 Myth says that turning off bi-directional text support can improve performance. I don't use bi-directional text anyway.
 
 #+begin_src emacs-lisp
+(setq-default bidi-display-reordering 'left-to-right
+              bidi-paragraph-direction 'left-to-right)
 (setq bidi-inhibit-bpa t)
+#+end_src
+
+*** Skip fontification on input
+
+#+begin_src emacs-lisp
+(setq redisplay-skip-fontification-on-input t)
 #+end_src
 
 *** Disable unused mouse buttons
@@ -761,6 +769,17 @@ is currently active (as in transient-mark-mode)
 
 #+begin_src emacs-lisp
 (setq mark-even-if-inactive nil)
+#+end_src
+
+*** Kill ring
+
+#+begin_src emacs-lisp
+;; Preserve external clipboard content before killing in emacs to
+;; allow yanking from the kill ring.
+(setq save-interprogram-paste-before-kill t)
+
+;; No duplicate entries that waste space
+(setq kill-do-not-save-duplicates t)
 #+end_src
 
 ** Minibuffer completion
