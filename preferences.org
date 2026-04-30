@@ -155,7 +155,9 @@ Allow performing actions in minibuffer that uses minibuffer.
 (bind-key "C-x c" #'clone-indirect-buffer-other-window)
 
 (defun shou/other-window-backwards nil (interactive) (other-window -1))
-(bind-key "M-O" #'shou/other-window-backwards)
+(when (display-graphic-p)
+  ;; this binding breaks arrow keys on emacs tui
+  (bind-key "M-O" #'shou/other-window-backwards))
 
 ;; prefer splitting window vertically (|)
 (setq split-width-threshold 140)
@@ -538,9 +540,8 @@ Never show graphical dialog box.
 ;; allow italic constructs such as comments and helper messages
 (setq modus-themes-italic-constructs t)
 
-(load-theme 'modus-operandi t nil)
-(add-hook 'emacs-startup-hook
-	  (lambda () (enable-theme 'modus-operandi)))
+(let ((theme (if (display-graphic-p) 'modus-operandi 'modus-vivendi)))
+  (load-theme theme t nil))
 #+end_src
 
 ** Fonts
