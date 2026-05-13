@@ -30,8 +30,7 @@
 
   (add-hook 'server-visit-hook
             (lambda ()
-              (when (null window-system)  ; Only in terminal (tty)
-                (local-set-key (kbd "C-c C-c") #'shou/server-save-and-close))))
+              (local-set-key (kbd "C-c C-c") #'shou/server-save-and-close)))
   )
 #+end_src
 
@@ -141,7 +140,7 @@ Allow performing actions in minibuffer that uses minibuffer.
 (bind-key "C-x -" #'split-window-below)
 
 (defun shou/other-window-or-ace ()
-  "Switch to other window. If C-u is pressed, call ave-window."
+  "Switch to other window. If C-u is pressed, call ace-window."
   (interactive)
   (if (not (equal '(4) current-prefix-arg))
       (other-window 1)
@@ -322,6 +321,7 @@ Built-in module:
          (rx ".rustup/toolchains") ;; rust library source files
          (rx ".cargo/registry") ;; rust library source files
          (rx "/nix/store") ;; nix source files
+         (rx "/tmp/fish.") ;; fish commandline editor
          ))
   ;; auto clean up every day after 11:00pm
   (recentf-auto-cleanup "11:00pm")
@@ -330,7 +330,7 @@ Built-in module:
   ;; save 2000 files instead of default 20 files in history
   (setq recentf-max-saved-items 2000)
 
-  ;; save every 5 minutes (default: save on emacs exit)
+  ;; save every 1 minutes (default: save on emacs exit)
   (defun shou/recentf-save-if-changed ()
     "Save `recentf-list` only if it has changed since last save."
     (let ((last-recentf-list nil))
@@ -338,7 +338,7 @@ Built-in module:
         (unless (equal last-recentf-list recentf-list)
           (let ((inhibit-message t)) (recentf-save-list))
           (setq last-recentf-list recentf-list)))))
-  (run-at-time 300 300 #'shou/recentf-save-if-changed)
+  (run-at-time 60 60 #'shou/recentf-save-if-changed)
 
   (recentf-mode 1)
   (defun shou/find-recent-file ()
@@ -911,14 +911,7 @@ Extra completion:
     (make-local-variable 'completion-at-point-functions)
     ;; add to the end
     (add-to-list 'completion-at-point-functions #'cape-dict t))
-
-  ;; c.f. https://github.com/minad/corfu#completing-in-the-eshell-or-shell
-  (when (version< emacs-version "29")
-    ;; Silence the pcomplete capf, no errors or messages!
-    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
-    ;; Ensure that pcomplete does not write to the buffer
-    ;; and behaves as a pure `completion-at-point-function'.
-    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)))
+  )
 #+end_src
 
 Show docs beside completion:
@@ -1257,6 +1250,8 @@ Gather statistics for frequently used commands.
 #+begin_src emacs-lisp
 (use-package keyfreq
   :ensure t
+  ;; avoid tty emacs session locking on the same file
+  :when (display-graphic-p)
   :hook (emacs-startup . keyfreq-mode)
   :custom
   (keyfreq-file "~/.emacs.d/keyfreq")
@@ -2049,10 +2044,6 @@ Hotkey to remember:
   :after magit
   :bind (:map magit-mode-map
               ("M-W" . forge-copy-url-at-point-as-kill))
-  :custom-face
-  ;; The status (unread/read) affects the boldness of the text, while
-  ;; the state (open/close) affects the text color (normal/dimmed).
-  (forge-topic-unread ((t (:foreground nil))))
   :config
   ;; '(githost apihost id class)
   (add-to-list 'forge-alist
@@ -2743,6 +2734,8 @@ otherwise fallback to =dumb-jump=.
 #+begin_src emacs-lisp
 (use-package track-changes :ensure (:source "MELPA")) ;; newer version required by copilot
 (use-package copilot
+  ;; faster emacs -nw load time (for quick edits)
+  :when (display-graphic-p)
   :ensure (:host github :repo "copilot-emacs/copilot.el")
   :commands (copilot-mode copilot-clear-overlay copilot-complete copilot-diagnose)
   :custom
@@ -2802,7 +2795,10 @@ otherwise fallback to =dumb-jump=.
        ;; copilot is very inaccurate.
        (and (derived-mode-p 'text-mode) (> (buffer-size) 60000))
        ;; do not enable copilot on files in tmp/cu
-       (string-match-p "tmp/cu" buffer-file))))
+       (string-match-p "tmp/cu" buffer-file)
+       ;; do not enable for inline command line editing
+       (string-match-p "/tmp/fish." buffer-file)
+       )))
 
   (add-to-list 'copilot-disable-predicates #'shou/copilot-disable-predicate)
 
