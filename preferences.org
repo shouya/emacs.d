@@ -954,6 +954,7 @@ Corfu completion in terminal:
   (("M-g g" . consult-goto-line)
    ;; consult single line
    ("M-g M-g" . consult-line)
+   ("M-g f" . shou/consult-diagnostics)
    ;; any org heading
    ("C-c C-S-j" . consult-org-agenda)
    ("C-x b" . consult-buffer)
@@ -1002,7 +1003,20 @@ Corfu completion in terminal:
     "Project file candidate source for `consult-buffer'.")
 
   (add-to-list 'consult-buffer-sources 'consult--source-project-file)
+
+  (defun shou/consult-diagnostics (arg)
+    "Consult diagnostics produced by lsp or flycheck"
+    (interactive "P")
+    (cond
+     ((and lsp-mode
+           (not (hash-table-empty-p (lsp-diagnostics))))
+      (consult-lsp-diagnostics arg))
+     (flycheck-mode (consult-flycheck))))
   )
+
+(use-package consult-flycheck
+  :ensure t
+  :after consult)
 
 (use-package consult-lsp
   :ensure t
