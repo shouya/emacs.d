@@ -63,6 +63,8 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 (use-package s :ensure t :demand t)
 ;; magit/forge requires the latest version of transient instead of the built-in one.
 (use-package transient :ensure (:fetcher github :repo "magit/transient"))
+;; elpaca does not automatically update built-in packages, declare manually
+(use-package compat :ensure t :demand t)
 
 (elpaca-wait)
 #+end_src
@@ -947,7 +949,7 @@ Corfu completion in terminal:
 #+begin_src emacs-lisp
 (use-package consult
   :ensure t
-  :after recentf
+  :after recentf compat
   :bind
   (("M-g g" . consult-goto-line)
    ;; consult single line
@@ -980,6 +982,26 @@ Corfu completion in terminal:
   (consult-customize
    consult-goto-line consult-line
    :preview-key '(:debounce 0.1 any))
+
+  ;; adapted from https://github.com/minad/consult/issues/6#issuecomment-848077449
+  ;; trigger via C-x b p <SPC>
+  (defvar consult--source-project-file
+    `(:name "Project File"
+            :narrow    (?p . "Project")
+            :hidden    t
+            :category  file
+            :face      consult-file
+            :history   file-name-history
+            :action    ,#'consult--file-action
+            :enabled   ,#'project-current
+            :items     ,(lambda ()
+                          (mapcar (lambda (f)
+                                    (f-relative f
+                                                (project-root (project-current))))
+                                  (project-files (project-current)))))
+    "Project file candidate source for `consult-buffer'.")
+
+  (add-to-list 'consult-buffer-sources 'consult--source-project-file)
   )
 
 (use-package consult-lsp
