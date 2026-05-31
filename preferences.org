@@ -2767,7 +2767,6 @@ otherwise fallback to =dumb-jump=.
 (use-package copilot
   ;; faster emacs -nw load time (for quick edits)
   :when (display-graphic-p)
-  :disabled
   :ensure (:host github :repo "copilot-emacs/copilot.el")
   :commands (copilot-mode copilot-clear-overlay copilot-complete copilot-diagnose)
   :custom
@@ -2879,29 +2878,6 @@ otherwise fallback to =dumb-jump=.
                      copilot-mode-map)))
 #+end_src
 
-*** copilot fix with org-todo
-
-See https://github.com/copilot-emacs/copilot.el/issues/172.
-
-#+begin_src emacs-lisp
-(use-package copilot
-  :disabled
-  :after org
-  :config
-  (defun shou/disable-copilot-temporarily (fn &rest args)
-    (if (not (and (boundp 'copilot-mode) copilot-mode))
-        (apply fn args)
-      (copilot-mode -1)
-      (apply fn args)
-      (save-restriction
-        (widen)
-        (copilot-mode 1))))
-
-  ;; advice it on org-todo
-  (advice-add 'org-todo :around #'shou/disable-copilot-temporarily)
-  ;; used in org-indent-item/org-outdent-item/org-cycle-list-bullet
-  (advice-add 'org-list-struct-apply-struct :around #'shou/disable-copilot-temporarily))
-#+end_src
 
 ** wingman
 
@@ -2909,6 +2885,7 @@ See https://github.com/copilot-emacs/copilot.el/issues/172.
 (use-package wingman
   :ensure (wingman :host github :repo "mjrusso/wingman")
   :when (display-graphic-p)
+  :disabled
   :hook
   (prog-mode . wingman-mode)
   (text-mode . wingman-mode)
