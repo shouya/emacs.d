@@ -2903,43 +2903,38 @@ See https://github.com/copilot-emacs/copilot.el/issues/172.
   (advice-add 'org-list-struct-apply-struct :around #'shou/disable-copilot-temporarily))
 #+end_src
 
-** minuet-ai.el
+** wingman
 
 #+begin_src emacs-lisp
-(use-package minuet
-  :ensure (minuet :host github :repo "milanglacier/minuet-ai.el")
+(use-package wingman
+  :ensure (wingman :host github :repo "mjrusso/wingman")
   :when (display-graphic-p)
+  :hook
+  (prog-mode . wingman-mode)
+  (text-mode . wingman-mode)
   :bind
-  (:map prog-mode-map
-        ("C-c TAB" . minuet-complete-with-minibuffer)
+  (:map wingman-mode-prefix-map
+        ("TAB" . wingman-fim)              ; Request Native FIM
+        ("S-TAB" . wingman-fim-emulated)   ; Request Emulated FIM
+        ("d" . wingman-fim-debug)
 
-        :map minuet-active-mode-map
-        ("C-e" . minuet-accept-suggestion-line)
-        ("M-n" . minuet-next-suggestion))
+        :map wingman-mode-completion-transient-map
+        ("TAB" . wingman-accept-full)
+        ("C-e" . wingman-accept-line)
+        ("M-f" . wingman-accept-word))
+
+  :init
+  (setq wingman-prefix-key (kbd "C-c w"))
+
   :config
-  (setq minuet-provider 'openai-fim-compatible)
+  (setq wingman-log-level 2)
+  (setq wingman-ring-n-chunks 16)
 
-  (setq minuet-openai-fim-compatible-options
-        (-> minuet-openai-fim-compatible-options
-            (plist-put :name "Local FIM")
-            (plist-put :model "local-fim")
-            (plist-put :end-point "http://127.0.0.1:11434/v1/completions")
-            ;; (plist-put :end-point "http://127.0.0.1:8012/v1/completions")
-            (plist-put :api-key (-const "sk-any"))
-            ))
-
-  (minuet-set-nested-plist minuet-openai-fim-compatible-options nil :template :suffix)
-  (minuet-set-optional-options minuet-openai-fim-compatible-options
-                               :prompt
-                               (defun minuet-llama-cpp-fim-qwen-prompt-function (ctx)
-                                 (format "<|fim_prefix|>%s\n%s<|fim_suffix|>%s<|fim_middle|>"
-                                         (plist-get ctx :language-and-tab)
-                                         (plist-get ctx :before-cursor)
-                                         (plist-get ctx :after-cursor)))
-                               :template)
-  )
+  ;; default llama.cpp server port is 8012
+  (setq wingman-llama-endpoint "http://127.0.0.1:11434/infill")
+  (setq wingman-model-name "fim")
+)
 #+end_src
-
 
 * Languages and modes
 ** Markup formats
