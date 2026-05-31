@@ -2767,6 +2767,7 @@ otherwise fallback to =dumb-jump=.
 (use-package copilot
   ;; faster emacs -nw load time (for quick edits)
   :when (display-graphic-p)
+  :disabled
   :ensure (:host github :repo "copilot-emacs/copilot.el")
   :commands (copilot-mode copilot-clear-overlay copilot-complete copilot-diagnose)
   :custom
@@ -2901,6 +2902,44 @@ See https://github.com/copilot-emacs/copilot.el/issues/172.
   ;; used in org-indent-item/org-outdent-item/org-cycle-list-bullet
   (advice-add 'org-list-struct-apply-struct :around #'shou/disable-copilot-temporarily))
 #+end_src
+
+** minuet-ai.el
+
+#+begin_src emacs-lisp
+(use-package minuet
+  :ensure (minuet :host github :repo "milanglacier/minuet-ai.el")
+  :when (display-graphic-p)
+  :bind
+  (:map prog-mode-map
+        ("C-c TAB" . minuet-complete-with-minibuffer)
+
+        :map minuet-active-mode-map
+        ("C-e" . minuet-accept-suggestion-line)
+        ("M-n" . minuet-next-suggestion))
+  :config
+  (setq minuet-provider 'openai-fim-compatible)
+
+  (setq minuet-openai-fim-compatible-options
+        (-> minuet-openai-fim-compatible-options
+            (plist-put :name "Local FIM")
+            (plist-put :model "local-fim")
+            (plist-put :end-point "http://127.0.0.1:11434/v1/completions")
+            ;; (plist-put :end-point "http://127.0.0.1:8012/v1/completions")
+            (plist-put :api-key (-const "sk-any"))
+            ))
+
+  (minuet-set-nested-plist minuet-openai-fim-compatible-options nil :template :suffix)
+  (minuet-set-optional-options minuet-openai-fim-compatible-options
+                               :prompt
+                               (defun minuet-llama-cpp-fim-qwen-prompt-function (ctx)
+                                 (format "<|fim_prefix|>%s\n%s<|fim_suffix|>%s<|fim_middle|>"
+                                         (plist-get ctx :language-and-tab)
+                                         (plist-get ctx :before-cursor)
+                                         (plist-get ctx :after-cursor)))
+                               :template)
+  )
+#+end_src
+
 
 * Languages and modes
 ** Markup formats
