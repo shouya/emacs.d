@@ -1511,7 +1511,8 @@ fits in the original number's width."
 ;; loaded from site-lisp
 (use-package dired+
   :after dired
-  :demand t
+  :ensure (dired+ :host github :repo "emacsmirror/dired-plus" :main "dired+.el")
+
   :init
   ;; do not show compressed files with face for ignored files
   ;; this variable must be set before dired+ is loaded because it affects font-lock
@@ -1534,20 +1535,6 @@ fits in the original number's width."
   (set-face-attribute 'diredp-flag-mark-line nil :background "gray94" :weight 'bold)
   (set-face-attribute 'diredp-flag-mark nil :background 'unspecified :foreground "orange")
   (set-face-attribute 'diredp-omit-file-name nil :strike-through 'unspecified)
-
-  (defun shou/update-dired+ ()
-    "Download the latest version of dired+."
-    (interactive)
-    ;; download
-    (url-copy-file
-     "http://www.emacswiki.org/emacs/download/dired+.el"
-     "~/.emacs.d/site-lisp/dired+.el"
-     t)
-    ;; rebuild
-    (byte-compile-file "~/.emacs.d/site-lisp/dired+.el")
-    ;; reload
-    (unload-feature 'dired+ t)
-    (require 'dired+ nil t))
 
   (unbind-key "M-b" dired-mode-map))
 #+end_src
