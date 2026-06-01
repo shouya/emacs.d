@@ -434,8 +434,13 @@ Key bindings:
   ;; use alternating set of bullet for lists. Default behaviour is to
   ;; only use "-".
   (setq org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
+
+  ;; treat as symbols than pairs (fix compairson signs & pair matching)
+  (modify-syntax-entry ?< "_" org-mode-syntax-table)
+  (modify-syntax-entry ?> "_" org-mode-syntax-table)
   )
 #+end_src
+
 
 ** Hide UI elements
 
