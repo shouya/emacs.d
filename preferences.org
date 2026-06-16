@@ -300,6 +300,9 @@ Tab key never insert "\t" character. It should always indent.
 *** Duplicate
 
 #+begin_src emacs-lisp
+;; move point to new copy after duplicating
+(setq duplicate-region-final-position -1
+      duplicate-line-final-position -1)
 (bind-key* "M-j" #'duplicate-dwim)
 #+end_src
 
