@@ -767,8 +767,10 @@ Enable line wrap by default:
 Stolen from https://stackoverflow.com/a/45363946/1232832.
 
 #+begin_src emacs-lisp
-(bind-key "M-<up>" 'scroll-other-window)
-(bind-key "M-<down>" 'scroll-other-window-down)
+(bind-key "C-M-p" '(lambda() (interactive) (scroll-other-window -1)))
+(bind-key "C-M-n" '(lambda() (interactive) (scroll-other-window 1)))
+
+(setq other-window-scroll-default #'get-lru-window)
 #+end_src
 
 *** Show column number
