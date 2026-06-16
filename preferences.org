@@ -2802,7 +2802,12 @@ otherwise fallback to =dumb-jump=.
   :demand t
   :when (executable-find "direnv")
   :config
-  (direnv-mode))
+  (direnv-mode)
+
+  ;; ensure env updated before lsp command spawn
+  (with-eval-after-load 'lsp
+    (advice-add 'lsp-mode :before #'direnv-update-environment))
+  )
 #+end_src
 
 * Auto-completion
