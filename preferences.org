@@ -461,6 +461,13 @@ Also, do not show splash screen.
 (setq inhibit-splash-screen t)
 #+end_src
 
+** Jump to emacs function definition
+
+#+begin_src emacs-lisp
+(bind-key "M-f" #'find-function help-map)
+(bind-key "M-k" #'find-function-on-key help-map)
+#+end_src
+
 ** Better help
 
 #+begin_src emacs-lisp
