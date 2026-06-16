@@ -2341,7 +2341,7 @@ Mostly to load indentation settings.
   (lsp-response-timeout 1.0)
 
   ;; do not expect yasnippet is installed
-  (lsp-enable-snippet nil)
+  (lsp-enable-snippet t)
 
   ;; place lens above a line instead at the end of a line
   (lsp-lens-place-position 'above-line)
@@ -2422,6 +2422,18 @@ Mostly to load indentation settings.
 
   (message "lsp loaded")
   )
+#+end_src
+
+*** Stub yasnippet with tempel
+
+#+begin_src emacs-lisp
+(use-package lsp-snippet-tempel
+  :ensure (:host github :repo "svaante/lsp-snippet")
+  :after lsp-mode
+  :commands lsp-snippet-tempel-lsp-mode-init
+  :init
+  (with-eval-after-load 'tempel
+    (lsp-snippet-tempel-lsp-mode-init)))
 #+end_src
 
 *** JSON parsing performance boost
