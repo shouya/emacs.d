@@ -2102,6 +2102,23 @@ Hotkey to remember:
   )
 #+end_src
 
+*** Majutsu
+
+#+begin_src emacs-lisp
+(use-package majutsu
+  :ensure (:host github :repo "0WD0/majutsu")
+  :bind ("C-x G" . majutsu)
+  :config
+  ;; promote status display before log
+  (setq majutsu-log-sections-hook
+        (->> majutsu-log-sections-hook
+            (remove #'majutsu-log-insert-status)
+            (cons #'majutsu-log-insert-status)
+            (remove #'majutsu-log-insert-error-header)
+            (cons #'majutsu-log-insert-error-header)))
+  )
+#+end_src
+
 *** Ediff
 
 #+begin_src emacs-lisp
