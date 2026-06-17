@@ -3325,7 +3325,10 @@ Editing agenix encrypted files:
 
 #+begin_src emacs-lisp
 (use-package agenix
-  :ensure t)
+  :ensure t
+  :custom
+  (agenix-key-files '("~/.ssh/age_id_ed25519" "~/.ssh/id_ed25519"))
+  )
 #+end_src
 
 ** Web mode
