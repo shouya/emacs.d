@@ -2322,6 +2322,11 @@ Mostly to load indentation settings.
   :bind-keymap
   ("M-l" . lsp-command-map)
 
+  :init
+  ;; lsp-enable-snippet detects (fbound 'yas-minor-mode) before
+  ;; enabling snippet. make it believe we have yasnippet installed.
+  (fset 'yas-minor-mode #'ignore)
+
   :hook
   ;; enable LSP on these modes
   (rust-mode . lsp-deferred)
@@ -2336,9 +2341,6 @@ Mostly to load indentation settings.
   ;; do not show debug messages that tend to be long (turn off for debugging)
   ;; example: rust-analyzer crash message
   (lsp--show-message nil)
-
-  ;; 1 sec or fail
-  (lsp-response-timeout 1.0)
 
   ;; do not expect yasnippet is installed
   (lsp-enable-snippet t)
@@ -2390,8 +2392,17 @@ Mostly to load indentation settings.
   :config
   ;; see https://github.com/minad/corfu/wiki#basic-example-configuration-with-orderless
   (defun shou/lsp-mode-setup-completion ()
+    ;; Configure orderless
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(orderless))) ;; Configure orderless
+          '(orderless))
+
+    ;; remove dabbrev completion
+    (remove-hook 'completion-at-point-functions #'cape-dabbrev t)
+
+    ;; ensure tempel matches before lsp-completion
+    (remove-hook 'completion-at-point-functions #'lsp-completion-at-point t)
+    (add-hook 'completion-at-point-functions #'lsp-completion-at-point 90 t)
+    )
   (add-hook 'lsp-completion-mode-hook 'shou/lsp-mode-setup-completion)
 
   ;; exclude unwanted watch files
@@ -2429,11 +2440,10 @@ Mostly to load indentation settings.
 #+begin_src emacs-lisp
 (use-package lsp-snippet-tempel
   :ensure (:host github :repo "svaante/lsp-snippet")
-  :after lsp-mode
   :commands lsp-snippet-tempel-lsp-mode-init
+  :after lsp-mode tempel
   :init
-  (with-eval-after-load 'tempel
-    (lsp-snippet-tempel-lsp-mode-init)))
+  (lsp-snippet-tempel-lsp-mode-init))
 #+end_src
 
 *** JSON parsing performance boost
@@ -2801,12 +2811,13 @@ otherwise fallback to =dumb-jump=.
   :ensure t
   :demand t
   :when (executable-find "direnv")
+  :init
+  ;; ensure env updated before lsp command spawn
+  (with-eval-after-load 'lsp-mode
+    (advice-add 'lsp-mode :before #'direnv-update-environment))
+
   :config
   (direnv-mode)
-
-  ;; ensure env updated before lsp command spawn
-  (with-eval-after-load 'lsp
-    (advice-add 'lsp-mode :before #'direnv-update-environment))
   )
 #+end_src
 
@@ -3192,6 +3203,14 @@ Tree sitter mode specific config.
 #+begin_src emacs-lisp
 (use-package rust-mode
   :after lsp-rust
+
+  :bind
+  (:map rust-mode-map
+        ("M-<up>" . lsp-rust-analyzer-move-item-up)
+        ("M-<down>" . lsp-rust-analyzer-move-item-down)
+        ("C-h d" . lsp-rust-analyzer-open-external-docs)
+        )
+
   :custom
   ;; enable proc macro expansion in rust-analyzer
   (lsp-rust-analyzer-proc-macro-enable t)
