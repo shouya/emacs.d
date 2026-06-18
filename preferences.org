@@ -11,6 +11,17 @@
 (add-to-list 'load-path (expand-file-name "site-lisp" user-emacs-directory))
 #+end_src
 
+** Inherit shell PATH on macOS
+
+#+begin_src emacs-lisp
+(use-package exec-path-from-shell
+  :ensure t
+  :if (eq system-type 'darwin)
+  :demand t
+  :config
+  (exec-path-from-shell-initialize))
+#+end_src
+
 ** Start server automatically
 
 #+begin_src emacs-lisp
@@ -1390,6 +1401,7 @@ Copy to X clipboard:
   :hook (emacs-startup . xclip-mode)
   :custom
   (xclip-method (or
+                 (and (eq system-type 'darwin) 'pbpaste)
                  (and (getenv "DISPLAY") 'xclip)
                  (and (getenv "WAYLAND_DISPLAY") 'wl-copy)))
   )
