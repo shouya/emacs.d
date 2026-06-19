@@ -1279,6 +1279,14 @@ Typing on opening delimiter inserts closing delimiter. Wrap pair around active r
 
 #+begin_src emacs-lisp
 (electric-pair-mode 1)
+
+;; inhibit electric pair when:
+(setq electric-pair-inhibit-predicate
+      (lambda (c)
+        (or
+         (minibufferp)                  ; don't insert pair in minibuffer
+         (not (eolp))                   ; don't insert pair unless point is at eol
+         (electric-pair-default-inhibit c))))
 #+end_src
 
 *** Deleting pair
