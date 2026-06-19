@@ -3018,8 +3018,8 @@ otherwise fallback to =dumb-jump=.
 *** MediaWiki
 
 #+begin_src emacs-lisp
-(use-package mediawiki
-  :ensure t
+(use-package mediawiki-mode
+  :ensure (mediawiki)
   :commands mediawiki-mode
   :config
   (unbind-key "<tab>" mediawiki-mode-map)
