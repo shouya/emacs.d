@@ -751,6 +751,7 @@ Show popup window in desired styles.
   (push "*explain-pause-log*" popwin:special-display-config)
   (push "*explain-pause-profiles*" popwin:special-display-config)
   (push '("*Flycheck errors*" :position bottom :stick t) popwin:special-display-config)
+  (push '(crit-list-mode :position bottom :stick t) popwin:special-display-config)
   (push '("*Flycheck error messages*" :position bottom :height 10 :noselect t)
         popwin:special-display-config)
   (push '(cargo-process-mode :position bottom :stick t :height 10) popwin:special-display-config)
@@ -2120,6 +2121,17 @@ Hotkey to remember:
                  "git.lain.li"
                  forge-gitea-repository))
   )
+#+end_src
+
+*** Code review
+
+#+begin_src emacs-lisp
+(use-package crit
+  :ensure (:host nil :repo "https://git.lain.li/shouya/crit.el.git")
+  ;; :ensure (:repo "~/projects/crit" :files (:defaults))
+  :bind-keymap ("C-x C-r" . crit-prefix-map)
+  :config
+  (crit-persistence-mode))
 #+end_src
 
 *** Majutsu
