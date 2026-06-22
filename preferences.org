@@ -2138,8 +2138,12 @@ Hotkey to remember:
 
 #+begin_src emacs-lisp
 (use-package majutsu
-  :ensure (:host github :repo "0WD0/majutsu")
-  :bind ("C-x G" . majutsu)
+  :ensure (:host github :repo "0WD0/majutsu" :files (:defaults))
+  :bind
+  (("C-x G" . majutsu)
+   :map majutsu-blob-mode-map
+   ("RET" . majutsu-blob-visit-file))
+
   :config
   ;; promote status display before log
   (setq majutsu-log-sections-hook
