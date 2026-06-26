@@ -2782,11 +2782,7 @@ otherwise fallback to =dumb-jump=.
   :hook (flycheck-mode . sideline-flycheck-setup))
 (use-package sideline-lsp
   :ensure t
-  :after flycheck lsp-mode)
-
-(use-package sideline-lsp
-  :after (lsp-modeline all-the-icons)
-  :demand t
+  :after (flycheck lsp-mode)
   :config
   ;; the default code action prefix is the unicode emoji char "💡" (U+1F4A1).
   ;; Because of some reason it my Noto Color Emoji font cannot be specified
@@ -2795,11 +2791,10 @@ otherwise fallback to =dumb-jump=.
   ;; would shift a bit, causing a uncomfortable visual twitch. To fix this,
   ;; I just simply copy the icon from the lsp-mode's modeline, which uses
   ;; all-the-icons under the hood.
+  (require 'all-the-icons)
   (setq sideline-lsp-code-actions-prefix
-        (concat
-         (all-the-icons-octicon "light-bulb" :v-adjust -0.0575)
-         " "))
-  )
+        (concat (all-the-icons-octicon "light-bulb" :height 0.7 :v-adjust -0.0575)
+                " ")))
 #+end_src
 
 ** Highlight/edit all occurrences
