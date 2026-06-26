@@ -11,15 +11,23 @@
 (add-to-list 'load-path (expand-file-name "site-lisp" user-emacs-directory))
 #+end_src
 
-** Inherit shell PATH on macOS
+** Load shell environment
+
+GUI Emacs on macOS does not inherit the shell environment. =shell.env= captures
+it as =KEY=VALUE= lines; load it here so =PATH= and friends are available before
+the rest of the config runs.
 
 #+begin_src emacs-lisp
-(use-package exec-path-from-shell
-  :ensure t
-  :if (eq system-type 'darwin)
-  :demand t
-  :config
-  (exec-path-from-shell-initialize))
+(let ((env-file (expand-file-name "shell.env" user-emacs-directory)))
+  (when (file-exists-p env-file)
+    (dolist (line (split-string (with-temp-buffer
+                                  (insert-file-contents env-file)
+                                  (buffer-string))
+                                "\n" t))
+      (when (string-match "\\`\\([^#=][^=]*\\)=\\(.*\\)\\'" line)
+        (setenv (match-string 1 line) (match-string 2 line))))
+    (setq exec-path (append (split-string (getenv "PATH") path-separator t)
+                            (list exec-directory)))))
 #+end_src
 
 ** Start server automatically
