@@ -2969,13 +2969,15 @@ Cheatsheet:
                      copilot-mode-map)))
 #+end_src
 
-
 ** wingman
 
 #+begin_src emacs-lisp
 (use-package wingman
   :ensure (wingman :host github :repo "mjrusso/wingman")
   :when (display-graphic-p)
+
+  ;; Disabled because the local fill-in-middle models are yet to reach
+  ;; a satisfactory level of usability.
   :disabled
   :hook
   (prog-mode . wingman-mode)
@@ -3002,6 +3004,14 @@ Cheatsheet:
   (setq wingman-llama-endpoint "http://127.0.0.1:11434/infill")
   (setq wingman-model-name "fim")
 )
+#+end_src
+
+** acp
+
+#+begin_src emacs-lisp
+(use-package agent-shell :ensure t
+  :custom
+  (agent-shell-header-style 'text))
 #+end_src
 
 * Languages and modes
