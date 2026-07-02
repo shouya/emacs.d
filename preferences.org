@@ -1018,6 +1018,7 @@ Corfu completion in terminal:
         xref-show-definitions-function #'consult-xref)
 
   :config
+  (require 'project)
   ;; show preview automatically for some commands
   (consult-customize
    consult-goto-line consult-line
