@@ -291,7 +291,28 @@ I found expreg.el faster and typically more predictable than expand-region.
   :init
   :bind (("C-=" . expreg-expand)
          ("C--" . expreg-contract))
-  )
+  :config
+  (defun shou/expreg--trim-whitespaces (regions)
+    (mapcar
+     (lambda (region)
+       (pcase-let ((`(,producer . (,beg . ,end)) region))
+         (save-excursion
+           ;; Trim leading whitespace.
+           (goto-char beg)
+           (forward-char)
+           (skip-syntax-forward "-")
+           (setq beg (point))
+
+           ;; Trim trailing whitespace.
+           (goto-char end)
+           (backward-char)
+           (skip-syntax-backward "-")
+           (setq end (point))
+
+           (cons producer (cons beg end)))))
+     regions))
+
+  (advice-add #'expreg--outside-list :filter-return #'shou/expreg--trim-whitespaces))
 #+end_src
 
 *** Disable bi-directional text support
