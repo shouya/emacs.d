@@ -1235,18 +1235,24 @@ appear in the alist."
 #+begin_src emacs-lisp
 (use-package tramp
   :custom
-  ;; cache file names for 10 seconds
-  (remote-file-name-inhibit-cache 10)
+  ;; cache file names for 3 minutes
+  (remote-file-name-inhibit-cache 180)
   ;; avoid locking for remote files
   (remote-file-name-inhibit-locks t)
-  (tramp-use-scp-direct-remote-copying t)
   ;; do not store remote command history over tramp
   (tramp-histfile-override t)
 
-  ;; increase inline transfer threshold
+  ;; increase inline transfer threshold, use out of band (rsync) for larger files
   (tramp-copy-size-limit (* 1024 1024)) ;; 1MiB
   ;; use rsync for larger files
+  (tramp-use-scp-direct-remote-copying t)
   (tramp-default-method "rsync")
+
+  ;; treat as timeout after 1 sec
+  (remote-file-name-access-timeout 1)
+
+  ;; inhibit auto save
+  (remote-file-name-inhibit-auto-save-visited t)
 
   ;; uncomment for debugging
   ;; (tramp-verbose 10)
@@ -1264,6 +1270,21 @@ appear in the alist."
     (setq-local projectile-dynamic-mode-line nil)
     (setq-local doom-modeline-project-detection nil))
   (add-hook 'tramp-mode-hook #'shou/turn-off-project-detection)
+
+
+  ;; use direct async for remote processes (used by e.g. magit)
+  (connection-local-set-profile-variables
+   'remote-direct-async-process
+   '((tramp-direct-async-process . t)))
+  (connection-local-set-profiles
+   '(:application tramp :protocol "scp")
+   'remote-direct-async-process)
+  (setq magit-tramp-pipe-stty-settings 'pty)
+
+  ;; do not disable ssh control master for compile commands
+  (with-eval-after-load 'tramp
+    (with-eval-after-load 'compile
+      (remove-hook 'compilation-mode-hook #'tramp-compile-disable-ssh-controlmaster-options)))
   )
 #+end_src
 
