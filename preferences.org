@@ -274,12 +274,24 @@ Delete current active region when I begin typing or pasting.
 #+begin_src emacs-lisp
 (use-package expand-region
   :ensure t
+  :disabled t
   :init
   (setq expand-region-reset-fast-key (kbd "C-0"))
   :bind (("C-=" . er/expand-region)
          ("C--" . er/contract-region))
   :custom
   (expand-region-subword-enabled t))
+#+end_src
+
+I found expreg.el faster and typically more predictable than expand-region.
+
+#+begin_src emacs-lisp
+(use-package expreg
+  :ensure t
+  :init
+  :bind (("C-=" . expreg-expand)
+         ("C--" . expreg-contract))
+  )
 #+end_src
 
 *** Disable bi-directional text support
