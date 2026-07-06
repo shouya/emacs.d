@@ -292,27 +292,98 @@ I found expreg.el faster and typically more predictable than expand-region.
   :bind (("C-=" . expreg-expand)
          ("C--" . expreg-contract))
   :config
+  (setq-default expreg--verbose t)
+
+  ;; add list inset
   (defun shou/expreg--trim-whitespaces (regions)
-    (mapcar
+    (mapcan
      (lambda (region)
        (pcase-let ((`(,producer . (,beg . ,end)) region))
          (save-excursion
            ;; Trim leading whitespace.
            (goto-char beg)
-           (forward-char)
-           (skip-syntax-forward "-")
+           (while (> (skip-syntax-forward "-> ") 0))
            (setq beg (point))
 
            ;; Trim trailing whitespace.
            (goto-char end)
-           (backward-char)
-           (skip-syntax-backward "-")
+           (while (> (skip-syntax-backward "-> ") 0))
            (setq end (point))
 
-           (cons producer (cons beg end)))))
+           (list ;; (cons (cons 'ws-trimed producer) (cons beg end))
+            region))))
      regions))
 
-  (advice-add #'expreg--outside-list :filter-return #'shou/expreg--trim-whitespaces))
+  (advice-add #'expreg--inside-list :filter-return #'shou/expreg--trim-whitespaces)
+  (advice-add #'expreg--tree-sit :filter-return #'shou/expreg--trim-whitespaces)
+
+  ;; inhibit paragraph in org-src
+  (defun shou/expreg--trim-inhibit-in-org-src ()
+    (not (and (featurep 'org) (eq major-mode 'org-mode) (org-in-src-block-p))))
+  (advice-add #'expreg--paragraph-defun :before-while #'shou/expreg--trim-inhibit-in-org-src)
+
+  ;; blank-line delimited block
+(defun shou/expreg--balanced-paragraph ()
+  "Return the largest line-wise paren-balanced region within the
+current paragraph that still contains point's line.
+Unmatched parens above point's line advance BEG; unmatched parens
+below it retreat END.  Returns nil if no such region exists (e.g.
+the imbalance is on point's own line)."
+  (save-excursion
+    (let ((cur-beg (line-beginning-position))
+          (cur-end (line-end-position))
+          beg end state done)
+      (backward-paragraph)
+      (forward-char)
+      (beginning-of-line)
+      (setq beg (point))
+      (forward-paragraph)
+      (setq end (point))
+      (while (and (not done) (< beg end))
+        (setq state (parse-partial-sexp beg end))
+        (cond
+         ;; Minimum depth < 0: an unmatched CLOSER exists.
+         ((< (nth 6 state) 0)
+          ;; Re-parse with target depth -1: stops right after the
+          ;; first unmatched closer.
+          (parse-partial-sexp beg end -1)
+          (let ((pos (1- (point))))          ; the closer itself
+            (cond
+             ((< pos cur-beg)                ; above cursor -> BEG down
+              (goto-char pos)
+              (forward-line 1)
+              (setq beg (point)))
+             ((> pos cur-end)                ; below cursor -> END up
+              (goto-char pos)
+              (setq end (line-beginning-position)))
+             (t (setq beg end)))))           ; on cursor's line -> fail
+         ;; Final depth > 0: unmatched OPENER(s), positions in (nth 9),
+         ;; outermost first.
+         ((> (car state) 0)
+          (let* ((opens (nth 9 state))
+                 ;; innermost unmatched opener above the cursor line
+                 (above (car (last (seq-filter
+                                    (lambda (p) (< p cur-beg)) opens))))
+                 ;; outermost unmatched opener below the cursor line
+                 (below (seq-find (lambda (p) (> p cur-end)) opens)))
+            (cond
+             (above (goto-char above)        ; above cursor -> BEG down
+                    (forward-line 1)
+                    (setq beg (point)))
+             (below (goto-char below)        ; below cursor -> END up
+                    (setq end (line-beginning-position)))
+             (t (setq beg end)))))           ; on cursor's line -> fail
+         ;; Region ends inside a string: trim END to the string's line.
+         ((nth 3 state)
+          (goto-char (nth 8 state))
+          (setq end (line-beginning-position)))
+         (t (setq done t))))
+      (when (and done (< beg end))
+        (list (cons 'paragraph (cons beg end)))))))
+  (add-to-list 'expreg-functions #'shou/expreg--balanced-paragraph)
+
+  (setq-default expreg-functions expreg-functions) ;; override default value
+  )
 #+end_src
 
 *** Disable bi-directional text support
