@@ -2960,6 +2960,13 @@ Cheatsheet:
 ** Direnv
 
 #+begin_src emacs-lisp
+;; On nix-darwin, /etc/zshenv rebuilds PATH in every zsh unless
+;; =__NIX_DARWIN_SET_ENVIRONMENT_DONE= is set, which would overwrite the
+;; direnv-injected PATH in shell-mediated subprocesses (compile,
+;; shell-command, cargo-process, ...).
+(when (eq system-type 'darwin)
+  (setenv "__NIX_DARWIN_SET_ENVIRONMENT_DONE" "1"))
+
 (use-package direnv
   :ensure t
   :demand t
