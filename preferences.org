@@ -582,15 +582,10 @@ Key bindings:
 
 ** Hide UI elements
 
-#+begin_src emacs-lisp
-(defun shou/hide-ui-elements ()
-  (when (boundp 'tool-bar-mode) (tool-bar-mode -1))
-  (when (boundp 'menu-bar-mode) (menu-bar-mode -1))
-  (when (boundp 'scroll-bar-mode) (scroll-bar-mode -1)))
-(shou/hide-ui-elements)
-#+end_src
+The tool bar, menu bar and scroll bars are kept out of
+=default-frame-alist= in =early-init.el=, so they are never built.
 
-Also, do not show splash screen.
+Do not show splash screen.
 
 #+begin_src emacs-lisp
 (setq inhibit-splash-screen t)
