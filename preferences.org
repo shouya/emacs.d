@@ -149,7 +149,7 @@ By default the customization is saved into =init.el=. Avoid the mess by saving i
 in a separate file =custom.el=.
 
 #+BEGIN_SRC emacs-lisp
-(setq-default custom-file (expand-file-name "custom.el" user-emacs-directory))
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load-file custom-file)
 #+END_SRC
 
@@ -902,8 +902,15 @@ Enable line wrap by default:
 Stolen from https://stackoverflow.com/a/45363946/1232832.
 
 #+begin_src emacs-lisp
-(bind-key "C-M-p" '(lambda() (interactive) (scroll-other-window -1)))
-(bind-key "C-M-n" '(lambda() (interactive) (scroll-other-window 1)))
+(defun shou/scroll-other-window-backward ()
+  (interactive)
+  (scroll-other-window -1))
+(defun shou/scroll-other-window-forward ()
+  (interactive)
+  (scroll-other-window 1))
+
+(bind-key "C-M-p" #'shou/scroll-other-window-backward)
+(bind-key "C-M-n" #'shou/scroll-other-window-forward)
 
 (setq other-window-scroll-default #'get-lru-window)
 #+end_src
@@ -3100,10 +3107,15 @@ Cheatsheet:
 
   (cl-loop for (key . f) in shou/copilot-keymap
            do
-           (bind-key key f copilot-completion-map)
-           (bind-key key `(lambda () (interactive)
-                            (shou/copilot-override-key ,(kbd key) (quote ,f)))
-                     copilot-mode-map)))
+           ;; cl-loop reuses one binding for key/f across iterations, so
+           ;; the closure below needs bindings of its own.
+           (let ((key key) (f f))
+             (bind-key key f copilot-completion-map)
+             (bind-key key
+                       (lambda ()
+                         (interactive)
+                         (shou/copilot-override-key (kbd key) f))
+                       copilot-mode-map))))
 #+end_src
 
 ** wingman

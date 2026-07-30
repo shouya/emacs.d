@@ -7,9 +7,13 @@
 (setq gc-cons-percentage 0.4)
 ;; reset it after load
 (add-hook 'after-init-hook
-          (lambda () (setq gc-cons-threshold (* 100 1024 1024))))
+          (lambda ()
+            (setq gc-cons-threshold (* 100 1024 1024))
+            (setq gc-cons-percentage 0.1)))
 ;; force garbage collect when out of focus
-(add-hook 'focus-out-hook 'garbage-collect)
+(add-function :after after-focus-change-function
+              (lambda ()
+                (unless (frame-focus-state) (garbage-collect))))
 
 ;; ----------- empty file handler alist --------
 (defvar cfg--file-name-handler-alist file-name-handler-alist)
