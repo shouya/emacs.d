@@ -2288,6 +2288,10 @@ Hotkey to remember:
             (cons #'majutsu-log-insert-status)
             (remove #'majutsu-log-insert-error-header)
             (cons #'majutsu-log-insert-error-header)))
+
+  ;; do not show long desc
+  (with-eval-after-load 'magit-section
+    (add-to-list 'magit-section-initial-visibility-alist '(jj-commit . hide)))
   )
 #+end_src
 
