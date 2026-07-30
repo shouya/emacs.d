@@ -469,13 +469,13 @@ Built-in module:
   (setq recentf-max-saved-items 2000)
 
   ;; save every 1 minutes (default: save on emacs exit)
+  (defvar shou/recentf-last-saved nil
+    "Value of `recentf-list' as of the last save.")
   (defun shou/recentf-save-if-changed ()
-    "Save `recentf-list` only if it has changed since last save."
-    (let ((last-recentf-list nil))
-      (lambda ()
-        (unless (equal last-recentf-list recentf-list)
-          (let ((inhibit-message t)) (recentf-save-list))
-          (setq last-recentf-list recentf-list)))))
+    "Save `recentf-list' only if it has changed since last save."
+    (unless (equal shou/recentf-last-saved recentf-list)
+      (let ((inhibit-message t)) (recentf-save-list))
+      (setq shou/recentf-last-saved recentf-list)))
   (run-at-time 60 60 #'shou/recentf-save-if-changed)
 
   (recentf-mode 1)
