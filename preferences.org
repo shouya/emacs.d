@@ -1184,7 +1184,7 @@ I use =which-key= to display a screen of hints when a key prefix is entered.
   :ensure t
   :hook (emacs-startup . which-key-mode)
   :custom
-  (which-key-idel-delay 1.5))
+  (which-key-idle-delay 1.5))
 #+end_src
 
 ** Spell checker
@@ -3092,7 +3092,6 @@ Cheatsheet:
 
   (cl-loop for (key . f) in shou/copilot-keymap
            do
-           (message "binding %s to %s" key f)
            (bind-key key f copilot-completion-map)
            (bind-key key `(lambda () (interactive)
                             (shou/copilot-override-key ,(kbd key) (quote ,f)))
@@ -3151,10 +3150,10 @@ Cheatsheet:
 (use-package markdown-mode
   :ensure t
   :commands gfm-mode
-  :mode (("\.md$" . gfm-mode)
-         ("\.markdown$" . gfm-mode))
+  :mode (("\\.md\\'" . gfm-mode)
+         ("\\.markdown\\'" . gfm-mode))
   :config
-  (when (executable-find "pando")
+  (when (executable-find "pandoc")
     (setq markdown-command "pandoc --standalone --mathjax --from=markdown")))
 
 ;; edit-indirect is required to edit code blocks in markdown
@@ -3253,7 +3252,7 @@ Cheatsheet:
 Shorten the mode name to =Elisp=.
 
 #+begin_src emacs-lisp
-(add-hook 'emacs-lisp-mode-hook (lambda () (setq-default mode-name "Elisp")))
+(add-hook 'emacs-lisp-mode-hook (lambda () (setq mode-name "Elisp")))
 #+end_src
 
 Evaluate an expression with pretty print:
