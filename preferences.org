@@ -1150,10 +1150,10 @@ Corfu completion in terminal:
     "Consult diagnostics produced by lsp or flycheck"
     (interactive "P")
     (cond
-     ((and lsp-mode
+     ((and (bound-and-true-p lsp-mode)
            (not (hash-table-empty-p (lsp-diagnostics))))
       (consult-lsp-diagnostics arg))
-     (flycheck-mode (consult-flycheck))))
+     ((bound-and-true-p flycheck-mode) (consult-flycheck))))
   )
 
 (use-package consult-flycheck
@@ -2732,8 +2732,7 @@ https://github.com/blahgeek/emacs-lsp-booster
 
     ;; eshell-lookup-alias is defined buffer-locally
     (shou/def-eshell-alias "ll" "ls -al $*")
-    (shou/def-eshell-alias "k" "kubectl $*")
-    (shou/def-eshell-alias "z" "kubectl $*"))
+    (shou/def-eshell-alias "k" "kubectl $*"))
 
   (add-hook 'eshell-mode-hook #'shou/eshell-customization)
 
@@ -2974,7 +2973,8 @@ Cheatsheet:
   (defun shou/direnv-update-env (&rest args)
     (direnv-update-environment))
   (with-eval-after-load 'lsp-mode
-    (advice-add 'lsp-mode :before #'shou/direnv-update-env))
+    (advice-add 'lsp :before #'shou/direnv-update-env)
+    (advice-add 'lsp-deferred :before #'shou/direnv-update-env))
 
   :config
   (direnv-mode)
