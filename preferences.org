@@ -626,7 +626,6 @@ Also, do not show splash screen.
   (setq auto-save-default nil)
   (setq transient-save-history nil)
   (setq org-clock-persist nil)
-  (setq projectile-auto-update-cache nil)
   (setq save-place-file "/tmp/emacs-sandbox/save-place")
   (setq savehist-file "/tmp/emacs-sandbox/history")
   (with-eval-after-load 'project
@@ -956,15 +955,7 @@ And show rich info on the margin:
 
   :bind
   (:map minibuffer-local-map
-        ("M-A" . marginalia-cycle))
-
-  :config
-  (setq marginalia-command-categories
-        (append '((projectile-find-file . file)
-                  (projectile-find-dir . file)
-                  (projectile-switch-project . file))
-                marginalia-command-categories))
-  )
+        ("M-A" . marginalia-cycle)))
 #+end_src
 
 Narrow down the selection using orderless style:
@@ -1370,8 +1361,6 @@ appear in the alist."
   ;; (setq tramp-methods shou/tramp-methods)
 
   (defun shou/turn-off-project-detection ()
-    (setq-local projectile-auto-update-cache nil)
-    (setq-local projectile-dynamic-mode-line nil)
     (setq-local doom-modeline-project-detection nil))
   (add-hook 'tramp-mode-hook #'shou/turn-off-project-detection)
 
@@ -2395,7 +2384,9 @@ while. The mode is activated for specific folder only using
   ("M-`" . project-prefix-map)
   :bind
   (:map project-prefix-map
-        ("g" . shou/project-switch-to-magit))
+        ("g" . shou/project-switch-to-magit)
+        ;; mirrors "e" (project-eshell), like C-x e / C-x E globally
+        ("E" . eat-project))
   :config
   (require 'magit-extras) ;; inserts (m) magit to project-switch-commands
   (setq project-switch-commands
@@ -2590,9 +2581,8 @@ Mostly to load indentation settings.
   ;; disable lsp-modeline-diagnostics-mode
   (add-hook 'lsp-mode-hook (lambda () (lsp-modeline-diagnostics-mode -1)))
 
-  ;; conflict with projectile prefix
+  ;; signature navigation, which I never bother using, shadows M-p/M-n
   (unbind-key "M-p" lsp-signature-mode-map)
-  ;; unbind it as well as I never bother using it.
   (unbind-key "M-n" lsp-signature-mode-map)
 
   ;; See https://github.com/minad/corfu/issues/188#issuecomment-1148658471
@@ -2802,11 +2792,8 @@ Some programs requires a more POSIX compatible terminal software. I use =eat= fo
 	                        ("integration" "integration/*")
 	                        (:exclude ".dir-locals.el" "*-tests.el")))
   :commands (eat eat-eshell-mode eat-project)
-  :after projectile
   :bind
   ("C-x E" . eat)
-  (:map projectile-command-map
-   ("x E" . shou/eat-projectile))
   :hook
   (eshell-load . eat-eshell-mode)
   (eshell-load . eat-eshell-visual-command-mode)
@@ -2814,16 +2801,7 @@ Some programs requires a more POSIX compatible terminal software. I use =eat= fo
   ;; unlimited scrollback
   (eat-term-scrollback-size nil)
   :config
-  (defun shou/eat-projectile (arg)
-    (interactive "P")
-    (require 'projectile)
-    (let ((project (projectile-acquire-root)))
-      (projectile-with-default-dir project
-        (let ((eat-buffer-name
-               (projectile-generate-process-name "eat" arg project)))
-          (eat nil arg)))))
-
-  ;; allow switching file via projectile (M-`)
+  ;; let M-` reach `project-prefix-map' instead of the terminal
   (add-to-list 'eat-semi-char-non-bound-keys [?\e ?`])
   (add-to-list 'eat-semi-char-non-bound-keys [C-n])
   (add-to-list 'eat-semi-char-non-bound-keys [C-p])
@@ -3486,8 +3464,6 @@ Tree sitter mode specific config.
               ("C-c C-t" . haskell-process-do-type)
               ("C-c C-i" . haskell-process-do-info)
               ("M-." . haskell-mode-jump-to-def))
-  :after apheleia-mode
-  :hook (haskell-mode . shou/disable-apheleia-mode)
   :mode (("\\.hs\\'" . haskell-mode))
   :custom
   ;; build with "stack build"
