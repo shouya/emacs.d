@@ -2615,7 +2615,26 @@ Mostly to load indentation settings.
   :commands lsp-snippet-tempel-lsp-mode-init
   :after lsp-mode tempel
   :init
-  (lsp-snippet-tempel-lsp-mode-init))
+  (lsp-snippet-tempel-lsp-mode-init)
+  :config
+  ;; See https://github.com/svaante/lsp-snippet/issues/5
+  (defun shou/lsp-snippet--escaped-string-to (stop-at)
+    "Collect text up to a STOP-AT token, dropping escaping backslashes."
+    (let ((parts nil)
+          (continue t))
+      (while continue
+        ;; A backslash escapes what follows: keep the escapee, drop the backslash.
+        (when (lsp-snippet--take '(backslash))
+          (when-let ((escaped (lsp-snippet--ignore '(eof))))
+            (push escaped parts)))
+        (let ((text (lsp-snippet--ignore `(eof . ,stop-at))))
+          (setq continue text)
+          (when text (push text parts))))
+      (when parts
+        (apply #'concat (nreverse parts)))))
+
+  (advice-add 'lsp-snippet--escaped-string-to
+              :override #'shou/lsp-snippet--escaped-string-to))
 #+end_src
 
 *** JSON parsing performance boost
