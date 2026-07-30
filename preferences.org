@@ -3167,6 +3167,7 @@ Cheatsheet:
 ;; edit-indirect is required to edit code blocks in markdown
 ;; summon with <C-c '>
 (use-package edit-indirect
+  :ensure t
   :after markdown-mode
   :commands edit-indirect-region)
 #+end_src
@@ -3224,6 +3225,7 @@ Cheatsheet:
 
 #+begin_src emacs-lisp
 (use-package csv-mode
+  :ensure t
   :commands csv-mode
   :mode (("\\.csv\\'" . csv-mode))
   :config
