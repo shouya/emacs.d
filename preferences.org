@@ -68,8 +68,9 @@ Browser extension: [[https://github.com/GhostText/GhostText][GhostText]]
 #+begin_src emacs-lisp
 (use-package atomic-chrome
   :ensure t
-  :hook (emacs-startup . atomic-chrome-start-server)
   :if (display-graphic-p)
+  :defer 2
+  :config (atomic-chrome-start-server)
   :custom
   (atomic-chrome-url-major-mode-alist
    '(("wiki\\.lain\\.li" . mediawiki-mode)
@@ -2396,9 +2397,11 @@ while. The mode is activated for specific folder only using
   (:map project-prefix-map
         ("g" . shou/project-switch-to-magit)
         ;; mirrors "e" (project-eshell), like C-x e / C-x E globally
-        ("E" . eat-project))
+        ("E" . eat-project)
+        ;; `project-switch-commands' dispatches through `project-prefix-map',
+        ;; so an entry there is only reachable if its key is bound here
+        ("m" . magit-project-status))
   :config
-  (require 'magit-extras) ;; inserts (m) magit to project-switch-commands
   (setq project-switch-commands
         '((project-find-file "Find file")
           (project-dired "Dired")
@@ -2843,23 +2846,21 @@ otherwise fallback to =dumb-jump=.
   ;; Defaults to --pcre2. ripgrep's pcre is an opt-in feature that's not enabled by default.
   (dumb-jump-rg-search-args "--auto-hybrid-regex")
   :init
-  (require 'xref)
-  (remove-hook 'xref-backend-functions #'etags--xref-backend)
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+  (with-eval-after-load 'xref
+    (remove-hook 'xref-backend-functions #'etags--xref-backend)
+    (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 
-  ;; Do not show a *xref* buffer when there are multiple
-  ;; candidates. Show a completion buffer instead.
-  (when (fboundp 'xref-show-definitions-completing-read)
+    ;; Do not show a *xref* buffer when there are multiple
+    ;; candidates. Show a completion buffer instead.
     (setq xref-show-definitions-function #'xref-show-definitions-completing-read))
 
   ;; unmark as obsolete, i need this function from time to time in lsp-mode.
   (put 'dumb-jump-go 'byte-obsolete-info nil)
   )
 
-(with-eval-after-load 'xref
-  (bind-key* "M-," #'xref-find-definitions)
-  (bind-key* "M-." #'xref-find-definitions-other-window)
-  (bind-key* "M-?" #'xref-find-references))
+(bind-key* "M-," #'xref-find-definitions)
+(bind-key* "M-." #'xref-find-definitions-other-window)
+(bind-key* "M-?" #'xref-find-references)
 #+end_src
 
 ** On-the-fly check
@@ -3017,14 +3018,28 @@ Cheatsheet:
           ("M-f" . copilot-accept-completion-by-word)
           ("C-g" . copilot-clear-overlay)))
 
+  (defvar shou/copilot-idle-delay 1
+    "Seconds of idle time before `copilot-mode' is turned on in a buffer.")
+
+  (defun shou/copilot-mode-when-idle ()
+    "Turn on `copilot-mode' in the current buffer once Emacs is idle.
+Starting the copilot server takes about half a second, which is
+better spent showing the buffer."
+    (run-with-idle-timer
+     shou/copilot-idle-delay nil
+     (lambda (buffer)
+       (when (buffer-live-p buffer)
+         (with-current-buffer buffer (copilot-mode 1))))
+     (current-buffer)))
+
   :bind
   ;; C-S-tab
   (("C-<iso-lefttab>" . copilot-complete))
 
   :hook
-  ;; (text-mode . copilot-mode)
-  (conf-mode . copilot-mode)
-  (prog-mode . copilot-mode)
+  ;; (text-mode . shou/copilot-mode-when-idle)
+  (conf-mode . shou/copilot-mode-when-idle)
+  (prog-mode . shou/copilot-mode-when-idle)
 
   :config
   ;; (add-hook 'copilot-mode-hook #'copilot-nes-mode)
