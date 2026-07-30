@@ -535,10 +535,12 @@ Key bindings:
   ;; indent contents according to the heading level
   (add-hook 'org-mode-hook #'org-indent-mode)
 
-  ;; save to the file directly, no a temp file
-  (add-hook 'org-mode-hook 'auto-save-visited-mode)
+  ;; save to the file directly, not a temp file. the mode is global, so
+  ;; the predicate is what scopes it to org buffers.
+  (setq auto-save-visited-predicate (lambda () (derived-mode-p 'org-mode)))
   ;; default is 5 sec, which is too intrusive
   (setq auto-save-visited-interval 30)
+  (auto-save-visited-mode 1)
 
   ;; save and don't leave a message.
   (setq auto-save-no-message t)
@@ -1061,19 +1063,15 @@ Extra completion:
 Show docs beside completion:
 
 #+begin_src emacs-lisp
+;; the mode itself is turned on at startup, together with corfu.
 (use-package corfu-popupinfo
   :after corfu
-  :hook (corfu-mode . shou/enable-corfu-popupinfo-conditionally)
   :ensure nil
   :bind (:map corfu-map
               ;; Scroll in the documentation window
               ("M-n" . #'corfu-popupinfo-scroll-up)
               ("M-p" . #'corfu-popupinfo-scroll-down)
-              )
-  :config
-  (defun shou/enable-corfu-popupinfo-conditionally ()
-    (when (not (display-graphic-p))
-      (corfu-popupinfo-mode 1))))
+              ))
 #+end_src
 
 Corfu completion in terminal:
@@ -1083,7 +1081,8 @@ Corfu completion in terminal:
   :unless (display-graphic-p)
   :ensure (corfu-terminal :host codeberg :repo "akib/emacs-corfu-terminal")
   :after corfu
-  :hook (corfu-mode . corfu-terminal-mode))
+  :demand t
+  :config (corfu-terminal-mode 1))
 #+end_src
 
 ** Consult
@@ -2457,7 +2456,7 @@ Mostly to load indentation settings.
 
 #+begin_src emacs-lisp
 (use-package editorconfig
-  :hook (prog-mode . editorconfig-mode)
+  :hook (emacs-startup . editorconfig-mode)
   :ensure t)
 #+end_src
 
