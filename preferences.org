@@ -1501,7 +1501,7 @@ Several differences from the default =*scratch-buffer*= (or =M-x scratch=)
 ** Code folding support
 
 #+begin_src emacs-lisp
-(use-package hs-minor-mode
+(use-package hideshow
   :ensure nil
   :hook (prog-mode . hs-minor-mode)
   :bind (:map prog-mode-map
@@ -1551,7 +1551,7 @@ Copy to X clipboard:
 Scroll with mouse wheel:
 
 #+begin_src emacs-lisp
-(use-package xterm-mouse-mode
+(use-package xt-mouse
   :ensure nil
   :when (not (display-graphic-p))
   :hook (emacs-startup . xterm-mouse-mode)
