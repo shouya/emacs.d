@@ -3,6 +3,14 @@
 #+latex_header: \usemintedstyle{emacs}
 
 * Boot up
+** Lexical binding
+
+Tangle to the first line of =preferences.el=: enable lexical binding.
+
+#+begin_src emacs-lisp
+;;; preferences.el --- tangled from preferences.org -*- lexical-binding: t; -*-
+#+end_src
+
 ** Add load path for contrib packages
 
 =site-lisp/= stores downloaded modules that are not on MELPA.
@@ -1613,7 +1621,8 @@ integer.  Leading zeros are preserved when the resulting value
 fits in the original number's width."
   (interactive "sExpression (use x): ")
   (shou/modify-number-at-point
-   (lambda (x) (eval (read expr)))))
+   ;; passing 'x' is required by lexical binding
+   (lambda (x) (eval (read expr) (list (cons 'x x))))))
 
 (bind-key "<f2>" nil) ;; free up the <f2> key space (previously used by 2C-mode commands)
 (bind-key "<f2> a" #'shou/increment-at-point)

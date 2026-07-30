@@ -1,3 +1,5 @@
+;;; init.el --- emacs entry point -*- lexical-binding: t; -*-
+
 ;; startup time hacks
 
 ;; ----------- disable gc on startup -----------
