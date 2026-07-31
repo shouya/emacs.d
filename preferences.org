@@ -3048,6 +3048,32 @@ better spent showing the buffer."
   :config
   ;; (add-hook 'copilot-mode-hook #'copilot-nes-mode)
 
+  ;; copilot decides the server is alive from `process-exit-status', which
+  ;; is 0 both while the process runs and after it exits cleanly, so a
+  ;; server that has quit still looks alive and every notification sent to
+  ;; it signals "Process copilot server not running".
+  (defun shou/copilot--connection-alivep ()
+    "Non-nil if `copilot--connection' still has a running server process."
+    (and copilot--connection
+         (process-live-p (jsonrpc--process copilot--connection))))
+
+  (advice-add 'copilot--connection-alivep
+              :override #'shou/copilot--connection-alivep)
+
+  ;; The server is restarted lazily on the next request, but the buffer and
+  ;; workspace bookkeeping belongs to the connection that died: without
+  ;; clearing it, no buffer is ever announced to the new server again.
+  (defun shou/copilot-discard-connection ()
+    "Drop `copilot--connection' along with the state that belonged to it."
+    (when copilot--connection
+      (ignore-errors (jsonrpc-shutdown copilot--connection 'cleanup))
+      (setq copilot--connection nil
+            copilot--opened-buffers nil
+            copilot--workspace-folders nil
+            copilot--status nil)))
+
+  (advice-add 'copilot--start-server :before #'shou/copilot-discard-connection)
+
   (defun shou/buffer-file-name ()
     "Return the file name of the current buffer (or the base buffer if in narrowed buffer)."
     (or (buffer-file-name)
