@@ -1544,11 +1544,11 @@ Copy to X clipboard:
   :when (not (display-graphic-p))
   :hook (emacs-startup . xclip-mode)
   :custom
-  (xclip-method (or
-                 (and (eq system-type 'darwin) 'pbpaste)
-                 (and (getenv "DISPLAY") 'xclip)
-                 (and (getenv "WAYLAND_DISPLAY") 'wl-copy)))
-  )
+  (xclip-method
+   (cond
+    ((memq system-type '(darwin ns)) 'pbpaste)
+    ((getenv "WAYLAND_DISPLAY") 'wl-copy)
+    ((getenv "DISPLAY") 'xclip))))
 #+end_src
 
 Scroll with mouse wheel:
