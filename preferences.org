@@ -286,8 +286,8 @@ Delete current active region when I begin typing or pasting.
   :disabled t
   :init
   (setq expand-region-reset-fast-key (kbd "C-0"))
-  :bind (("C-=" . er/expand-region)
-         ("C--" . er/contract-region))
+  :bind (("M-=" . er/expand-region)
+         ("M-+" . er/contract-region))
   :custom
   (expand-region-subword-enabled t))
 #+end_src
@@ -298,10 +298,10 @@ I found expreg.el faster and typically more predictable than expand-region.
 (use-package expreg
   :ensure t
   :init
-  :bind (("C-=" . expreg-expand)
-         ("C--" . expreg-contract))
+  :bind (("M-=" . expreg-expand)
+         ("M-+" . expreg-contract))
   :config
-  (setq-default expreg--verbose t)
+  (setq-default expreg--verbose nil)
 
   ;; add list inset
   (defun shou/expreg--trim-whitespaces (regions)
