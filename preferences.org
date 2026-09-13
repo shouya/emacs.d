@@ -3292,10 +3292,6 @@ better spent showing the buffer."
 (use-package dockerfile-mode
   :ensure t
   :mode "Dockerfile")
-(use-package docker-compose-mode
-  :ensure t
-  :mode "docker-compose\\.ya?ml"
-  :mode "fig\\.ya?ml")
 #+end_src
 
 *** Systemd unit files
