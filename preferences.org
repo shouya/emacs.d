@@ -461,6 +461,7 @@ Built-in module:
          (rx ".cargo/registry") ;; rust library source files
          (rx "/nix/store") ;; nix source files
          (rx "/tmp/fish.") ;; fish commandline editor
+         (rx "jj-diff-") ;; jj diff
          ))
   ;; auto clean up every day after 11:00pm
   (recentf-auto-cleanup "11:00pm")
@@ -733,8 +734,13 @@ Second, we set the font set for various types of special symbols:
                   (font-spec :family "Noto Sans Mono"))
 
 ;; gemoetric shapes (https://www.compart.com/en/unicode/block/U+25A0)
+;; JetBrains Mono comes first here: Noto Sans Mono advances two cells for the
+;; East-Asian-ambiguous shapes (◆ ▶ ◯ ...) while Emacs reserves one column for
+;; them, which shifts the rest of the line (jj's log graph, for one).
 (set-fontset-font t '(#x25A0 . #x25FF)
-                  (font-spec :family "Noto Sans Mono"))
+                  (font-spec :family "JetBrains Mono"))
+(set-fontset-font t '(#x25A0 . #x25FF)
+                  (font-spec :family "Noto Sans Mono") nil 'append)
 
 ;; general punctuation (https://www.compart.com/en/unicode/block/U+2000)
 ;; to ensure a uniform look for punctuations (especially bullets like ◦•‣)
@@ -2275,10 +2281,23 @@ Hotkey to remember:
 #+begin_src emacs-lisp
 (use-package majutsu
   :ensure (:host github :repo "0WD0/majutsu" :files (:defaults))
+  :preface
+  (defun shou/majutsu-diff-edit-file ()
+    "Visit the file at point from a diff, ready to edit."
+    (interactive)
+    (majutsu-diff-visit-file)
+    (when (bound-and-true-p majutsu-blob-mode)
+      (majutsu-blob-edit-start)
+      (message "Editing %s at %s; save applies via jj diffedit"
+               majutsu-buffer-blob-path majutsu-buffer-blob-revision)))
+
   :bind
   (("C-x G" . majutsu)
    :map majutsu-blob-mode-map
-   ("RET" . majutsu-blob-visit-file))
+   ("RET" . majutsu-blob-visit-file)
+   :map majutsu-diff-mode-map
+   ("e" . shou/majutsu-diff-edit-file)
+   ("E" . majutsu-ediff-edit))
 
   :config
   ;; promote status display before log
@@ -2302,7 +2321,7 @@ Hotkey to remember:
   :custom
   (ediff-window-setup-function 'ediff-setup-windows-plain)
   (ediff-split-window-function 'split-window-horizontally)
-  (ediff-keep-variants nil)
+  (ediff-keep-variants t)
   :config
   ;; quit immediately without asking
   ;; https://emacs.stackexchange.com/questions/9322/how-can-i-quit-ediff-immediately-without-having-to-type-y
