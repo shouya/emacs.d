@@ -2311,6 +2311,9 @@ Hotkey to remember:
   ;; do not show long desc
   (with-eval-after-load 'magit-section
     (add-to-list 'magit-section-initial-visibility-alist '(jj-commit . hide)))
+
+  ;; `+' / `-' on elided revisions in the log buffer, loaded from site-lisp
+  (require 'majutsu-log-expand)
   )
 #+end_src
 
