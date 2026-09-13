@@ -90,7 +90,6 @@
    (rx string-start (or "emacs-lisp" "elisp") string-end)
   ))
 
-(load-file (expand-file-name "secrets.el" "~/.emacs.d"))
 (load-file (expand-file-name "preferences.el" "~/.emacs.d"))
 
 ;; ---------- config managed by emacs ----------
