@@ -2209,7 +2209,7 @@ I use pandoc for exporting to mediawiki and gfm.
   (magit-process-finish-apply-ansi-colors t)
 
   ;; show word-granularity diff
-  (magit-diff-refine-hunk 'all)
+  (magit-diff-refine-hunk 't)
 
   :config
   ;; so it don't close other windows
@@ -2298,6 +2298,10 @@ Hotkey to remember:
    :map majutsu-diff-mode-map
    ("e" . shou/majutsu-diff-edit-file)
    ("E" . majutsu-ediff-edit))
+
+  :custom
+  ;; word-level diff
+  (majutsu-diff-refine-hunk 't)
 
   :config
   ;; promote status display before log
