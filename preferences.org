@@ -1678,6 +1678,25 @@ fits in the original number's width."
         (message path)
         (kill-new path))))
 
+  (defun shou/dired-eshell-command (command &optional arg files)
+    "Run COMMAND on marked FILES in an interactive eshell.
+Guesses a default command like `dired-do-async-shell-command'.
+`*' and `?' are substituted as in `dired-do-shell-command'."
+    (interactive
+     (let ((files (dired-get-marked-files t current-prefix-arg nil nil t)))
+       (list (dired-read-shell-command "Eshell on %s: " current-prefix-arg files)
+             current-prefix-arg
+             files)))
+    (let ((cmd (dired-shell-stuff-it command files nil arg))
+          (default-directory default-directory))
+      (eshell t)
+      (goto-char (point-max))
+      (eshell-kill-input)
+      (insert cmd)
+      (eshell-send-input)))
+
+  (keymap-set dired-mode-map "C-c !" #'shou/dired-eshell-command)
+
   ;; copy full path of the current file
   (bind-key "W" #'shou/copy-full-path dired-mode-map)
   ;; copy visible text only
