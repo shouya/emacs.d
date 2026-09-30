@@ -3776,6 +3776,18 @@ GLSL:
   :config
   (add-hook 'kdl-mode-hook #'shou/set-tab-width-to-4)
   (defun shou/set-tab-width-to-4 nil (setq-local tab-width 4))
+
+  ;; Bug: treesit takes minutes to compile.
+  ;; Drop this once https://github.com/taquangtrung/emacs-kdl-mode/issues/8 is fixed.
+  (setq kdl-treesit-font-locks
+        (append (butlast kdl-treesit-font-locks)
+                (treesit-font-lock-rules
+                 :language 'kdl
+                 :feature 'comment
+                 :override t
+                 '((node (node_comment)) @font-lock-comment-face
+                   (node_field_comment) @font-lock-comment-face
+                   (node_children_comment) @font-lock-comment-face))))
   )
 #+end_src
 
