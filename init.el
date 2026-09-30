@@ -29,7 +29,10 @@
 ;; ----------- initialize elpaca ---------------
 (defvar elpaca-installer-version 0.12)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
-(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-builds-directory
+  (expand-file-name (format "builds-%d/" emacs-major-version) elpaca-directory))
+(defvar elpaca-cache-directory
+  (expand-file-name (format "cache-%d" emacs-major-version) elpaca-directory))
 (defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
                               :ref nil :depth 1 :inherit ignore
