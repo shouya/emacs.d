@@ -2007,19 +2007,19 @@ The purpose of this function is to easily construct id:-links to
 org-mode items. If its assigned to a key it saves you marking the
 text and copying to the killring."
     (interactive)
-    (save-window-excursion
-      (when (eq major-mode 'org-agenda-mode) ;switch to orgmode
-        (org-agenda-show)
-        (org-agenda-goto))
-      (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
+    (let ((entry (cond ((derived-mode-p 'org-agenda-mode)
+                        (or (org-get-at-bol 'org-hd-marker)
+                            (user-error "No Org entry on this agenda line")))
+                       ((derived-mode-p 'org-mode) (point-marker))
+                       (t (user-error "Not in an Org or agenda buffer")))))
+      (org-with-point-at entry
         (let* ((head (nth 4 (org-heading-components)))
                ;; replace links with their description
                (clean-head (replace-regexp-in-string org-link-bracket-re "\\2" head))
-               (id (funcall 'org-id-get-create))
+               (id (org-id-get-create))
                (link (format "[[id:%s][%s]]" id clean-head)))
           (kill-new link)
-          (message "Copied %s to killring (clipboard)" link)
-        )))))
+          (message "Copied %s to killring (clipboard)" link))))))
 #+end_src
 
 ** Clip link
