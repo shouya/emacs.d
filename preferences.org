@@ -2046,6 +2046,18 @@ Press F5 to insert current timestamp.
   (bind-key "<f5>" 'shou/insert-timestamp org-mode-map))
 #+end_src
 
+** Typesetting math in org mode
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (setq org-pretty-entities t
+        ;; only render subscript when surrounded by {}.
+        ;; i.e. no snake_case
+        org-pretty-entities-include-sub-superscripts t
+        org-use-sub-superscripts '{}
+        org-export-with-sub-superscripts '{}))
+#+end_src
+
 ** Export support
 
 I don't use any other export backends (e.g. ==odt=, =icalendar=).
@@ -2177,6 +2189,7 @@ I use pandoc for exporting to mediawiki and gfm.
 (use-package quail
   :ensure nil
   :config
+  (require 'cl-lib)
   (with-temp-buffer
     ;; the input method has to be triggered for `quail-package-alist' to be non-nil
     (activate-input-method "TeX")
@@ -2186,8 +2199,31 @@ I use pandoc for exporting to mediawiki and gfm.
                           ("\\or" ?∨)
                           ("\\implies" ?⇒)
                           ("\\iso" ?≅)
+                          ("\\def" ?≡)
+                          ("\\del" ?∂)
                           ;; \bar is \=
-                          ))))
+                          )))
+
+  (defvar shou/tex-subsup
+    (let ((quail-current-package (assoc "TeX" quail-package-alist)))
+      (cl-loop for p in '("_" "^")
+               nconc (cl-loop for s in (append (mapcar #'string "0123456789+-=()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+                                               '("\\beta" "\\gamma" "\\rho" "\\phi" "\\chi"))
+                              for k = (concat p s)
+                              for orig = (car (quail-lookup-key k))
+                              when orig collect (cons k orig))))
+    "Original (KEY . TRANSLATION) of TeX sub/superscripts.")
+
+  (defun shou/tex-toggle-subsup (&optional unicode)
+    "Toggle TeX sub/superscripts between Unicode and literal _x/^x."
+    (interactive (list (not (get 'shou/tex-subsup 'unicode))))
+    (let ((quail-current-package (assoc "TeX" quail-package-alist)))
+      (cl-loop for (k . orig) in shou/tex-subsup
+               do (setcar (quail-lookup-key k) (if unicode orig (vector k)))))
+    (put 'shou/tex-subsup 'unicode unicode)
+    (message "TeX sub/superscripts: %s" (if unicode "Unicode" "literal")))
+
+  (shou/tex-toggle-subsup nil))
 #+end_src
 
 ** REST client
