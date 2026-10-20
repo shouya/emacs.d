@@ -1284,8 +1284,24 @@ I use =jinx= for spell check.
       ;; en_US cannot judge words with characters beyond Latin-1 letters: π, a², J⃗, ϵ₀
       (string-match-p "[^A-Za-z'’À-ÖØ-öø-ÿ]" word)))
 
+  ;; a comma without a following space separates math items, as in sx,sy,sz
+  (defconst shou/jinx-math-char-regexp
+    (rx (or (any "=+^_{}<>|\\")
+            (seq "," (not space))
+            (not (any (0 . #xff) (#x2000 . #x206f))))))
+
+  (defun shou/jinx-valid-math-token-p (start)
+    (save-excursion
+      (save-match-data
+        (let ((token-beg (progn (goto-char start) (skip-chars-backward "^[:space:]") (point)))
+              (token-end (progn (skip-chars-forward "^[:space:]") (point))))
+          (goto-char token-beg)
+          (when (re-search-forward shou/jinx-math-char-regexp token-end t)
+            token-end)))))
+
   (add-to-list 'jinx--predicates #'shou/jinx-valid-english-possessive-p)
   (add-to-list 'jinx--predicates #'shou/jinx-valid-math-expression-p)
+  (add-to-list 'jinx--predicates #'shou/jinx-valid-math-token-p)
   )
 #+end_src
 
