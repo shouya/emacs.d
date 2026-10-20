@@ -1281,8 +1281,8 @@ I use =jinx= for spell check.
            (jinx--word-valid-p (substring word 0 -2)))))
   (defun shou/jinx-valid-math-expression-p (start)
     (let ((word (buffer-substring-no-properties start (point))))
-      ;; matches: π, a², ℕ, Δt, xⱼ, Ā, etc
-      (string-match-p "\\`[Α-Ωα-ω℀-⅏Ā-ſ][²-ₜⱼ]*\\|[A-Za-z][²-ₜⱼ]+\\|[Α-Ωα-ω][A-Za-z]\\'" word)))
+      ;; en_US cannot judge words with characters beyond Latin-1 letters: π, a², J⃗, ϵ₀
+      (string-match-p "[^A-Za-z'’À-ÖØ-öø-ÿ]" word)))
 
   (add-to-list 'jinx--predicates #'shou/jinx-valid-english-possessive-p)
   (add-to-list 'jinx--predicates #'shou/jinx-valid-math-expression-p)
