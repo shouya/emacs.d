@@ -697,7 +697,6 @@ Never show graphical dialog box.
 #+begin_src emacs-lisp
 (add-hook 'emacs-startup-hook
 	  (lambda ()
-            (set-frame-font "JetBrains Mono:weight=Light")
             (set-face-attribute 'default nil :family "JetBrains Mono"
                                 :weight 'light
                                 :height 130)))
@@ -705,7 +704,7 @@ Never show graphical dialog box.
 
 ** Fonts for special codepoints
 
-The default monospace font I use doesn't have much coverage for extensive codepoints. To avoid fallback to the system's default behavior, I need to specify the fonts to use for these codepoints.
+JetBrains Mono lacks CJK, IPA, most math, and all combining marks for symbols (U+20D0-20FF). JuliaMono fills these gaps. Its cell width (0.6 em), x-height and weight match JetBrains Mono, and its ascent and descent fit inside JetBrains Mono's, so mixing the two neither shifts columns nor makes lines taller.
 
 First, non-latin script should be displayed with the correct font variants:
 
@@ -714,24 +713,38 @@ First, non-latin script should be displayed with the correct font variants:
          '((han "Noto Sans CJK TC" :weight demilight)
            (kana "Noto Sans CJK JP" :weight demilight)
            (hangul "Noto Sans CJK KR" :weight demilight)
-           (phonetic "Noto Sans")
            ;; JetBrains Mono's Greek alphabet has glyphs
            ;; indistinguishable from latin. See
            ;; https://github.com/JetBrains/JetBrainsMono/issues/623
-           (greek "Noto Sans" :weight regular)
-           )
+           (greek "JuliaMono")
+           (phonetic "JuliaMono")
+           (mathematical "JuliaMono"))
          do
          (set-fontset-font t ;; font for 'default face
                            script
                            (apply #'font-spec :family font)))
 #+end_src
 
-Second, we set the font set for various types of special symbols:
+Second, we set the font set for various types of special symbols. Whole math blocks go to JuliaMono, because JetBrains Mono covers about half of each and a formula would otherwise mix the two styles.
 
 #+begin_src emacs-lisp
-;; IPA symbols and diacritic marks (https://www.compart.com/en/unicode/block/U+0250)
-(set-fontset-font t '(#x0250 . #x036F)
-                  (font-spec :family "Noto Sans Mono"))
+(dolist (range '((#x00B2 . #x00B3)   ; superscripts two, three
+                 (#x00B9 . #x00B9)   ; superscript one
+                 (#x0250 . #x036F)   ; IPA, combining diacritical marks
+                 (#x2070 . #x209F)   ; superscripts and subscripts
+                 (#x20D0 . #x20FF)   ; combining marks for symbols
+                 (#x2100 . #x214F)   ; letterlike symbols
+                 (#x2200 . #x22FF)   ; mathematical operators
+                 (#x27C0 . #x27EF)   ; misc math symbols A
+                 (#x2980 . #x2AFF))) ; misc math symbols B, supplemental operators
+  (set-fontset-font t range (font-spec :family "JuliaMono")))
+
+;; arrows keep JetBrains Mono's style, JuliaMono fills the ones it lacks
+(dolist (range '((#x2190 . #x21FF)   ; arrows
+                 (#x27F0 . #x27FF)   ; supplemental arrows A
+                 (#x2900 . #x297F))) ; supplemental arrows B
+  (set-fontset-font t range (font-spec :family "JetBrains Mono"))
+  (set-fontset-font t range (font-spec :family "JuliaMono") nil 'append))
 
 ;; gemoetric shapes (https://www.compart.com/en/unicode/block/U+25A0)
 ;; JetBrains Mono comes first here: Noto Sans Mono advances two cells for the
@@ -750,8 +763,29 @@ Second, we set the font set for various types of special symbols:
 ;; symbols cannot be overriden by fontset by default. Turning off this setting.
 (setq use-default-font-for-symbols nil)
 
+;; JuliaMono keeps one-cell width for glyphs JetBrains Mono lacks
+(set-fontset-font t nil "JuliaMono" nil 'append)
 ;; use noto sans mono as backup font for unsupported glyphs
 (set-fontset-font t nil "Noto Sans Mono" nil 'append)
+#+end_src
+
+** Combining sequences
+
+Emacs shapes a combining sequence (t⃗, σ⃗) with the font of its base character, and composes it only if that font also has the marks. JetBrains Mono has no marks for symbols, so every sequence gets a JuliaMono face, base included.
+
+#+begin_src emacs-lisp
+(defface shou/combining-sequence '((t :family "JuliaMono"))
+  "Face for a base character and its combining marks.")
+
+(defconst shou/combining-sequence-keywords
+  '(("[^\n][\u0300-\u036F\u1AB0-\u1AFF\u1DC0-\u1DFF\u20D0-\u20FF\uFE20-\uFE2F]+"
+     0 'shou/combining-sequence prepend)))
+
+(defun shou/font-lock-combining-sequences ()
+  (font-lock-add-keywords nil shou/combining-sequence-keywords 'append))
+
+(add-hook 'text-mode-hook #'shou/font-lock-combining-sequences)
+(add-hook 'prog-mode-hook #'shou/font-lock-combining-sequences)
 #+end_src
 
 ** Icon fonts
