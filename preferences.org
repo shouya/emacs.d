@@ -2225,13 +2225,6 @@ I use pandoc for exporting to mediawiki and gfm.
   :custom (valign-fancy-bar t))
 #+end_src
 
-** Spot weaselwords
-
-#+begin_src emacs-lisp
-(use-package writegood-mode
-  :ensure t
-  :hook (org-mode . writegood-mode))
-#+end_src
 
 ** Math symbols in Tex input method
 
