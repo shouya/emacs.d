@@ -2409,6 +2409,12 @@ Hotkey to remember:
             (remove #'majutsu-log-insert-error-header)
             (cons #'majutsu-log-insert-error-header)))
 
+  ;; the blocky dark background color is unsuited for my light-mode theme
+  (dolist (face (list 'majutsu-interactive-selected-region
+                      'majutsu-interactive-selected-hunk
+                      'majutsu-interactive-selected-file))
+    (set-face-attribute face nil :background 'unspecified :weight 'extra-bold :extend t))
+
   ;; do not show long desc
   (with-eval-after-load 'magit-section
     (add-to-list 'magit-section-initial-visibility-alist '(jj-commit . hide)))
