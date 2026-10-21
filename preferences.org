@@ -747,13 +747,8 @@ Second, we set the font set for various types of special symbols. Whole math blo
   (set-fontset-font t range (font-spec :family "JuliaMono") nil 'append))
 
 ;; gemoetric shapes (https://www.compart.com/en/unicode/block/U+25A0)
-;; JetBrains Mono comes first here: Noto Sans Mono advances two cells for the
-;; East-Asian-ambiguous shapes (◆ ▶ ◯ ...) while Emacs reserves one column for
-;; them, which shifts the rest of the line (jj's log graph, for one).
 (set-fontset-font t '(#x25A0 . #x25FF)
-                  (font-spec :family "JetBrains Mono"))
-(set-fontset-font t '(#x25A0 . #x25FF)
-                  (font-spec :family "Noto Sans Mono") nil 'append)
+                  (font-spec :family "JuliaMono"))
 
 ;; general punctuation (https://www.compart.com/en/unicode/block/U+2000)
 ;; to ensure a uniform look for punctuations (especially bullets like ◦•‣)
@@ -2173,11 +2168,13 @@ I use pandoc for exporting to mediawiki and gfm.
 (use-package org-modern
   :ensure t
   :after org
-  :disabled
   :hook (emacs-startup . global-org-modern-mode)
   :config
   ;; align agenda tags to the right at 80 column
-  (setq org-agenda-tags-column -80
+  (setq org-agenda-tags-column 0
+        org-auto-align-tags nil
+        org-tags-column 0
+        org-insert-heading-respect-content t
         org-agenda-block-separator ?─)
 
   ;; label should have the same size as normal text
@@ -2193,7 +2190,6 @@ I use pandoc for exporting to mediawiki and gfm.
   (setq org-modern-star '("◉" " ○" "  ◆" "   ◇" "    ▶" "     ▷"))
 
   ;; task completion progress indicator
-  ;; or "●"
   (setq org-modern-progress '("○" "◔" "◑" "◕" "✓"))
 
   ;; do not prettify block names
@@ -2204,6 +2200,9 @@ I use pandoc for exporting to mediawiki and gfm.
 
   ;; do not prettify tables
   (setq org-modern-table nil)
+
+  ;; do not prettify timestamps
+  (setq org-modern-timestamp nil)
 
   ;; customize the list bullets
   (setq org-modern-list '((?+ . "◦")
