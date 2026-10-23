@@ -3723,14 +3723,30 @@ Editing agenix encrypted files:
     (password-read (format "Password for %s: " identity-file)
                    (concat "agenix:" identity-file)))
 
+  ;; password-cache-add never restarts its timer, so expiry is tracked here.
+  (defvar shou/agenix-password-timers (make-hash-table :test #'equal))
+
+  (defun shou/agenix-forget-password (key)
+    (when-let* ((timer (gethash key shou/agenix-password-timers)))
+      (cancel-timer timer))
+    (remhash key shou/agenix-password-timers)
+    (password-cache-remove key))
+
+  (defun shou/agenix-remember-password (key password)
+    (when-let* ((timer (gethash key shou/agenix-password-timers)))
+      (cancel-timer timer))
+    (let ((password-cache-expiry nil))
+      (password-cache-add key password))
+    ;; cache entered password for 10m since last use
+    (puthash key (run-at-time (* 10 60) nil #'shou/agenix-forget-password key)
+             shou/agenix-password-timers))
+
   (defun shou/agenix-cache-password (create identity-path password)
     (let ((key (concat "agenix:" identity-path)))
       (condition-case err
           (prog1 (funcall create identity-path password)
-            ;; cache entered password for 10m
-            (let ((password-cache-expiry 600))
-              (password-cache-add key password)))
-        (error (password-cache-remove key)
+            (shou/agenix-remember-password key password))
+        (error (shou/agenix-forget-password key)
                (signal (car err) (cdr err))))))
 
   (advice-add 'agenix-save-decrypted :override #'shou/agenix-save-decrypted)
