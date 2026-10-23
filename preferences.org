@@ -3703,7 +3703,39 @@ Editing agenix encrypted files:
   :ensure t
   :custom
   (agenix-key-files '("~/.ssh/age_id_ed25519" "~/.ssh/id_ed25519"))
-  )
+  :config
+  ;; avoid re-entering password on save
+  (defun shou/agenix-save-decrypted (&optional unencrypted-buffer)
+    (with-current-buffer (or unencrypted-buffer (current-buffer))
+      (let* ((recipient-flags (mapcan (lambda (k) (list "--recipient" k)) agenix--keys))
+             (age-flags `("--encrypt" ,@recipient-flags "-o" ,agenix--encrypted-fp))
+             (plaintext (buffer-string)))
+        (with-temp-buffer
+          (let ((exit-code (apply #'call-process-region plaintext nil
+                                  agenix-age-program nil t nil age-flags)))
+            (unless (zerop exit-code)
+              (error "age failed: %s" (buffer-string)))))
+        (set-visited-file-modtime)
+        (set-buffer-modified-p nil)
+        t)))
+
+  (defun shou/agenix-prompt-password (identity-file)
+    (password-read (format "Password for %s: " identity-file)
+                   (concat "agenix:" identity-file)))
+
+  (defun shou/agenix-cache-password (create identity-path password)
+    (let ((key (concat "agenix:" identity-path)))
+      (condition-case err
+          (prog1 (funcall create identity-path password)
+            ;; cache entered password for 10m
+            (let ((password-cache-expiry 600))
+              (password-cache-add key password)))
+        (error (password-cache-remove key)
+               (signal (car err) (cdr err))))))
+
+  (advice-add 'agenix-save-decrypted :override #'shou/agenix-save-decrypted)
+  (advice-add 'agenix--prompt-password :override #'shou/agenix-prompt-password)
+  (advice-add 'agenix--create-temp-identity :around #'shou/agenix-cache-password))
 #+end_src
 
 ** Web mode
