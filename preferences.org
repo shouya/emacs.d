@@ -3702,7 +3702,7 @@ Editing agenix encrypted files:
 (use-package agenix
   :ensure t
   :custom
-  (agenix-key-files '("~/.ssh/age_id_ed25519" "~/.ssh/id_ed25519"))
+  (agenix-key-files '("~/.ssh/id_ed25519"))
   :config
   ;; avoid re-entering password on save
   (defun shou/agenix-save-decrypted (&optional unencrypted-buffer)
@@ -3749,6 +3749,16 @@ Editing agenix encrypted files:
         (error (shou/agenix-forget-password key)
                (signal (car err) (cdr err))))))
 
+  (defun shou/agenix-auto-select-key (decrypt &rest args)
+    (let ((key-files (agenix--process-agenix-key-files)))
+      (if (/= (length key-files) 1)
+          (apply decrypt args)
+        ;; The key menu is the only completing-read in agenix-decrypt-buffer.
+        (cl-letf (((symbol-function 'completing-read)
+                   (lambda (&rest _) (car key-files))))
+          (apply decrypt args)))))
+
+  (advice-add 'agenix-decrypt-buffer :around #'shou/agenix-auto-select-key)
   (advice-add 'agenix-save-decrypted :override #'shou/agenix-save-decrypted)
   (advice-add 'agenix--prompt-password :override #'shou/agenix-prompt-password)
   (advice-add 'agenix--create-temp-identity :around #'shou/agenix-cache-password))
