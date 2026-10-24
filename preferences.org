@@ -1473,6 +1473,8 @@ Typing on opening delimiter inserts closing delimiter. Wrap pair around active r
         (or
          (minibufferp)                  ; don't insert pair in minibuffer
          (not (eolp))                   ; don't insert pair unless point is at eol
+         (not (and (bound-and-true-p org-mode)
+                   (eq c ?{)))          ; don't insert closing brace for super/sub-script
          (electric-pair-default-inhibit c))))
 #+end_src
 
