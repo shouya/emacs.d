@@ -2511,7 +2511,11 @@ while. The mode is activated for specific folder only using
               (lambda (filename)
                 (file-relative-name
                  filename
-                 (locate-dominating-file filename ".git")))))
+                 (locate-dominating-file filename ".git"))))
+
+  ;; make background ssh prompt up gui for passphrase
+  (setenv "SSH_ASKPASS_REQUIRE" "prefer")
+  )
 #+end_src
 
 ** Project management
