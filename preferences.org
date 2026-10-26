@@ -2515,6 +2515,20 @@ while. The mode is activated for specific folder only using
                  filename
                  (locate-dominating-file filename ".git"))))
 
+  ;; push at most once per 60 min
+  (defvar shou/gac-last-push 0)
+  (defvar shou/gac-push-timer nil)
+  (define-advice gac-push (:around (gac-push-orig buffer) throttle)
+    (let ((wait (- (+ shou/gac-last-push (* 60 60)) (float-time))))
+      (cond ((<= wait 0)
+             (setq shou/gac-last-push (float-time))
+             (and (timerp shou/gac-push-timer)
+                  (cancel-timer shou/gac-push-timer)
+                  (setq shou/gac-push-timer nil))
+             (funcall gac-push-orig buffer))
+            ((not (timerp shou/gac-push-timer))
+             (setq shou/gac-push-timer (run-at-time wait nil #'gac-push buffer))))))
+
   ;; make background ssh prompt up gui for passphrase
   (setenv "SSH_ASKPASS_REQUIRE" "prefer")
   )
