@@ -641,6 +641,11 @@ Do not show splash screen.
                 (lambda (args) (cons (car args) '(t))))) ;; set nowrite
   (add-to-list 'native-comp-eln-load-path "/tmp/emacs-sandbox/eln-cache")
 
+  ;; In sandbox without wayland privilege context, wl-clipboard needs
+  ;; a focused window to set clipboard, so every kill steals focus. We
+  ;; use osc 52 instead.
+  (setq save-interprogram-paste-before-kill nil)
+
   (savehist-mode -1)
   )
 #+end_src
@@ -1594,10 +1599,19 @@ Copy only visible text with ~C-c C-x v~.
 Copy to X clipboard:
 
 #+begin_src emacs-lisp
+(defun shou/osc52-cut (text)
+  (if (display-graphic-p)
+      (gui-select-text text)
+    (send-string-to-terminal
+     (format "\e]52;c;%s\a"
+             (base64-encode-string (encode-coding-string text 'utf-8) t)))))
+
 (use-package xclip
   :ensure t
   :when (not (display-graphic-p))
   :hook (emacs-startup . xclip-mode)
+  :config
+  (setq interprogram-cut-function #'shou/osc52-cut)
   :custom
   (xclip-method
    (cond
