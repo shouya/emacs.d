@@ -2121,6 +2121,20 @@ Press F5 to insert current timestamp.
         org-export-with-sub-superscripts '{}))
 #+end_src
 
+Show the raw markup of the element under point.
+
+#+begin_src emacs-lisp
+(use-package org-appear
+  :ensure t
+  :hook (org-mode . org-appear-mode)
+  :custom
+  (org-appear-autoentities t)
+  (org-appear-autosubmarkers t)
+  (org-appear-autoemphasis t)
+  (org-appear-autolinks t)
+  (org-appear-inside-latex t))
+#+end_src
+
 ** Export support
 
 I don't use any other export backends (e.g. ==odt=, =icalendar=).
