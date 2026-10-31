@@ -629,6 +629,7 @@ Do not show splash screen.
 
 #+begin_src emacs-lisp
 (defun shou/enable-sandbox ()
+  (make-directory "/tmp/emacs-sandbox" t)
   (setq make-backup-files nil)
   (setq auto-save-default nil)
   (setq transient-save-history nil)
