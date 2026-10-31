@@ -1119,6 +1119,7 @@ Corfu completion in terminal:
   :unless (display-graphic-p)
   :ensure (corfu-terminal :host codeberg :repo "akib/emacs-corfu-terminal")
   :after corfu
+  :when (version< emacs-version "31")
   :demand t
   :config (corfu-terminal-mode 1))
 #+end_src
