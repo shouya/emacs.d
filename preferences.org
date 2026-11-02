@@ -2456,6 +2456,19 @@ Hotkey to remember:
   )
 #+end_src
 
+*** Dabbrev fix
+
+Make diff prefix chars not part of word so its next word can be expanded correctly.
+
+#+begin_src emacs-lisp
+(defun shou/diff-prefix-punctuation ()
+  (modify-syntax-entry ?+ ".")
+  (modify-syntax-entry ?- "."))
+(add-hook 'magit-mode-hook #'shou/diff-prefix-punctuation)
+(add-hook 'majutsu-mode-hook #'shou/diff-prefix-punctuation)
+(add-hook 'diff-mode-hook #'shou/diff-prefix-punctuation)
+#+end_src
+
 *** Ediff
 
 #+begin_src emacs-lisp
