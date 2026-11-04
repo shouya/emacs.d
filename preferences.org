@@ -2131,7 +2131,6 @@ Show the raw markup of the element under point.
   (org-appear-autoentities t)
   (org-appear-autosubmarkers t)
   (org-appear-autoemphasis t)
-  (org-appear-autolinks t)
   (org-appear-inside-latex t))
 #+end_src
 
