@@ -24,7 +24,8 @@
 It marks both a hole between two shown revisions, which jj labels
 \"(elided revisions)\", and a branch whose remaining ancestors are all
 unshown, whose row carries no text at all.  The node is the only signal
-common to the two, and majutsu keeps the graph in `line-prefix'.")
+common to the two.  Majutsu draws both rows as graph overlays anchored
+on the next commit, so they belong to the commit above them.")
 
 (defconst majutsu-log-expand--graph-lines '(?\s ?| ?- ?\\ ?/)
   "Non-node characters jj's ascii graph styles draw.
@@ -131,22 +132,18 @@ graph line rather than the last glyph of PREFIX."
                             (<= #x2500 ch #x257F))))
                  prefix)))
 
-(defun majutsu-log-expand--marker-row-p ()
-  "Return non-nil when the row at point draws the elision node."
-  (eq (majutsu-log-expand--graph-node
-       (get-text-property (line-beginning-position) 'line-prefix))
-      majutsu-log-expand--marker))
+(defun majutsu-log-expand--marker-text-p (text)
+  "Return non-nil when some line of graph TEXT draws the elision node."
+  (seq-some (lambda (line)
+              (eq (majutsu-log-expand--graph-node line) majutsu-log-expand--marker))
+            (split-string text "\n")))
 
-(defun majutsu-log-expand--marked-p (section)
-  "Return non-nil when SECTION spans an elision marker row."
-  (save-excursion
-    (goto-char (oref section start))
-    (let ((end (oref section end))
-          (found nil))
-      (while (and (not found) (not (eobp)) (< (point) end))
-        (setq found (majutsu-log-expand--marker-row-p))
-        (forward-line 1))
-      found)))
+(defun majutsu-log-expand--owner-of (overlay)
+  "Return the change id of the commit drawn just above graph OVERLAY."
+  (let ((section (magit-section-at (1- (overlay-start overlay)))))
+    (while (and section (not (eq (oref section type) 'jj-commit)))
+      (setq section (oref section parent)))
+    (majutsu-log-expand--section-id section)))
 
 (defun majutsu-log-expand--owner-at-point ()
   "Return the change id of the elided segment at point, if any.
@@ -154,22 +151,22 @@ A commit already carrying an expansion counts as its own segment, so
 repeated commands keep walking the same one as its marker moves down."
   (when-let* ((section (magit-current-section))
               (id (majutsu-log-expand--section-id section)))
-    (and (or (majutsu-log-expand--marked-p section)
+    (and (or (member id (majutsu-log-expand--all-owners))
              (assoc id majutsu-log-expand--depths))
          id)))
 
 (defun majutsu-log-expand--all-owners ()
   "Return the change ids of every elided segment in the buffer."
   (let (ids)
-    (save-excursion
-      (goto-char (point-min))
-      (while (not (eobp))
-        (when (majutsu-log-expand--marker-row-p)
-          (when-let* ((id (majutsu-log-expand--section-id (magit-current-section))))
-            (unless (member id ids)
-              (push id ids))))
-        (forward-line 1)))
-    (nreverse ids)))
+    (dolist (overlay majutsu-row--graph-overlays)
+      (let ((text (or (overlay-get overlay 'before-string)
+                      (overlay-get overlay 'after-string)))
+            (id nil))
+        (when (and text (majutsu-log-expand--marker-text-p text))
+          (setq id (majutsu-log-expand--owner-of overlay)))
+        (when (and id (not (member id ids)))
+          (push id ids))))
+    ids))
 
 ;;; Depth bookkeeping
 

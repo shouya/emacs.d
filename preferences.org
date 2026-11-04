@@ -2432,6 +2432,9 @@ Hotkey to remember:
   (majutsu-diff-refine-hunk 't)
 
   :config
+  ;; load faces
+  (require 'magit)
+
   ;; promote status display before log
   (setq majutsu-log-sections-hook
         (->> majutsu-log-sections-hook
@@ -2449,6 +2452,13 @@ Hotkey to remember:
   ;; do not show long desc
   (with-eval-after-load 'magit-section
     (add-to-list 'magit-section-initial-visibility-alist '(jj-commit . hide)))
+
+  ;; a folded body only needs graph rows that change the geometry
+  (define-advice majutsu-row--collapsed-graph (:filter-return (graph) drop-straight-rows)
+    (when (stringp graph)
+      (let ((rows (seq-remove (lambda (row) (string-match-p "\\`[ |│]*\\'" row))
+                              (split-string graph "\n"))))
+        (and rows (string-join rows "\n")))))
 
   ;; `+' / `-' on elided revisions in the log buffer, loaded from site-lisp
   (require 'majutsu-log-expand)
