@@ -906,7 +906,7 @@ Show popup window in desired styles.
   (push "*idris-repl*" popwin:special-display-config)
   (push '("*idris-holes*" :noselect t) popwin:special-display-config)
   (push '("*Help*" :stick t) popwin:special-display-config)
-  (push "*Warnings*" popwin:special-display-config)
+  (push '("*Warnings*" :noselect t) popwin:special-display-config)
   (push "*rustfmt*" popwin:special-display-config)
   (push "*explain-pause-log*" popwin:special-display-config)
   (push "*explain-pause-profiles*" popwin:special-display-config)
@@ -3830,7 +3830,13 @@ Editing agenix encrypted files:
                    (lambda (&rest _) (car key-files))))
           (apply decrypt args)))))
 
+  (defun shou/agenix-demote-decrypt-error (decrypt &rest args)
+    (condition-case err
+        (apply decrypt args)
+      (error (message "agenix: %s" (error-message-string err)))))
+
   (advice-add 'agenix-decrypt-buffer :around #'shou/agenix-auto-select-key)
+  (advice-add 'agenix-decrypt-buffer :around #'shou/agenix-demote-decrypt-error)
   (advice-add 'agenix-save-decrypted :override #'shou/agenix-save-decrypted)
   (advice-add 'agenix--prompt-password :override #'shou/agenix-prompt-password)
   (advice-add 'agenix--create-temp-identity :around #'shou/agenix-cache-password))
