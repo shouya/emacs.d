@@ -2267,13 +2267,23 @@ I use pandoc for exporting to mediawiki and gfm.
     ;; the input method has to be triggered for `quail-package-alist' to be non-nil
     (activate-input-method "TeX")
     (let ((quail-current-package (assoc "TeX" quail-package-alist)))
+      (quail-defrule "\\o" ?∘) ;; overriding ∅
       (quail-define-rules ((append . t))
                           ("\\and" ?∧)
                           ("\\or" ?∨)
+                          ("\\meet" ?∧)
+                          ("\\join" ?∨)
                           ("\\implies" ?⇒)
                           ("\\iso" ?≅)
                           ("\\def" ?≡)
                           ("\\del" ?∂)
+                          ("\\surj" ?↠)
+                          ("\\inj" ?↣)
+                          ("\\emb" ?↪)
+                          ("\\o/" ?∅)
+                          ("\\adj" ?⊣)
+                          ("\\ladj" ?⊣)
+                          ("\\radj" ?⊢)
                           ;; \bar is \=
                           )))
 
